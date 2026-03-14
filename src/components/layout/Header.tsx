@@ -160,15 +160,17 @@ export const Header = () => {
                                                     <span>Ir a Dashboard</span>
                                                 </Link>
                                             )}
-                                            <Link
-                                                href="/mi-cuenta"
-                                                className="flex items-center gap-3 px-4 py-2.5 text-[11.5px] text-white/70 hover:text-white hover:bg-white/5 transition-all group/item"
-                                            >
-                                                <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center group-hover/item:bg-primary transition-colors">
-                                                    <User className="h-3.5 w-3.5 text-primary group-hover:text-white transition-colors" />
-                                                </div>
-                                                <span>Mi Panel</span>
-                                            </Link>
+                                            {user.role !== 'ADMIN' && (
+                                                <Link
+                                                    href="/mi-cuenta"
+                                                    className="flex items-center gap-3 px-4 py-2.5 text-[11.5px] text-white/70 hover:text-white hover:bg-white/5 transition-all group/item"
+                                                >
+                                                    <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center group-hover/item:bg-primary transition-colors">
+                                                        <User className="h-3.5 w-3.5 text-primary group-hover:text-white transition-colors" />
+                                                    </div>
+                                                    <span>Mi Panel</span>
+                                                </Link>
+                                            )}
 
                                             <div className="mt-2 pt-2 border-t border-white/5">
                                                 <button

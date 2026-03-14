@@ -98,25 +98,33 @@ export default function PedidoDetailPage() {
         }
     };
 
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case 'PENDING': return 'text-amber-600 bg-amber-50 border-amber-100';
-            case 'PAID': return 'text-emerald-600 bg-emerald-50 border-emerald-100';
-            case 'SHIPPED': return 'text-blue-600 bg-blue-50 border-blue-100';
-            case 'COMPLETED': return 'text-gray-600 bg-gray-50 border-gray-100';
-            case 'CANCELLED': return 'text-red-600 bg-red-50 border-red-100';
-            default: return 'text-gray-600 bg-gray-50 border-gray-100';
-        }
-    };
+    const getStatusStyles = (status: string) => {
+        if (!status) return { bg: 'bg-gray-100 text-gray-600 border-gray-200', label: 'Sin Estado' };
 
-    const getStatusText = (status: string) => {
-        switch (status) {
-            case 'PENDING': return 'Pendiente de Pago';
-            case 'PAID': return 'Pagado';
-            case 'SHIPPED': return 'Enviado';
-            case 'COMPLETED': return 'Entregado';
-            case 'CANCELLED': return 'Cancelado';
-            default: return status;
+        const s = status.toLowerCase();
+        switch (s) {
+            case 'pending':
+            case 'pendiente':
+                return { bg: 'bg-orange-100 text-orange-700 border-orange-200', label: 'Pendiente' };
+            case 'processing':
+            case 'procesando':
+                return { bg: 'bg-blue-100 text-blue-700 border-blue-200', label: 'Procesando' };
+            case 'shipped':
+            case 'enviado':
+                return { bg: 'bg-purple-100 text-purple-700 border-purple-200', label: 'Enviado' };
+            case 'completed':
+            case 'completado':
+                return { bg: 'bg-green-100 text-green-700 border-green-200', label: 'Entregado' };
+            case 'cancelled':
+            case 'cancelado':
+                return { bg: 'bg-red-100 text-red-700 border-red-200', label: 'Cancelado' };
+            case 'paid':
+            case 'pagado':
+                return { bg: 'bg-emerald-100 text-emerald-700 border-emerald-200', label: 'Pagado' };
+            default:
+                if (s.includes('pend')) return { bg: 'bg-orange-100 text-orange-700 border-orange-200', label: 'Pendiente' };
+                if (s.includes('proc')) return { bg: 'bg-blue-100 text-blue-700 border-blue-200', label: 'Procesando' };
+                return { bg: 'bg-gray-100 text-gray-600 border-gray-200', label: status };
         }
     };
 
@@ -152,9 +160,14 @@ export default function PedidoDetailPage() {
                     </Link>
                     <h1 className="text-2xl font-medium text-gray-900 mb-1">Pedido #{order.id.slice(-6).toUpperCase()}</h1>
                     <div className="flex items-center gap-3">
-                        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border uppercase tracking-widest ${getStatusColor(order.status)}`}>
-                            {getStatusText(order.status)}
-                        </span>
+                        {(() => {
+                            const status = getStatusStyles(order.status);
+                            return (
+                                <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border uppercase tracking-widest ${status.bg}`}>
+                                    {status.label}
+                                </span>
+                            );
+                        })()}
                         <span className="text-xs text-gray-400 italic">
                             Realizado el {new Date(order.createdAt).toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' })}
                         </span>

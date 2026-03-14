@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronDown, ShoppingBag, SlidersHorizontal, Loader2 } from "lucide-react";
+import { ChevronDown, ShoppingBag, SlidersHorizontal, Loader2, CheckCircle2 } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
+import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { PopupOverlay } from "@/components/ui/PopupOverlay";
 
 export default function TiendaPage() {
     const [mounted, setMounted] = useState(false);
@@ -14,6 +16,7 @@ export default function TiendaPage() {
     const [selectedCategory, setSelectedCategory] = useState("todas");
     const [isLoading, setIsLoading] = useState(true);
     const addItem = useCartStore((state) => state.addItem);
+    const cartItems = useCartStore((state) => state.items);
 
     useEffect(() => {
         setMounted(true);
@@ -43,6 +46,13 @@ export default function TiendaPage() {
         };
         fetchData();
     }, []);
+
+    // Scroll to top on category change
+    useEffect(() => {
+        if (mounted) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }, [selectedCategory, mounted]);
 
     const filteredProducts = selectedCategory === "todas"
         ? products
@@ -127,6 +137,7 @@ export default function TiendaPage() {
                             const displayPrice = hasVariations
                                 ? Math.min(...product.variants.map((v: any) => v.price))
                                 : product.price;
+                            const isInCart = !hasVariations && cartItems.some(item => item.id === product.id);
 
                             return (
                                 <div key={product.id} className="group bg-white rounded-[24px] border border-gray-100 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_60px_-10px_rgba(35,85,61,0.08)] hover:-translate-y-1.5 transition-all duration-700 overflow-hidden flex flex-col">
@@ -152,14 +163,18 @@ export default function TiendaPage() {
                                                         e.preventDefault();
                                                         if (hasVariations) {
                                                             router.push(`/producto/${product.slug}`);
-                                                        } else {
+                                                        } else if (!isInCart) {
                                                             addItem({ ...product, price: displayPrice, image: mainImage, quantity: 1 });
                                                         }
                                                     }}
-                                                    className="w-full bg-primary text-white text-[11px] font-medium py-3.5 rounded-xl shadow-2xl hover:bg-[#1a3f2d] transition-all flex items-center justify-center gap-2 transform translate-y-8 group-hover:translate-y-0 transition-transform duration-700 cursor-pointer"
+                                                    disabled={isInCart}
+                                                    className={`w-full text-[11px] font-medium py-3.5 rounded-xl shadow-2xl transition-all flex items-center justify-center gap-2 transform translate-y-8 group-hover:translate-y-0 transition-transform duration-700 cursor-pointer ${isInCart
+                                                        ? "bg-[#23553d]/40 text-white/80 backdrop-blur-sm shadow-none cursor-default"
+                                                        : "bg-primary text-white hover:bg-[#1a3f2d]"
+                                                        }`}
                                                 >
-                                                    <ShoppingBag className="h-4 w-4" />
-                                                    {hasVariations ? "Ver opciones" : "Añadir al carrito"}
+                                                    {isInCart ? <CheckCircle2 className="h-4 w-4" /> : <ShoppingBag className="h-4 w-4" />}
+                                                    {hasVariations ? "Ver opciones" : isInCart ? "Ya en el carrito" : "Añadir al carrito"}
                                                 </button>
                                             </div>
                                         </Link>
@@ -211,6 +226,7 @@ export default function TiendaPage() {
                     </div>
                 </main>
             </div>
+            <PopupOverlay location="SHOP" />
         </div>
     );
 }

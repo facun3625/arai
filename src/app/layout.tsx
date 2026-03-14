@@ -4,6 +4,8 @@ import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { WhatsAppButton } from "@/components/common/WhatsAppButton";
+import { Providers } from "@/app/providers";
+import { SessionSync } from "@/components/auth/SessionSync";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -23,12 +25,15 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={montserrat.className}>
-        <Header />
-        <main className="min-h-screen bg-white">
-          {children}
-        </main>
-        <Footer />
-        <WhatsAppButton />
+        <Providers>
+          <SessionSync />
+          <Header />
+          <main className="min-h-screen bg-white">
+            {children}
+          </main>
+          <Footer />
+          <WhatsAppButton />
+        </Providers>
       </body>
     </html>
   );

@@ -35,6 +35,11 @@ export default function CheckoutPage() {
         setIsHydrated(true);
     }, []);
 
+    // Scroll to top on step change
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [currentStep]);
+
     // Form State
     const [contactInfo, setContactInfo] = useState({
         email: "",

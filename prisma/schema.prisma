@@ -12,7 +12,7 @@ model User {
   name      String?
   lastName  String?
   email     String    @unique
-  password  String
+  password  String?
   role      String    @default("USER")
   dni       String?
   phone     String?
@@ -159,4 +159,14 @@ model OrderItem {
   quantity  Int
   price     Float
   image     String?
+}
+
+model Popup {
+  id               String   @id @default(cuid())
+  location         String   @unique // HOME o SHOP
+  isActive         Boolean  @default(false)
+  imageUrl         String
+  displayFrequency String   @default("SESSION") // SESSION or ALWAYS
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }

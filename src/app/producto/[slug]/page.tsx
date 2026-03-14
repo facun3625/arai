@@ -36,6 +36,7 @@ export default function ProductoDetallePage() {
     const [activeImage, setActiveImage] = useState("");
     const [selectedAddons, setSelectedAddons] = useState<Record<string, string[]>>({});
     const addItem = useCartStore((state) => state.addItem);
+    const cartItems = useCartStore((state) => state.items);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -177,6 +178,13 @@ export default function ProductoDetallePage() {
     }
     const uniqueImages = Array.from(new Set(allImages)) as string[];
 
+    const itemId = selectedVariant ? `${product.id}-${selectedVariant.id}` : product.id;
+    const isInCart = cartItems.some(item => {
+        const sameId = item.id === itemId;
+        const sameAddons = JSON.stringify(item.addons || {}) === JSON.stringify(selectedAddons || {});
+        return sameId && sameAddons;
+    });
+
     return (
         <div className="bg-white min-h-screen font-montserrat">
             <div className="max-w-7xl mx-auto px-4 md:px-8 pt-6 pb-16">
@@ -273,10 +281,14 @@ export default function ProductoDetallePage() {
 
                                     <button
                                         onClick={handleAddToCart}
-                                        className="h-12 bg-primary text-white rounded-xl font-medium text-[12px] uppercase tracking-widest flex items-center justify-center gap-2.5 shadow-md hover:-translate-y-0.5 hover:shadow-xl transition-all active:scale-95 px-6"
+                                        disabled={isInCart}
+                                        className={`h-12 rounded-xl font-medium text-[12px] uppercase tracking-widest flex items-center justify-center gap-2.5 transition-all active:scale-95 px-6 ${isInCart
+                                            ? "bg-[#23553d]/20 text-[#23553d] border border-[#23553d]/10 cursor-default"
+                                            : "bg-primary text-white shadow-md hover:-translate-y-0.5 hover:shadow-xl shadow-primary/10"
+                                            }`}
                                     >
-                                        <ShoppingBag className="h-4 w-4" />
-                                        Añadir al Carrito
+                                        {isInCart ? <CheckCircle2 className="h-4 w-4" /> : <ShoppingBag className="h-4 w-4" />}
+                                        {isInCart ? "Ya en el Carrito" : "Añadir al Carrito"}
                                     </button>
                                 </div>
                             </div>

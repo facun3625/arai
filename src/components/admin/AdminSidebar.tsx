@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     LayoutDashboard,
     Package,
@@ -56,6 +56,36 @@ export const AdminSidebar = () => {
         }));
     };
 
+    const [stats, setStats] = useState<{ Pending: number; Processing: number }>({ Pending: 0, Processing: 0 });
+
+    const fetchStats = async () => {
+        if (!user?.id) return;
+        try {
+            const res = await fetch(`/api/admin/orders/stats?adminId=${user.id}`);
+            const data = await res.json();
+            if (data && !data.error) {
+                setStats(data);
+            }
+        } catch (error) {
+            console.error("Error fetching sidebar stats:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchStats();
+
+        const handleRefresh = () => fetchStats();
+        window.addEventListener('refreshAdminStats', handleRefresh);
+
+        // Refresh stats every 30 seconds for real-time feel
+        const interval = setInterval(fetchStats, 30000);
+
+        return () => {
+            clearInterval(interval);
+            window.removeEventListener('refreshAdminStats', handleRefresh);
+        };
+    }, [user?.id]);
+
     return (
         <aside className="w-64 bg-[#0c120e] text-white/90 flex flex-col h-screen sticky top-0 border-r border-white/5 font-montserrat">
             {/* Navigation */}
@@ -106,17 +136,36 @@ export const AdminSidebar = () => {
                     const item = node as MenuItem;
                     const isActive = pathname === item.href;
                     const Icon = item.icon;
+                    const isOrders = item.href === "/admin/pedidos";
+
                     return (
                         <Link
                             key={item.name}
                             href={item.href}
-                            className={`flex items-center gap-3 px-4 py-3 rounded-xl text-[11px] transition-all group ${isActive
+                            className={`flex items-center justify-between px-4 py-3 rounded-xl text-[11px] transition-all group ${isActive
                                 ? "bg-primary text-white shadow-lg shadow-primary/20"
                                 : "hover:bg-white/5 text-white/60 hover:text-white"
                                 }`}
                         >
-                            <Icon className={`h-4 w-4 ${isActive ? "text-white" : "text-primary group-hover:text-white transition-colors"}`} />
-                            <span className="capitalize">{item.name}</span>
+                            <div className="flex items-center gap-3">
+                                <Icon className={`h-4 w-4 ${isActive ? "text-white" : "text-primary group-hover:text-white transition-colors"}`} />
+                                <span className="capitalize">{item.name}</span>
+                            </div>
+
+                            {isOrders && (stats.Pending > 0 || stats.Processing > 0) && (
+                                <div className="flex items-center gap-1.5 animate-in zoom-in duration-300">
+                                    {stats.Pending > 0 && (
+                                        <span className="bg-orange-500 text-white min-w-[18px] h-[18px] px-1 rounded-full text-[9px] font-bold flex items-center justify-center shadow-lg shadow-orange-500/20">
+                                            {stats.Pending}
+                                        </span>
+                                    )}
+                                    {stats.Processing > 0 && (
+                                        <span className="bg-blue-500 text-white min-w-[18px] h-[18px] px-1 rounded-full text-[9px] font-bold flex items-center justify-center shadow-lg shadow-blue-500/20">
+                                            {stats.Processing}
+                                        </span>
+                                    )}
+                                </div>
+                            )}
                         </Link>
                     );
                 })}

@@ -13,7 +13,8 @@ import {
     ArrowUpRight,
     FileText,
     ExternalLink,
-    Loader2
+    Loader2,
+    ChevronDown
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -26,6 +27,16 @@ export default function AdminPedidosPage() {
     const { user } = useAuthStore();
     const [selectedOrder, setSelectedOrder] = useState<any>(null);
     const [statusUpdating, setStatusUpdating] = useState<string | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 20;
+
+    const STATUS_MAP: Record<string, string> = {
+        'Pending': 'Pendiente',
+        'Processing': 'Procesando',
+        'Shipped': 'Enviado',
+        'Completed': 'Completado',
+        'Cancelled': 'Cancelado'
+    };
 
     const fetchOrders = async () => {
         if (!user?.id) return;
@@ -46,6 +57,13 @@ export default function AdminPedidosPage() {
         fetchOrders();
     }, [user?.id]);
 
+    // Scroll to top when an order is selected (useful for mobile)
+    useEffect(() => {
+        if (selectedOrder) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }, [selectedOrder]);
+
     const updateStatus = async (orderId: string, newStatus: string) => {
         setStatusUpdating(orderId);
         try {
@@ -57,6 +75,9 @@ export default function AdminPedidosPage() {
 
             if (res.ok) {
                 fetchOrders();
+                // Notify sidebar to refresh badges
+                window.dispatchEvent(new CustomEvent('refreshAdminStats'));
+
                 if (selectedOrder?.id === orderId) {
                     setSelectedOrder({ ...selectedOrder, status: newStatus });
                 }
@@ -69,31 +90,165 @@ export default function AdminPedidosPage() {
     };
 
     const getStatusStyles = (status: string) => {
-        switch (status.toLowerCase()) {
+        const s = status.toLowerCase();
+        switch (s) {
             case 'pending':
             case 'pendiente':
-                return { bg: 'bg-orange-500/10', border: 'border-orange-500/20', text: 'text-orange-400', icon: Clock };
+                return { bg: 'bg-orange-500/10', border: 'border-orange-500/20', text: 'text-orange-400', icon: Clock, label: 'Pendiente' };
             case 'processing':
             case 'procesando':
-                return { bg: 'bg-blue-500/10', border: 'border-blue-500/20', text: 'text-blue-400', icon: Package };
+                return { bg: 'bg-blue-500/10', border: 'border-blue-500/20', text: 'text-blue-400', icon: Package, label: 'Procesando' };
             case 'shipped':
             case 'enviado':
-                return { bg: 'bg-purple-500/10', border: 'border-purple-500/20', text: 'text-purple-400', icon: Truck };
+                return { bg: 'bg-purple-500/10', border: 'border-purple-500/20', text: 'text-purple-400', icon: Truck, label: 'Enviado' };
             case 'completed':
             case 'completado':
-                return { bg: 'bg-green-500/10', border: 'border-green-500/20', text: 'text-green-400', icon: CheckCircle };
+                return { bg: 'bg-green-500/10', border: 'border-green-500/20', text: 'text-green-400', icon: CheckCircle, label: 'Completado' };
+            case 'cancelled':
+            case 'cancelado':
+                return { bg: 'bg-red-500/10', border: 'border-red-500/20', text: 'text-red-400', icon: Clock, label: 'Cancelado' };
             default:
-                return { bg: 'bg-gray-500/10', border: 'border-gray-500/20', text: 'text-gray-400', icon: Clock };
+                return { bg: 'bg-gray-500/10', border: 'border-gray-500/20', text: 'text-gray-400', icon: Clock, label: status };
         }
+    };
+
+    const [filterStatus, setFilterStatus] = useState<string | null>(null);
+
+    const filteredOrders = filterStatus
+        ? orders.filter(o => o.status.toLowerCase() === filterStatus.toLowerCase())
+        : orders;
+
+    // Reset pagination when filter changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [filterStatus]);
+
+    const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE);
+    const paginatedOrders = filteredOrders.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
+
+    const StatsCard = ({ label, count, statusKey, icon: Icon, colorClass, bgColor }: any) => {
+        const isActive = filterStatus === statusKey;
+
+        return (
+            <button
+                onClick={() => {
+                    setFilterStatus(isActive ? null : statusKey);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className={`p-6 border rounded-3xl group transition-all text-left flex flex-col justify-between h-full relative overflow-hidden ${isActive
+                    ? `${colorClass} ${bgColor} border-current shadow-lg ring-1 ring-current/30`
+                    : 'bg-white/[0.03] border-white/5 hover:bg-white/[0.05] hover:border-white/10'
+                    }`}
+            >
+                <div className="flex items-center gap-3 mb-4 relative z-10">
+                    <div className={`p-2 rounded-xl ${isActive ? 'bg-white/20' : bgColor}`}>
+                        <Icon className={`h-4 w-4 ${isActive ? 'text-white' : colorClass.replace('border-', 'text-')}`} />
+                    </div>
+                    <span className={`text-[10px] uppercase tracking-widest font-bold ${isActive ? 'text-white' : 'text-white/40'}`}>
+                        {label}
+                    </span>
+                </div>
+                <div className="relative z-10">
+                    <div className="flex items-end justify-between">
+                        <p className={`text-3xl font-light font-montserrat ${isActive ? 'text-white' : 'text-white'}`}>
+                            {count}
+                        </p>
+                        {!isActive ? (
+                            <span className="text-[9px] uppercase tracking-widest font-bold text-white/20 group-hover:text-primary transition-colors flex items-center gap-1">
+                                Filtrar <ArrowUpRight className="h-2.5 w-2.5" />
+                            </span>
+                        ) : (
+                            <span className="text-[9px] uppercase tracking-widest font-bold text-white/60 flex items-center gap-1">
+                                Activo <div className="h-1.5 w-1.5 bg-white rounded-full animate-pulse" />
+                            </span>
+                        )}
+                    </div>
+                </div>
+
+                {/* Decorative background element for active state */}
+                {isActive && (
+                    <div className="absolute -right-4 -bottom-4 opacity-10">
+                        <Icon size={80} />
+                    </div>
+                )}
+            </button>
+        );
     };
 
     return (
         <AdminLayout>
-            <div className="space-y-8 animate-in fade-in duration-700">
+            <div className="space-y-8 animate-in fade-in duration-700 pb-20">
                 {/* Header */}
-                <div className="flex flex-col gap-1">
-                    <h1 className="text-2xl font-light text-white font-montserrat tracking-tight">pedidos</h1>
-                    <p className="text-white/40 text-[11px] uppercase tracking-widest">gestiona las ventas de tu tienda</p>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-3">
+                            <h1 className="text-2xl font-light text-white font-montserrat tracking-tight">pedidos</h1>
+                            {filterStatus && (
+                                <div className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest border ${getStatusStyles(filterStatus).bg} ${getStatusStyles(filterStatus).text} ${getStatusStyles(filterStatus).border}`}>
+                                    Filtrando: {STATUS_MAP[Object.keys(STATUS_MAP).find(k => k.toLowerCase() === filterStatus.toLowerCase()) || ''] || filterStatus}
+                                </div>
+                            )}
+                        </div>
+                        <p className="text-white/40 text-[11px] uppercase tracking-widest">
+                            {filterStatus ? 'Explorando segmento seleccionado' : 'gestiona las ventas de tu tienda'}
+                        </p>
+                    </div>
+                    {filterStatus && (
+                        <button
+                            onClick={() => setFilterStatus(null)}
+                            className="flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white px-4 py-2 rounded-xl transition-all border border-white/5 text-[10px] uppercase tracking-widest font-bold group"
+                        >
+                            <div className="h-1.5 w-1.5 bg-red-500 rounded-full group-hover:animate-ping" />
+                            Quitar Filtro
+                        </button>
+                    )}
+                </div>
+
+                {/* Stats at the top */}
+                <div className="grid grid-cols-2 lg:grid-cols-5 gap-6">
+                    <StatsCard
+                        label="Pendientes"
+                        count={orders.filter(o => o.status.toLowerCase() === 'pending').length}
+                        statusKey="Pending"
+                        icon={Clock}
+                        colorClass="text-orange-400 border-orange-500/20"
+                        bgColor="bg-orange-500/10"
+                    />
+                    <StatsCard
+                        label="Procesando"
+                        count={orders.filter(o => o.status.toLowerCase() === 'processing').length}
+                        statusKey="Processing"
+                        icon={Package}
+                        colorClass="text-blue-400 border-blue-500/20"
+                        bgColor="bg-blue-500/10"
+                    />
+                    <StatsCard
+                        label="Enviados"
+                        count={orders.filter(o => o.status.toLowerCase() === 'shipped').length}
+                        statusKey="Shipped"
+                        icon={Truck}
+                        colorClass="text-purple-400 border-purple-500/20"
+                        bgColor="bg-purple-500/10"
+                    />
+                    <StatsCard
+                        label="Completados"
+                        count={orders.filter(o => o.status.toLowerCase() === 'completed').length}
+                        statusKey="Completed"
+                        icon={CheckCircle}
+                        colorClass="text-green-400 border-green-500/20"
+                        bgColor="bg-green-500/10"
+                    />
+                    <StatsCard
+                        label="Cancelados"
+                        count={orders.filter(o => o.status.toLowerCase() === 'cancelled').length}
+                        statusKey="Cancelled"
+                        icon={Clock}
+                        colorClass="text-red-400 border-red-500/20"
+                        bgColor="bg-red-500/10"
+                    />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -129,15 +284,25 @@ export default function AdminPedidosPage() {
                                                     Cargando pedidos...
                                                 </td>
                                             </tr>
-                                        ) : orders.length === 0 ? (
+                                        ) : paginatedOrders.length === 0 ? (
                                             <tr>
-                                                <td colSpan={5} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
-                                                    No hay pedidos registrados.
+                                                <td colSpan={5} className="px-6 py-24 text-center">
+                                                    <ShoppingCart className="h-8 w-8 text-white/5 mx-auto mb-4" />
+                                                    <p className="text-white/20 text-[11px] uppercase tracking-widest">
+                                                        No hay pedidos {filterStatus ? 'con este estado' : 'registrados'}.
+                                                    </p>
+                                                    {filterStatus && (
+                                                        <button
+                                                            onClick={() => setFilterStatus(null)}
+                                                            className="mt-4 text-[10px] uppercase tracking-widest text-primary font-bold hover:underline"
+                                                        >
+                                                            Limpiar Filtro
+                                                        </button>
+                                                    )}
                                                 </td>
                                             </tr>
-                                        ) : orders.map((order) => {
+                                        ) : paginatedOrders.map((order) => {
                                             const status = getStatusStyles(order.status);
-                                            const StatusIcon = status.icon;
 
                                             return (
                                                 <tr
@@ -165,10 +330,25 @@ export default function AdminPedidosPage() {
                                                         $ {order.total.toLocaleString('es-AR')}
                                                     </td>
                                                     <td className="px-6 py-5 text-center">
-                                                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase border ${status.bg} ${status.border} ${status.text}`}>
-                                                            <StatusIcon className="h-3 w-3" />
-                                                            {order.status}
-                                                        </span>
+                                                        <div className="relative group/status inline-block" onClick={(e) => e.stopPropagation()}>
+                                                            <select
+                                                                value={order.status}
+                                                                disabled={statusUpdating === order.id}
+                                                                onChange={(e) => updateStatus(order.id, e.target.value)}
+                                                                className={`appearance-none inline-flex items-center gap-1.5 pl-3 pr-8 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase border cursor-pointer hover:bg-white/5 transition-colors focus:outline-none ${status.bg} ${status.border} ${status.text}`}
+                                                            >
+                                                                {Object.entries(STATUS_MAP).map(([val, label]) => (
+                                                                    <option key={val} value={val} className="bg-[#0c120e] text-white">
+                                                                        {label}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                            {statusUpdating === order.id ? (
+                                                                <Loader2 className="absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 animate-spin text-primary" />
+                                                            ) : (
+                                                                <ChevronDown className={`absolute right-2.5 top-1/2 -translate-y-1/2 h-2.5 w-2.5 ${status.text} opacity-40 group-hover/status:opacity-100 transition-opacity pointer-events-none`} />
+                                                            )}
+                                                        </div>
                                                     </td>
                                                     <td className="px-6 py-5 text-right">
                                                         <div className={`p-2 rounded-lg transition-all ${selectedOrder?.id === order.id ? 'text-primary' : 'text-white/20 group-hover:text-white'}`}>
@@ -182,6 +362,54 @@ export default function AdminPedidosPage() {
                                 </table>
                             </div>
                         </div>
+
+                        {/* Pagination Controls */}
+                        {totalPages > 1 && (
+                            <div className="flex items-center justify-between px-2 pt-4">
+                                <p className="text-[11px] text-white/20 uppercase tracking-widest">
+                                    Página {currentPage} de {totalPages} ({filteredOrders.length} pedidos)
+                                </p>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        disabled={currentPage === 1}
+                                        onClick={() => {
+                                            setCurrentPage(prev => prev - 1);
+                                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                                        }}
+                                        className="p-2 rounded-xl bg-white/5 border border-white/5 text-white/40 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-white/5 transition-all outline-none"
+                                    >
+                                        <ChevronDown className="h-4 w-4 rotate-90" />
+                                    </button>
+                                    <div className="flex items-center gap-1">
+                                        {[...Array(totalPages)].map((_, i) => (
+                                            <button
+                                                key={i}
+                                                onClick={() => {
+                                                    setCurrentPage(i + 1);
+                                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                                }}
+                                                className={`w-8 h-8 rounded-xl text-[10px] font-bold transition-all outline-none ${currentPage === i + 1
+                                                    ? 'bg-primary text-white'
+                                                    : 'bg-white/5 text-white/40 hover:bg-white/10 hover:text-white'
+                                                    }`}
+                                            >
+                                                {i + 1}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <button
+                                        disabled={currentPage === totalPages}
+                                        onClick={() => {
+                                            setCurrentPage(prev => prev + 1);
+                                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                                        }}
+                                        className="p-2 rounded-xl bg-white/5 border border-white/5 text-white/40 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-white/5 transition-all outline-none"
+                                    >
+                                        <ChevronDown className="h-4 w-4 -rotate-90" />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Detail section */}
@@ -277,17 +505,21 @@ export default function AdminPedidosPage() {
                                         <div className="space-y-4">
                                             <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Cambiar Estado</p>
                                             <div className="grid grid-cols-2 gap-2">
-                                                {['Pending', 'Processing', 'Shipped', 'Completed'].map((s) => (
+                                                {Object.entries(STATUS_MAP).map(([val, label]) => (
                                                     <button
-                                                        key={s}
-                                                        disabled={statusUpdating === selectedOrder.id || selectedOrder.status === s}
-                                                        onClick={() => updateStatus(selectedOrder.id, s)}
-                                                        className={`px-3 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${selectedOrder.status === s
-                                                                ? 'bg-primary text-white shadow-lg shadow-primary/20'
-                                                                : 'bg-white/5 text-white/40 hover:bg-white/10'
+                                                        key={val}
+                                                        disabled={statusUpdating === selectedOrder.id || selectedOrder.status === val}
+                                                        onClick={() => updateStatus(selectedOrder.id, val)}
+                                                        className={`px-3 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${selectedOrder.status === val
+                                                            ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                                                            : 'bg-white/5 text-white/40 hover:bg-white/10'
                                                             }`}
                                                     >
-                                                        {statusUpdating === selectedOrder.id && selectedOrder.status === s ? <Loader2 className="h-3 w-3 animate-spin mx-auto" /> : s}
+                                                        {statusUpdating === selectedOrder.id && selectedOrder.status === val ? (
+                                                            <Loader2 className="h-3 w-3 animate-spin mx-auto" />
+                                                        ) : (
+                                                            label
+                                                        )}
                                                     </button>
                                                 ))}
                                             </div>
@@ -309,42 +541,6 @@ export default function AdminPedidosPage() {
                     </div>
                 </div>
 
-                {/* Footer stats helper */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-                    <div className="p-6 bg-white/[0.03] border border-white/5 rounded-3xl group hover:bg-white/[0.05] transition-all">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="p-2 bg-orange-500/10 rounded-xl">
-                                <Clock className="h-4 w-4 text-orange-400" />
-                            </div>
-                            <span className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Sin Procesar</span>
-                        </div>
-                        <p className="text-2xl font-light text-white font-montserrat">
-                            {orders.filter(o => o.status === 'Pending').length}
-                        </p>
-                    </div>
-                    <div className="p-6 bg-white/[0.03] border border-white/5 rounded-3xl group hover:bg-white/[0.05] transition-all">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="p-2 bg-purple-500/10 rounded-xl">
-                                <Truck className="h-4 w-4 text-purple-400" />
-                            </div>
-                            <span className="text-[10px] uppercase tracking-widest text-white/40 font-bold">En Camino</span>
-                        </div>
-                        <p className="text-2xl font-light text-white font-montserrat">
-                            {orders.filter(o => o.status === 'Shipped').length}
-                        </p>
-                    </div>
-                    <div className="p-6 bg-white/[0.03] border border-white/5 rounded-3xl group hover:bg-white/[0.05] transition-all">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="p-2 bg-green-500/10 rounded-xl">
-                                <CheckCircle className="h-4 w-4 text-green-400" />
-                            </div>
-                            <span className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Completados</span>
-                        </div>
-                        <p className="text-2xl font-light text-white font-montserrat">
-                            {orders.filter(o => o.status === 'Completed').length}
-                        </p>
-                    </div>
-                </div>
             </div>
         </AdminLayout>
     );

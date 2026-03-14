@@ -49,3 +49,6 @@ next-env.d.ts
 # logs
 dev_logs.txt
 login_test.txt
+
+# uploads
+/public/uploads

@@ -19,10 +19,13 @@ export default function MiCuentaLayout({
         // Redirigir si no está autenticado
         if (!isAuthenticated) {
             router.push("/");
+        } else if (user?.role === 'ADMIN') {
+            // Los administradores no deben acceder al panel de clientes
+            router.push("/admin/dashboard");
         } else {
             setIsChecking(false);
         }
-    }, [isAuthenticated, router]);
+    }, [isAuthenticated, user?.role, router]);
 
     if (isChecking) {
         return (

@@ -13,6 +13,7 @@ import {
   Loader2,
   Image as LucideImage
 } from "lucide-react";
+import { PopupOverlay } from "@/components/ui/PopupOverlay";
 
 export default function Home() {
   const [categories, setCategories] = useState<any[]>([]);
@@ -281,6 +282,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <PopupOverlay location="HOME" />
     </div>
   );
 }
