@@ -48,9 +48,74 @@ export default function AdminUsuariosPage() {
         u.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const [isDeleting, setIsDeleting] = useState<string | null>(null);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+    const handleDeleteUser = async (targetId: string) => {
+        if (!currentUser?.id) return;
+        setIsDeleting(targetId);
+        try {
+            const res = await fetch(`/api/admin/users?adminId=${currentUser.id}&targetId=${targetId}`, {
+                method: 'DELETE',
+            });
+            if (res.ok) {
+                setUsers(users.filter(u => u.id !== targetId));
+                setIsDeleteModalOpen(false);
+            }
+        } catch (error) {
+            console.error("Error deleting user:", error);
+        } finally {
+            setIsDeleting(null);
+        }
+    };
+
+    const [userToDelete, setUserToDelete] = useState<any>(null);
+
     return (
         <AdminLayout>
             <div className="space-y-8 animate-in fade-in duration-700">
+                {/* Delete Confirmation Modal */}
+                {isDeleteModalOpen && userToDelete && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 overflow-hidden">
+                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setIsDeleteModalOpen(false)} />
+                        <div className="bg-[#1A1F1C] border border-white/10 w-full max-w-md rounded-[32px] p-8 relative z-10 shadow-2xl animate-in zoom-in duration-300">
+                            <div className="flex flex-col items-center gap-6 text-center">
+                                <div className="h-16 w-16 rounded-full bg-red-500/10 flex items-center justify-center border border-red-500/20">
+                                    <Users className="h-8 w-8 text-red-500" />
+                                </div>
+                                <div className="space-y-2">
+                                    <h3 className="text-xl font-medium text-white font-montserrat tracking-tight">¿Eliminar usuario en cascada?</h3>
+                                    <p className="text-white/40 text-[13px] leading-relaxed">
+                                        Estás por eliminar a <span className="text-white font-medium">{userToDelete.name} {userToDelete.lastName}</span> ({userToDelete.email}).
+                                        Esta acción borrará permanentemente todos sus pedidos, direcciones, cupones y transacciones de puntos.
+                                        <br /><br />
+                                        <span className="text-red-400 font-bold uppercase text-[10px] tracking-widest">Esta acción no se puede deshacer.</span>
+                                    </p>
+                                </div>
+                                <div className="flex gap-3 w-full pt-2">
+                                    <button
+                                        onClick={() => setIsDeleteModalOpen(false)}
+                                        className="flex-1 px-6 py-3.5 rounded-2xl bg-white/5 border border-white/5 text-white/60 text-[13px] font-medium hover:bg-white/10 transition-all"
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        onClick={() => handleDeleteUser(userToDelete.id)}
+                                        disabled={isDeleting === userToDelete.id}
+                                        className="flex-1 px-6 py-3.5 rounded-2xl bg-red-500 text-white text-[13px] font-medium hover:bg-red-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                    >
+                                        {isDeleting === userToDelete.id ? (
+                                            <div className="h-4 w-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                                        ) : (
+                                            "Eliminar Todo"
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-1">
@@ -150,7 +215,14 @@ export default function AdminUsuariosPage() {
                                             </div>
                                         </td>
                                         <td className="px-6 py-6 text-right">
-                                            <button className="p-2 hover:bg-white/5 rounded-lg transition-colors text-white/20 hover:text-white">
+                                            <button
+                                                onClick={() => {
+                                                    setUserToDelete(u);
+                                                    setIsDeleteModalOpen(true);
+                                                }}
+                                                className="p-2 hover:bg-red-500/10 rounded-lg transition-colors text-white/20 hover:text-red-500 group/delete"
+                                                title="Eliminar usuario y toda su actividad"
+                                            >
                                                 <MoreVertical className="h-4 w-4" />
                                             </button>
                                         </td>

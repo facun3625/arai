@@ -3,16 +3,18 @@
 import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { useAuthStore } from "@/store/useAuthStore";
-import { Plus, Trash2, Edit2, CheckCircle2, XCircle, Save, Percent, DollarSign, Tag, Monitor, Image as ImageIcon, Loader2 } from "lucide-react";
+import { Plus, Trash2, Edit2, CheckCircle2, XCircle, Save, Percent, DollarSign, Tag, Monitor, Image as ImageIcon, Loader2, Coins, Gift, Settings2, Sparkles, Truck } from "lucide-react";
 
 export default function MarketingPage() {
-    const [activeTab, setActiveTab] = useState<"settings" | "coupons" | "popups">("settings");
+    const [activeTab, setActiveTab] = useState<"settings" | "coupons" | "popups" | "points">("settings");
     const { user } = useAuthStore();
 
     // Configuración Global
     const [settings, setSettings] = useState({
         freeShippingThreshold: 0,
-        bankTransferDiscount: 15
+        bankTransferDiscount: 15,
+        pointsEnabled: false,
+        pointsRatio: 0.01
     });
     const [isSavingSettings, setIsSavingSettings] = useState(false);
 
@@ -42,6 +44,19 @@ export default function MarketingPage() {
     const [isLoadingPopups, setIsLoadingPopups] = useState(false);
     const [isSavingPopup, setIsSavingPopup] = useState<string | null>(null);
 
+    // Puntos y Recompensas
+    const [rewards, setRewards] = useState<any[]>([]);
+    const [isLoadingRewards, setIsLoadingRewards] = useState(false);
+    const [isSavingReward, setIsSavingReward] = useState(false);
+    const [rewardForm, setRewardForm] = useState({
+        id: "",
+        title: "",
+        pointsRequired: "",
+        discountValue: "",
+        discountType: "FIXED",
+        isActive: true
+    });
+
     // Estado para confirmación de eliminación en línea
     const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
@@ -49,6 +64,7 @@ export default function MarketingPage() {
         fetchSettings();
         fetchCoupons();
         fetchPopups();
+        fetchRewards();
     }, []);
 
     const fetchSettings = async () => {
@@ -58,7 +74,9 @@ export default function MarketingPage() {
             if (data && !data.error) {
                 setSettings({
                     freeShippingThreshold: data.freeShippingThreshold || 0,
-                    bankTransferDiscount: data.bankTransferDiscount || 15
+                    bankTransferDiscount: data.bankTransferDiscount || 15,
+                    pointsEnabled: data.pointsEnabled || false,
+                    pointsRatio: data.pointsRatio || 0.01
                 });
             }
         } catch (error) {
@@ -79,6 +97,58 @@ export default function MarketingPage() {
             setIsLoadingCoupons(false);
         }
     };
+    const fetchRewards = async () => {
+        setIsLoadingRewards(true);
+        try {
+            const res = await fetch("/api/admin/rewards");
+            const data = await res.json();
+            if (Array.isArray(data)) {
+                setRewards(data);
+            }
+        } catch (error) {
+            console.error("Error fetching rewards:", error);
+        } finally {
+            setIsLoadingRewards(false);
+        }
+    };
+
+    const handleSaveReward = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSavingReward(true);
+        try {
+            const res = await fetch("/api/admin/rewards", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ...rewardForm, adminId: user?.id })
+            });
+            if (res.ok) {
+                showToast(rewardForm.id ? "Recompensa actualizada ✨" : "Recompensa creada ✨", "success");
+                setRewardForm({ id: "", title: "", pointsRequired: "", discountValue: "", discountType: "FIXED", isActive: true });
+                fetchRewards();
+            } else {
+                showToast("Error al guardar recompensa", "error");
+            }
+        } catch (error) {
+            showToast("Error de conexión", "error");
+        } finally {
+            setIsSavingReward(false);
+        }
+    };
+
+    const handleDeleteReward = async (id: string) => {
+        try {
+            const res = await fetch(`/api/admin/rewards?id=${id}&adminId=${user?.id}`, { method: "DELETE" });
+            if (res.ok) {
+                showToast("Recompensa eliminada 🗑️", "success");
+                fetchRewards();
+            }
+        } catch (error) {
+            showToast("Error al eliminar", "error");
+        } finally {
+            setConfirmDeleteId(null);
+        }
+    };
+
     const fetchPopups = async () => {
         setIsLoadingPopups(true);
         try {
@@ -234,6 +304,12 @@ export default function MarketingPage() {
                         Pop-ups Publicitarios
                     </button>
                     <button
+                        onClick={() => setActiveTab("points")}
+                        className={`text-[12px] font-medium tracking-wide pb-2 px-1 border-b-2 transition-all ${activeTab === 'points' ? 'text-primary border-primary' : 'text-white/40 border-transparent hover:text-white/70'}`}
+                    >
+                        Sistema de Puntos
+                    </button>
+                    <button
                         onClick={() => setActiveTab("coupons")}
                         className={`text-[12px] font-medium tracking-wide pb-2 px-1 border-b-2 transition-all ${activeTab === 'coupons' ? 'text-primary border-primary' : 'text-white/40 border-transparent hover:text-white/70'}`}
                     >
@@ -293,6 +369,208 @@ export default function MarketingPage() {
                                 Guardar Configuraciones
                             </button>
                         </form>
+                    </div>
+                )}
+
+                {activeTab === "points" && (
+                    <div className="space-y-12">
+                        {/* Configuración del Sistema */}
+                        <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 max-w-2xl">
+                            <div className="flex items-center justify-between mb-8">
+                                <div className="flex items-center gap-3">
+                                    <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                                        <Coins className="h-5 w-5 text-primary" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-white font-medium tracking-tight">Configuración del Programa</h2>
+                                        <p className="text-[11px] text-white/40 uppercase tracking-widest">Estado y ratio de puntos</p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => handleSaveSettings({ preventDefault: () => { } } as any).then(() => {
+                                        setSettings(prev => ({ ...prev, pointsEnabled: !prev.pointsEnabled }));
+                                        // Update in DB too
+                                        fetch("/api/settings", {
+                                            method: "POST",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify({ ...settings, pointsEnabled: !settings.pointsEnabled })
+                                        }).then(() => fetchSettings());
+                                    })}
+                                    className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${settings.pointsEnabled ? 'bg-primary/20 text-primary border border-primary/30' : 'bg-white/5 text-white/40 border border-white/10'}`}
+                                >
+                                    {settings.pointsEnabled ? 'Sistema Activo' : 'Sistema Inactivo'}
+                                </button>
+                            </div>
+
+                            <div className="space-y-6">
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="text-[12px] text-white/60 font-medium mb-1 block">Ratio de puntos (Puntos por cada $1)</label>
+                                        <p className="text-[11px] text-white/30 mb-3">Ejemplo: 0.01 significa que el cliente recibe 1 punto por cada $100 gastados.</p>
+                                        <div className="relative">
+                                            <input
+                                                type="number"
+                                                step="0.001"
+                                                value={settings.pointsRatio}
+                                                onChange={(e) => setSettings({ ...settings, pointsRatio: Number(e.target.value) })}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-[14px] text-white focus:outline-none focus:border-primary transition-colors font-mono"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {settings.pointsRatio > 0 && (
+                                        <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                                            <p className="text-[12px] text-primary/90 flex items-center gap-2">
+                                                <Sparkles className="h-3.5 w-3.5" />
+                                                <span>
+                                                    Por cada <span className="font-bold">$1.000</span> gastados, el cliente recibirá <span className="font-bold underline decoration-2">{(1000 * settings.pointsRatio).toFixed(2).replace(/\.?0+$/, "")} puntos</span>.
+                                                </span>
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <button
+                                    onClick={handleSaveSettings}
+                                    disabled={isSavingSettings}
+                                    className="w-full py-4 bg-primary text-white rounded-xl text-[12px] font-bold uppercase tracking-widest transition-all hover:bg-primary-dark shadow-lg shadow-primary/10 flex items-center justify-center gap-3"
+                                >
+                                    {isSavingSettings ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                                    Guardar Configuración de Puntos
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Gestión de Recompensas */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div className="lg:col-span-1">
+                                <form onSubmit={handleSaveReward} className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 space-y-4">
+                                    <h2 className="text-[14px] text-white font-medium mb-4 flex items-center gap-2">
+                                        <Gift className="h-4 w-4 text-primary" /> {rewardForm.id ? 'Editar Recompensa' : 'Nueva Recompensa'}
+                                    </h2>
+
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Título (Ej: Cupón $1000 OFF)</label>
+                                        <input
+                                            type="text"
+                                            value={rewardForm.title}
+                                            onChange={(e) => setRewardForm({ ...rewardForm, title: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Puntos Requeridos</label>
+                                        <input
+                                            type="number"
+                                            value={rewardForm.pointsRequired}
+                                            onChange={(e) => setRewardForm({ ...rewardForm, pointsRequired: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-1.5">
+                                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Tipo Descuento</label>
+                                            <select
+                                                value={rewardForm.discountType}
+                                                onChange={(e) => setRewardForm({ ...rewardForm, discountType: e.target.value })}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors appearance-none"
+                                            >
+                                                <option value="FIXED">Monto Fijo ($)</option>
+                                                <option value="PERCENTAGE">Porcentaje (%)</option>
+                                            </select>
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Valor</label>
+                                            <input
+                                                type="number"
+                                                value={rewardForm.discountValue}
+                                                onChange={(e) => setRewardForm({ ...rewardForm, discountValue: e.target.value })}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-2 mt-4">
+                                        <button
+                                            type="submit"
+                                            disabled={isSavingReward}
+                                            className="flex-1 bg-primary hover:bg-primary-dark text-white py-3 rounded-xl text-[12px] font-medium transition-all flex items-center justify-center gap-2"
+                                        >
+                                            {isSavingReward ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                                            {rewardForm.id ? 'Actualizar' : 'Crear'}
+                                        </button>
+                                        {rewardForm.id && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setRewardForm({ id: "", title: "", pointsRequired: "", discountValue: "", discountType: "FIXED", isActive: true })}
+                                                className="px-4 bg-white/5 hover:bg-white/10 text-white/60 rounded-xl text-[12px] transition-all"
+                                            >
+                                                Cancelar
+                                            </button>
+                                        )}
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div className="lg:col-span-2">
+                                <div className="bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden">
+                                    <table className="w-full text-left border-collapse">
+                                        <thead>
+                                            <tr className="border-b border-white/5 bg-white/[0.02]">
+                                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Recompensa</th>
+                                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium text-center">Puntos</th>
+                                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Beneficio</th>
+                                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium text-right">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-white/5">
+                                            {isLoadingRewards ? (
+                                                <tr>
+                                                    <td colSpan={4} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">Cargando recompensas...</td>
+                                                </tr>
+                                            ) : rewards.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan={4} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">No hay recompensas creadas.</td>
+                                                </tr>
+                                            ) : rewards.map((r) => (
+                                                <tr key={r.id} className="hover:bg-white/[0.02] transition-colors group">
+                                                    <td className="px-6 py-4">
+                                                        <p className="text-[13px] font-medium text-white">{r.title}</p>
+                                                        {!r.isActive && <span className="text-[9px] text-red-400 uppercase font-bold tracking-widest">Inactiva</span>}
+                                                    </td>
+                                                    <td className="px-6 py-4 text-center">
+                                                        <span className="text-[13px] font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">{r.pointsRequired} pts</span>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-[13px] text-white/60">
+                                                        {r.discountType === 'FIXED' ? `$${r.discountValue}` : `${r.discountValue}%`} OFF
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                        <div className="flex items-center justify-end gap-3 transition-opacity">
+                                                            {confirmDeleteId === r.id ? (
+                                                                <div className="flex items-center gap-2">
+                                                                    <button onClick={() => handleDeleteReward(r.id)} className="text-[10px] bg-red-500 text-white px-2 py-1 rounded">Borrar</button>
+                                                                    <button onClick={() => setConfirmDeleteId(null)} className="text-[10px] text-white/40">No</button>
+                                                                </div>
+                                                            ) : (
+                                                                <>
+                                                                    <button onClick={() => setRewardForm({ ...r, pointsRequired: r.pointsRequired.toString(), discountValue: r.discountValue.toString() })} className="text-white/40 hover:text-white"><Edit2 className="h-4 w-4" /></button>
+                                                                    <button onClick={() => setConfirmDeleteId(r.id)} className="text-red-400/60 hover:text-red-400"><Trash2 className="h-4 w-4" /></button>
+                                                                </>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 )}
 
@@ -605,12 +883,5 @@ export default function MarketingPage() {
                 </div>
             )}
         </AdminLayout>
-    );
-}
-
-// simple mock truck since not correctly imported
-function Truck(props: React.SVGProps<SVGSVGElement>) {
-    return (
-        <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" /><path d="M15 18H9" /><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14" /><circle cx="17" cy="18" r="2" /><circle cx="7" cy="18" r="2" /></svg>
     );
 }

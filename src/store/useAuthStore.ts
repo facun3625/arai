@@ -9,6 +9,7 @@ interface User {
     role: string;
     dni?: string;
     phone?: string;
+    provider?: 'credentials' | 'google';
 }
 
 interface AuthState {

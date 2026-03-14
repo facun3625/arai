@@ -31,11 +31,12 @@ export default function AdminPedidosPage() {
     const ITEMS_PER_PAGE = 20;
 
     const STATUS_MAP: Record<string, string> = {
-        'Pending': 'Pendiente',
-        'Processing': 'Procesando',
-        'Shipped': 'Enviado',
-        'Completed': 'Completado',
-        'Cancelled': 'Cancelado'
+        'PENDING': 'Pendiente',
+        'PAID': 'Pagado',
+        'PROCESSING': 'Procesando',
+        'SHIPPED': 'Enviado',
+        'COMPLETED': 'Completado',
+        'CANCELLED': 'Cancelado'
     };
 
     const fetchOrders = async () => {
@@ -90,24 +91,26 @@ export default function AdminPedidosPage() {
     };
 
     const getStatusStyles = (status: string) => {
-        const s = status.toLowerCase();
+        const s = status.toUpperCase();
         switch (s) {
-            case 'pending':
-            case 'pendiente':
+            case 'PENDING':
                 return { bg: 'bg-orange-500/10', border: 'border-orange-500/20', text: 'text-orange-400', icon: Clock, label: 'Pendiente' };
-            case 'processing':
-            case 'procesando':
+            case 'PAID':
+                return { bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', text: 'text-emerald-400', icon: CheckCircle, label: 'Pagado' };
+            case 'PROCESSING':
                 return { bg: 'bg-blue-500/10', border: 'border-blue-500/20', text: 'text-blue-400', icon: Package, label: 'Procesando' };
-            case 'shipped':
-            case 'enviado':
+            case 'SHIPPED':
                 return { bg: 'bg-purple-500/10', border: 'border-purple-500/20', text: 'text-purple-400', icon: Truck, label: 'Enviado' };
-            case 'completed':
-            case 'completado':
+            case 'COMPLETED':
                 return { bg: 'bg-green-500/10', border: 'border-green-500/20', text: 'text-green-400', icon: CheckCircle, label: 'Completado' };
-            case 'cancelled':
-            case 'cancelado':
+            case 'CANCELLED':
                 return { bg: 'bg-red-500/10', border: 'border-red-500/20', text: 'text-red-400', icon: Clock, label: 'Cancelado' };
             default:
+                // Fallback for older orders that might still have spanish text
+                if (status.toLowerCase().includes('pend')) return { bg: 'bg-orange-500/10', border: 'border-orange-500/20', text: 'text-orange-400', icon: Clock, label: 'Pendiente' };
+                if (status.toLowerCase().includes('proc')) return { bg: 'bg-blue-500/10', border: 'border-blue-500/20', text: 'text-blue-400', icon: Package, label: 'Procesando' };
+                if (status.toLowerCase().includes('env')) return { bg: 'bg-purple-500/10', border: 'border-purple-500/20', text: 'text-purple-400', icon: Truck, label: 'Enviado' };
+                if (status.toLowerCase().includes('comp') || status.toLowerCase().includes('ent')) return { bg: 'bg-green-500/10', border: 'border-green-500/20', text: 'text-green-400', icon: CheckCircle, label: 'Completado' };
                 return { bg: 'bg-gray-500/10', border: 'border-gray-500/20', text: 'text-gray-400', icon: Clock, label: status };
         }
     };
@@ -211,40 +214,40 @@ export default function AdminPedidosPage() {
                 <div className="grid grid-cols-2 lg:grid-cols-5 gap-6">
                     <StatsCard
                         label="Pendientes"
-                        count={orders.filter(o => o.status.toLowerCase() === 'pending').length}
-                        statusKey="Pending"
+                        count={orders.filter(o => o.status === 'PENDING').length}
+                        statusKey="PENDING"
                         icon={Clock}
                         colorClass="text-orange-400 border-orange-500/20"
                         bgColor="bg-orange-500/10"
                     />
                     <StatsCard
                         label="Procesando"
-                        count={orders.filter(o => o.status.toLowerCase() === 'processing').length}
-                        statusKey="Processing"
+                        count={orders.filter(o => o.status === 'PROCESSING').length}
+                        statusKey="PROCESSING"
                         icon={Package}
                         colorClass="text-blue-400 border-blue-500/20"
                         bgColor="bg-blue-500/10"
                     />
                     <StatsCard
                         label="Enviados"
-                        count={orders.filter(o => o.status.toLowerCase() === 'shipped').length}
-                        statusKey="Shipped"
+                        count={orders.filter(o => o.status === 'SHIPPED').length}
+                        statusKey="SHIPPED"
                         icon={Truck}
                         colorClass="text-purple-400 border-purple-500/20"
                         bgColor="bg-purple-500/10"
                     />
                     <StatsCard
                         label="Completados"
-                        count={orders.filter(o => o.status.toLowerCase() === 'completed').length}
-                        statusKey="Completed"
+                        count={orders.filter(o => o.status === 'COMPLETED').length}
+                        statusKey="COMPLETED"
                         icon={CheckCircle}
                         colorClass="text-green-400 border-green-500/20"
                         bgColor="bg-green-500/10"
                     />
                     <StatsCard
                         label="Cancelados"
-                        count={orders.filter(o => o.status.toLowerCase() === 'cancelled').length}
-                        statusKey="Cancelled"
+                        count={orders.filter(o => o.status === 'CANCELLED').length}
+                        statusKey="CANCELLED"
                         icon={Clock}
                         colorClass="text-red-400 border-red-500/20"
                         bgColor="bg-red-500/10"

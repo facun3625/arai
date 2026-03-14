@@ -80,7 +80,7 @@ export const AuthModal = ({ isOpen, onClose, initialView = "login" }: AuthModalP
             }
 
             console.log("Login exitoso:", result.user);
-            login(result.user);
+            login({ ...result.user, provider: 'credentials' });
             onClose();
             setIsLoading(false);
         } catch (error) {
@@ -243,16 +243,7 @@ export const AuthModal = ({ isOpen, onClose, initialView = "login" }: AuthModalP
                                         onClick={() => {
                                             setIsLoading(true);
                                             import('next-auth/react').then(({ signIn }) => {
-                                                signIn('google', { redirect: false }).then(async (res) => {
-                                                    if (res?.error) {
-                                                        setError("Error al conectar con Google");
-                                                    } else {
-                                                        // El redireccionamiento o el sync de sesión se manejará globalmente 
-                                                        // o mediante un componente de sesión
-                                                        onClose();
-                                                    }
-                                                    setIsLoading(false);
-                                                });
+                                                signIn('google');
                                             });
                                         }}
                                         className="w-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 text-white py-3.5 px-6 rounded-[20px] transition-all flex items-center justify-center gap-3 group text-[13px]"

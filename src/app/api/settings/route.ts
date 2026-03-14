@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
-
-const prisma = new PrismaClient();
 
 export async function GET() {
     try {
@@ -18,7 +16,9 @@ export async function GET() {
                 data: {
                     id: "global",
                     freeShippingThreshold: 0,
-                    bankTransferDiscount: 15
+                    bankTransferDiscount: 15,
+                    pointsEnabled: false,
+                    pointsRatio: 0.01
                 }
             });
         }
@@ -39,11 +39,15 @@ export async function POST(request: Request) {
             update: {
                 freeShippingThreshold: Number(body.freeShippingThreshold) || 0,
                 bankTransferDiscount: Number(body.bankTransferDiscount) || 0,
+                pointsEnabled: body.pointsEnabled ?? false,
+                pointsRatio: Number(body.pointsRatio) || 0,
             },
             create: {
                 id: "global",
                 freeShippingThreshold: Number(body.freeShippingThreshold) || 0,
                 bankTransferDiscount: Number(body.bankTransferDiscount) || 15,
+                pointsEnabled: body.pointsEnabled ?? false,
+                pointsRatio: Number(body.pointsRatio) || 0.01,
             }
         });
 

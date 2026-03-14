@@ -61,6 +61,44 @@ export async function PATCH(req: Request) {
             data: { status }
         });
 
+        // Lógica de Puntos
+        if ((status === "PAID" || status === "COMPLETED") && updatedOrder.userId) {
+            try {
+                // Verificar si ya se otorgaron puntos para este pedido
+                const existingTransaction = await prisma.pointTransaction.findFirst({
+                    where: { orderId: orderId, amount: { gt: 0 } }
+                });
+
+                if (!existingTransaction) {
+                    const settings = await prisma.storeSettings.findUnique({ where: { id: "global" } });
+
+                    if (settings?.pointsEnabled && settings.pointsRatio > 0) {
+                        const pointsToAward = Math.floor(updatedOrder.subtotal * settings.pointsRatio);
+
+                        if (pointsToAward > 0) {
+                            await prisma.$transaction([
+                                prisma.user.update({
+                                    where: { id: updatedOrder.userId },
+                                    data: { points: { increment: pointsToAward } }
+                                }),
+                                prisma.pointTransaction.create({
+                                    data: {
+                                        userId: updatedOrder.userId,
+                                        orderId: orderId,
+                                        amount: pointsToAward,
+                                        description: `Puntos ganados por pedido #${orderId.slice(-6)}`
+                                    }
+                                })
+                            ]);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error("DEBUG: Failed to award points", error);
+                // No fallamos la actualización del pedido por un error en puntos
+            }
+        }
+
         return NextResponse.json({ order: updatedOrder });
     } catch (error) {
         console.error("DEBUG: Failed to update order status", error);

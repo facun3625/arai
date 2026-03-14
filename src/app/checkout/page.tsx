@@ -84,6 +84,11 @@ export default function CheckoutPage() {
     const [isProcessing, setIsProcessing] = useState(false);
     const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
+    // Coupon State
+    const [couponCodeInput, setCouponCodeInput] = useState("");
+    const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discountType: string; discountValue: number } | null>(null);
+    const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
+
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -155,6 +160,37 @@ export default function CheckoutPage() {
         }
     }, [notification]);
 
+    const handleApplyCoupon = async () => {
+        if (!couponCodeInput.trim()) return;
+        setIsValidatingCoupon(true);
+
+        try {
+            const res = await fetch("/api/coupons/validate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code: couponCodeInput.trim() }),
+            });
+            const data = await res.json();
+
+            if (res.ok && data.success) {
+                setAppliedCoupon(data.coupon);
+                setCouponCodeInput("");
+                setNotification({ message: "¡Cupón aplicado correctamente!", type: 'success' });
+            } else {
+                setNotification({ message: data.error || "Cupón inválido", type: 'error' });
+            }
+        } catch (error) {
+            setNotification({ message: "Error al validar el cupón", type: 'error' });
+        } finally {
+            setIsValidatingCoupon(false);
+        }
+    };
+
+    const handleRemoveCoupon = () => {
+        setAppliedCoupon(null);
+        setNotification({ message: "Cupón eliminado", type: 'success' });
+    };
+
     // Dynamic Calculations
     const subtotal = items.reduce((total, item) => {
         const price = Number(item.price);
@@ -163,10 +199,24 @@ export default function CheckoutPage() {
 
     const shippingCost = selectedShipping || 0;
 
-    // Apply 15% discount if transfer is selected
-    const discount = selectedPayment === 'transferencia' ? subtotal * 0.15 : 0;
+    // Calculate discounts
+    let totalDiscount = 0;
 
-    const total = subtotal + shippingCost - discount;
+    // 1. Coupon Discount is evaluated first on subtotal
+    if (appliedCoupon) {
+        if (appliedCoupon.discountType === 'PERCENTAGE') {
+            totalDiscount += subtotal * (appliedCoupon.discountValue / 100);
+        } else {
+            totalDiscount += appliedCoupon.discountValue;
+        }
+    }
+
+    // 2. Apply 15% discount if transfer is selected (applied to subtotal after coupon maybe, or just subtotal. Let's do subtotal)
+    if (selectedPayment === 'transferencia') {
+        totalDiscount += subtotal * 0.15;
+    }
+
+    const total = Math.max(0, subtotal + shippingCost - totalDiscount);
 
     const handleNextStep = (e: React.FormEvent) => {
         e.preventDefault();
@@ -189,11 +239,12 @@ export default function CheckoutPage() {
                     subtotal,
                     shippingCost,
                     total,
-                    discount,
+                    discount: totalDiscount,
                     paymentMethod: selectedPayment,
                     paymentProof: paymentProofUrl,
                     shippingAddress,
-                    contactInfo
+                    contactInfo,
+                    couponCode: appliedCoupon?.code
                 }),
             });
 
@@ -706,6 +757,38 @@ export default function CheckoutPage() {
 
                         {/* Totals Calculation */}
                         <div className="space-y-4 mb-6">
+                            {/* Coupon Input */}
+                            <div className="bg-white border border-gray-200 rounded-xl p-3 flex items-center justify-between mb-2 shadow-sm">
+                                {appliedCoupon ? (
+                                    <div className="flex items-center justify-between w-full">
+                                        <div className="flex flex-col">
+                                            <span className="text-xs font-bold text-primary uppercase tracking-widest">{appliedCoupon.code}</span>
+                                            <span className="text-[10px] text-gray-500">Cupón aplicado ({appliedCoupon.discountType === 'PERCENTAGE' ? `${appliedCoupon.discountValue}% OFF` : `$${appliedCoupon.discountValue} OFF`})</span>
+                                        </div>
+                                        <button onClick={handleRemoveCoupon} className="text-[10px] text-red-500 font-bold uppercase hover:underline">
+                                            Quitar
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-2 w-full">
+                                        <input
+                                            type="text"
+                                            placeholder="Ingresar cupón de descuento"
+                                            value={couponCodeInput}
+                                            onChange={(e) => setCouponCodeInput(e.target.value.toUpperCase())}
+                                            className="w-full bg-transparent border-none text-xs focus:ring-0 px-2 outline-none uppercase"
+                                        />
+                                        <button
+                                            disabled={!couponCodeInput.trim() || isValidatingCoupon}
+                                            onClick={handleApplyCoupon}
+                                            className="bg-[#0c120e] text-white px-4 py-2 rounded-lg text-xs font-bold uppercase disabled:opacity-50 transition-all flex items-center"
+                                        >
+                                            {isValidatingCoupon ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Aplicar'}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-gray-500">Subtotal de productos</span>
                                 <span className="font-medium text-gray-900">$ {subtotal.toLocaleString('es-AR')}</span>
@@ -722,10 +805,18 @@ export default function CheckoutPage() {
                                 )}
                             </div>
 
-                            {discount > 0 && (
+                            {totalDiscount > 0 && (
                                 <div className="flex justify-between items-center text-sm text-primary animate-fade-in bg-primary/5 px-3 py-2 rounded-lg border border-primary/10">
-                                    <span className="font-medium">15% Descuento (Transferencia)</span>
-                                    <span className="font-bold">- $ {discount.toLocaleString('es-AR')}</span>
+                                    <div className="flex flex-col">
+                                        <span className="font-medium">Descuentos Aplicados</span>
+                                        <span className="text-[10px]">
+                                            {[
+                                                selectedPayment === 'transferencia' ? 'Transferencia (15%)' : null,
+                                                appliedCoupon ? `Cupón ${appliedCoupon.code}` : null
+                                            ].filter(Boolean).join(' + ')}
+                                        </span>
+                                    </div>
+                                    <span className="font-bold">- $ {totalDiscount.toLocaleString('es-AR', { maximumFractionDigits: 0 })}</span>
                                 </div>
                             )}
                         </div>

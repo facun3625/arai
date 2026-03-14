@@ -20,6 +20,9 @@ model User {
   updatedAt DateTime  @updatedAt
   addresses Address[]
   orders    Order[]
+  points    Int       @default(0)
+  pointTransactions PointTransaction[]
+  coupons   Coupon[]
 }
 
 model Address {
@@ -113,6 +116,8 @@ model StoreSettings {
   id                    String   @id @default("global") // Usamos un id fijo 'global'
   freeShippingThreshold Float    @default(0) // 0 significa desactivado
   bankTransferDiscount  Float    @default(15) // Descuento porcentual por transferencia
+  pointsEnabled         Boolean  @default(false)
+  pointsRatio           Float    @default(0.01) // Puntos por cada $1 gastado (e.g. 0.01 = 1 punto cada 100 pesos)
   updatedAt             DateTime @updatedAt
 }
 
@@ -123,6 +128,8 @@ model Coupon {
   discountValue     Float
   isActive          Boolean  @default(true)
   minPurchaseAmount Float?
+  userId            String?  // Optional, to track who generated/owns it
+  user              User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 }
@@ -130,12 +137,13 @@ model Coupon {
 model Order {
   id               String      @id @default(cuid())
   userId           String?
-  user             User?       @relation(fields: [userId], references: [id])
+  user             User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
   status           String      @default("PENDING") // PENDING, PAID, SHIPPED, COMPLETED, CANCELLED
   total            Float
   subtotal         Float
   shippingCost     Float
   discount         Float       @default(0)
+  couponCode       String?     // Código del cupón aplicado
   paymentMethod    String      // transferencia, mercadopago
   paymentProof     String?     // URL del comprobante de transferencia
   shippingAddress  String      // Almacenamos el JSON de la dirección
@@ -169,4 +177,25 @@ model Popup {
   displayFrequency String   @default("SESSION") // SESSION or ALWAYS
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+}
+
+model PointReward {
+  id              String   @id @default(cuid())
+  title           String
+  pointsRequired  Int
+  discountValue   Float
+  discountType    String   @default("FIXED") // PERCENTAGE o FIXED
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model PointTransaction {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderId     String?  // Opcional, para trazar puntos ganados en pedidos
+  amount      Int      // Positivo para carga, negativo para canje
+  description String
+  createdAt   DateTime @default(now())
 }
