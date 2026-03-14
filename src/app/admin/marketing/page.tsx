@@ -6,7 +6,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { Plus, Trash2, Edit2, CheckCircle2, XCircle, Save, Percent, DollarSign, Tag, Monitor, Image as ImageIcon, Loader2, Coins, Gift, Settings2, Sparkles, Truck } from "lucide-react";
 
 export default function MarketingPage() {
-    const [activeTab, setActiveTab] = useState<"settings" | "coupons" | "popups" | "points">("settings");
+    const [activeTab, setActiveTab] = useState<"settings" | "coupons" | "popups" | "points" | "subscribers">("settings");
     const { user } = useAuthStore();
 
     // Configuración Global
@@ -314,6 +314,12 @@ export default function MarketingPage() {
                         className={`text-[12px] font-medium tracking-wide pb-2 px-1 border-b-2 transition-all ${activeTab === 'coupons' ? 'text-primary border-primary' : 'text-white/40 border-transparent hover:text-white/70'}`}
                     >
                         Cupones de Descuento
+                    </button>
+                    <button
+                        onClick={() => setActiveTab("subscribers")}
+                        className={`text-[12px] font-medium tracking-wide pb-2 px-1 border-b-2 transition-all ${activeTab === 'subscribers' ? 'text-primary border-primary' : 'text-white/40 border-transparent hover:text-white/70'}`}
+                    >
+                        Suscriptores
                     </button>
                 </div>
 

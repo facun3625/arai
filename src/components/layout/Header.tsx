@@ -17,6 +17,7 @@ export const Header = () => {
 
     const { user, isAuthenticated, logout } = useAuthStore();
     const items = useCartStore((state) => state.items);
+    const openDrawer = useCartStore((state) => state.openDrawer);
     const itemCount = items.reduce((count, item) => count + item.quantity, 0);
     const totalPrice = items.reduce((total, item) => {
         const price = Number(item.price);
@@ -82,7 +83,11 @@ export const Header = () => {
                     </div>
 
                     <div className="hidden md:block text-[9px] font-bold text-white/90">
-                        {bankDiscount !== null && bankDiscount > 0 ? `${bankDiscount}% POR TRANSF. BANCARIA` : ""}
+                        {bankDiscount !== null && bankDiscount > 0 ? (
+                            <>
+                                <span className="text-primary font-black">{bankDiscount}%</span> POR TRANSF. BANCARIA
+                            </>
+                        ) : ""}
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -236,19 +241,25 @@ export const Header = () => {
                             </div>
 
                             {/* Cart Section - Client Side Sensitive */}
-                            <Link href="/carrito" className="flex items-center gap-2 group px-1">
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    openDrawer();
+                                }}
+                                className="flex items-center gap-2 group px-1"
+                            >
                                 <span className="hidden md:inline text-[11px] font-medium text-white">
                                     {mounted ? `$ ${totalPrice.toLocaleString('es-AR')}` : "$ 0"}
                                 </span>
                                 <div className="relative">
                                     <ShoppingBag className="h-5.5 w-5.5 text-white transition-transform group-hover:scale-110" />
                                     {mounted && itemCount > 0 && (
-                                        <span className="absolute -top-1.5 -right-1.5 bg-white text-primary text-[9px] font-black h-4 w-4 rounded-full flex items-center justify-center shadow-lg border border-primary/10">
+                                        <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[9px] font-black h-4 w-4 rounded-full flex items-center justify-center shadow-lg border border-white/10">
                                             {itemCount}
                                         </span>
                                     )}
                                 </div>
-                            </Link>
+                            </button>
 
                         </div>
                     </nav>

@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import Image from "next/image";
 import {
   ShoppingBag,
   ArrowRight,
@@ -19,6 +21,13 @@ export default function Home() {
   const [categories, setCategories] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
+
+  // Newsletter states
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [isSubscribing, setIsSubscribing] = useState(false);
+  const [newsletterStatus, setNewsletterStatus] = useState<"idle" | "success" | "error">("idle");
+  const [newsletterMessage, setNewsletterMessage] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,7 +41,7 @@ export default function Home() {
 
         // Filter categories that have at least one product
         const activeCategories = catsData.filter((cat: any) => (cat._count?.products || 0) > 0);
-        setCategories(activeCategories.slice(0, 4)); // Show top 4 categories
+        setCategories(activeCategories);
         setProducts(prodsData.slice(0, 8)); // Show top 8 products
       } catch (error) {
         console.error("Error fetching home data:", error);
@@ -42,6 +51,38 @@ export default function Home() {
     };
     fetchData();
   }, []);
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail) return;
+
+    setIsSubscribing(true);
+    setNewsletterStatus("idle");
+
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: newsletterEmail }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setNewsletterStatus("success");
+        setNewsletterMessage(data.message || "¡Gracias por suscribirte!");
+        setNewsletterEmail("");
+      } else {
+        setNewsletterStatus("error");
+        setNewsletterMessage(data.error || "Error al suscribirse");
+      }
+    } catch (error) {
+      setNewsletterStatus("error");
+      setNewsletterMessage("Error de conexión");
+    } finally {
+      setIsSubscribing(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -54,60 +95,131 @@ export default function Home() {
 
   return (
     <div className="flex flex-col font-montserrat overflow-x-hidden">
-      {/* Hero Section */}
-      <section className="relative h-[90vh] min-h-[600px] flex items-center overflow-hidden bg-[#0c120e]">
-        {/* Background Decor */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-primary/20 to-transparent"></div>
-          <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-primary/10 blur-[120px] rounded-full"></div>
-        </div>
+      {/* New Premium Hero Grid Section - Refined Typography to prevent overflow */}
+      <section className="bg-[#0c120e] pt-20 pb-20 overflow-hidden px-4 md:px-8">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 40 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-5xl mx-auto rounded-[32px] overflow-hidden shadow-[0_50px_120px_-30px_rgba(0,0,0,1)] border border-white/5"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-4 h-auto md:h-[65vh] min-h-[550px]">
 
-        <div className="max-w-7xl mx-auto px-6 md:px-12 w-full z-10 grid lg:grid-cols-2 gap-12 items-center">
-          <div className="space-y-8 animate-in fade-in slide-in-from-left-8 duration-1000">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full">
-              <Zap className="h-4 w-4 text-primary" />
-              <span className="text-[10px] font-bold text-white/80 uppercase tracking-widest">Nueva Cosecha 2026</span>
+            {/* Column 1: Vos Elegis / Arma tu propio blend */}
+            <div className="relative group overflow-hidden border-r border-white/5 h-[400px] md:h-full">
+              <Image
+                src="/images/proceso/1.webp"
+                alt="Arma tu propio blend"
+                fill
+                className="object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all duration-700" />
+              <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-center items-center text-center">
+                <span className="text-[12px] md:text-[14px] text-white font-light mb-3 italic">Vos elegis!</span>
+                <h2 className="text-[24px] md:text-[32px] font-bold text-white leading-tight uppercase tracking-tight mb-6">
+                  ARMA TU <br /> PROPIO <br /> BLEND
+                </h2>
+                <span className="text-[9px] md:text-[10px] text-white/50 mb-6 tracking-[0.3em] uppercase font-bold">Visita nuestra Tienda</span>
+                <Link href="/tienda" className="px-8 py-3 bg-white text-black text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-white/90 transition-all rounded-full shadow-lg">
+                  Comprar
+                </Link>
+              </div>
             </div>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-light text-white leading-[0.95] tracking-tight">
-              yerba mate <br />
-              <span className="font-bold text-primary italic">premium.</span>
-            </h1>
-            <p className="text-white/60 text-lg md:text-xl max-w-lg leading-relaxed font-light">
-              Descubrí el sabor auténtico de la selva misionera con nuestra selección exclusiva de yerbas orgánicas y blends especiales.
-            </p>
-            <div className="flex flex-wrap gap-6 pt-4">
-              <Link
-                href="/tienda"
-                className="group relative px-10 py-5 bg-primary text-white text-[13px] font-bold rounded-2xl overflow-hidden transition-all hover:shadow-[0_20px_40px_-10px_rgba(35,85,61,0.5)] active:scale-95"
-              >
-                <span className="relative z-10 flex items-center gap-3">
-                  Explorar Tienda <ShoppingBag className="h-5 w-5 group-hover:rotate-12 transition-transform" />
-                </span>
-              </Link>
-              <Link
-                href="/tienda"
-                className="px-10 py-5 bg-white/5 border border-white/10 text-white text-[13px] font-bold rounded-2xl hover:bg-white/10 transition-all flex items-center gap-3 active:scale-95"
-              >
-                Contactar <ArrowRight className="h-5 w-5" />
-              </Link>
-            </div>
-          </div>
 
-          <div className="relative aspect-square flex items-center justify-center animate-in fade-in zoom-in duration-1000 delay-300">
-            <div className="absolute inset-0 bg-primary/20 blur-[100px] rounded-full scale-75 animate-pulse"></div>
-            <div className="relative z-10 w-4/5 h-4/5 flex items-center justify-center">
-              {products[0] ? (
-                <img
-                  src={products[0]?.featuredImage || (typeof products[0]?.images === 'string' ? JSON.parse(products[0]?.images)[0] : products[0]?.images?.[0]) || "/placeholder.png"}
-                  className="w-full h-full object-contain drop-shadow-[0_35px_60px_rgba(0,0,0,0.8)] hover:scale-105 transition-transform duration-1000"
-                  alt="Hero Product"
+            {/* Column 2: Yerba Mate */}
+            <div className="relative group overflow-hidden border-r border-white/5 h-[400px] md:h-full">
+              <Image
+                src="/images/proceso/2.jpg"
+                alt="Yerba Mate"
+                fill
+                className="object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-black/50 group-hover:bg-black/30 transition-all duration-700" />
+              <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-start items-center text-center pt-20">
+                <h2 className="text-[20px] md:text-[28px] font-bold text-white leading-tight uppercase tracking-[0.2em] mb-8">
+                  YERBA <br /> MATE
+                </h2>
+                <Link href="/tienda?categoria=yerba-mate" className="px-8 py-3 bg-white text-black text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-white/90 transition-all rounded-full shadow-lg">
+                  Comprar
+                </Link>
+              </div>
+            </div>
+
+            {/* Column 3: Hierbas & Familias Araí */}
+            <div className="flex flex-col h-[800px] md:h-full">
+              <div className="relative flex-1 group overflow-hidden border-b border-white/5">
+                <Image
+                  src="/images/proceso/3.jpg"
+                  alt="Hierbas"
+                  fill
+                  className="object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
                 />
-              ) : (
-                <div className="text-white/20 uppercase tracking-widest">araí yerba mate</div>
-              )}
+                <div className="absolute inset-0 bg-black/50 group-hover:bg-black/30 transition-all duration-700" />
+                <div className="absolute inset-0 p-4 md:p-6 flex flex-col justify-center items-center text-center">
+                  <h2 className="text-[18px] md:text-[24px] font-bold text-white uppercase tracking-[0.2em] mb-4">HIERBAS</h2>
+                  <Link href="/tienda?categoria=hierbas" className="px-7 py-2.5 bg-white text-black text-[9px] font-bold uppercase tracking-[0.3em] hover:bg-white/90 transition-all rounded-full shadow-lg">
+                    Comprar
+                  </Link>
+                </div>
+              </div>
+              <div className="relative flex-1 group overflow-hidden">
+                <Image
+                  src="/images/proceso/4.webp"
+                  alt="Las distintas familias Araí"
+                  fill
+                  className="object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-all duration-700" />
+                <div className="absolute inset-0 p-4 md:p-6 flex flex-col justify-center items-center text-center">
+                  <h2 className="text-[14px] md:text-[18px] font-bold text-white uppercase tracking-[0.1em] mb-4 leading-relaxed">
+                    LAS DISTINTAS <br /> FAMILIAS <br /> ARAÍ
+                  </h2>
+                  <Link href="/tienda" className="px-7 py-2.5 bg-white text-black text-[9px] font-bold uppercase tracking-[0.3em] hover:bg-white/90 transition-all rounded-full shadow-lg">
+                    Comprar
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Column 4: Accesorios */}
+            <div className="relative group overflow-hidden h-[400px] md:h-full">
+              <Image
+                src="/images/proceso/5.jpeg"
+                alt="Accesorios"
+                fill
+                className="object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-black/50 group-hover:bg-black/30 transition-all duration-700" />
+              <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-center items-center text-center">
+                <h2 className="text-[20px] md:text-[28px] font-bold text-white leading-tight uppercase tracking-[0.15em] mb-8">
+                  ACCESORIOS
+                </h2>
+                <Link href="/tienda?categoria=accesorios" className="px-8 py-3 bg-white text-black text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-white/90 transition-all rounded-full shadow-lg">
+                  Comprar
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
+        </motion.div>
+      </section>
+
+      {/* Transition Banner Section - Now without text and with entrance animation */}
+      <section className="relative w-full h-[350px] md:h-[500px] overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, scale: 1.1 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute inset-0 z-0"
+        >
+          <Image
+            src="/images/proceso/banner.png"
+            alt="Yerba Mate Araí Experience"
+            fill
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-black/30" />
+        </motion.div>
       </section>
 
       {/* Benefits Banner */}
@@ -143,9 +255,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Categories */}
-      <section className="py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 space-y-16">
+      {/* Featured Categories - Horizontal Accordion */}
+      <section className="py-12 bg-gray-50 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 space-y-10">
           <div className="flex flex-col md:flex-row items-end justify-between gap-8">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
@@ -159,12 +271,12 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="flex overflow-x-auto pb-8 gap-8 no-scrollbar scroll-smooth">
             {categories.map((cat) => (
               <Link
                 key={cat.id}
                 href={`/tienda?categoria=${cat.slug}`}
-                className="group relative aspect-[4/5] rounded-[40px] overflow-hidden bg-white shadow-xl shadow-gray-200/50 hover:-translate-y-2 transition-all duration-700"
+                className="flex-none w-[280px] md:w-[calc(25%-1.5rem)] group relative aspect-[4/5] rounded-[40px] overflow-hidden bg-white shadow-xl shadow-gray-200/50 hover:-translate-y-2 transition-all duration-700"
               >
                 {cat.image ? (
                   <img src={cat.image} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" alt={cat.name} />
@@ -185,8 +297,8 @@ export default function Home() {
       </section>
 
       {/* Featured Products */}
-      <section className="py-32 bg-white">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 space-y-20">
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 space-y-12">
           <div className="text-center space-y-4 max-w-2xl mx-auto">
             <div className="flex items-center justify-center gap-3">
               <span className="h-px w-8 bg-primary"></span>
@@ -258,7 +370,7 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-6 md:px-12 bg-gray-50">
+      <section className="py-12 px-6 md:px-12 bg-gray-50">
         <div className="max-w-7xl mx-auto rounded-[60px] bg-[#0c120e] relative overflow-hidden p-16 md:p-32 flex flex-col items-center text-center space-y-10 group">
           {/* Abstract Decor */}
           <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-primary/20 blur-[150px] transition-transform duration-1000 group-hover:scale-125"></div>
@@ -270,16 +382,45 @@ export default function Home() {
           <p className="text-white/40 text-lg md:text-xl max-w-2xl leading-relaxed font-light z-10">
             Yerba mate equilibrada, estacionada y pensada para tu ritual diario. Recibí promociones exclusivas y lanzamientos en tu correo.
           </p>
-          <div className="flex items-center gap-4 z-10 w-full max-w-lg">
-            <input
-              type="email"
-              placeholder="Tu correo electrónico"
-              className="flex-1 h-16 bg-white/5 border border-white/10 rounded-2xl px-8 text-white focus:outline-none focus:border-primary transition-all"
-            />
-            <button className="h-16 px-10 bg-primary text-white text-[12px] font-bold rounded-2xl hover:scale-105 transition-all shadow-2xl shadow-primary/20">
-              Unirse
-            </button>
-          </div>
+          <form onSubmit={handleNewsletterSubmit} className="flex flex-col gap-4 z-10 w-full max-w-lg">
+            <div className="flex items-center gap-4">
+              <input
+                type="email"
+                required
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                placeholder="Tu correo electrónico"
+                className="flex-1 h-16 bg-white/5 border border-white/10 rounded-2xl px-8 text-white focus:outline-none focus:border-primary transition-all"
+                disabled={isSubscribing || newsletterStatus === "success"}
+              />
+              <button
+                type="submit"
+                disabled={isSubscribing || newsletterStatus === "success"}
+                className={`h-16 px-10 rounded-2xl text-[12px] font-bold transition-all shadow-2xl relative overflow-hidden ${newsletterStatus === "success"
+                    ? "bg-green-600 text-white cursor-default"
+                    : "bg-primary text-white hover:scale-105 shadow-primary/20"
+                  }`}
+              >
+                {isSubscribing ? (
+                  <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+                ) : newsletterStatus === "success" ? (
+                  "¡Suscrito!"
+                ) : (
+                  "Unirse"
+                )}
+              </button>
+            </div>
+            {newsletterStatus !== "idle" && (
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`text-[12px] font-medium tracking-wider uppercase ${newsletterStatus === "success" ? "text-green-400" : "text-red-400"
+                  }`}
+              >
+                {newsletterMessage}
+              </motion.p>
+            )}
+          </form>
         </div>
       </section>
       <PopupOverlay location="HOME" />

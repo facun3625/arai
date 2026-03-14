@@ -15,16 +15,22 @@ export interface Product {
 
 interface CartState {
   items: Product[];
+  isOpen: boolean;
   addItem: (product: Product) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
+  openDrawer: () => void;
+  closeDrawer: () => void;
 }
 
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      isOpen: false,
+      openDrawer: () => set({ isOpen: true }),
+      closeDrawer: () => set({ isOpen: false }),
       addItem: (product) => {
         const items = get().items;
 
@@ -38,6 +44,7 @@ export const useCartStore = create<CartState>()(
 
         if (existingItem) {
           set({
+            isOpen: true,
             items: items.map((item) => {
               const sameId = item.id === product.id;
               const sameVariant = item.variant === product.variant;
@@ -50,7 +57,7 @@ export const useCartStore = create<CartState>()(
             }),
           });
         } else {
-          set({ items: [...items, product] });
+          set({ items: [...items, product], isOpen: true });
         }
       },
       removeItem: (id) =>

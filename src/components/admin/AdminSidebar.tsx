@@ -36,7 +36,15 @@ const menuItems: MenuNode[] = [
             { name: "atributos", href: "/admin/atributos", icon: Settings2 },
         ]
     },
-    { name: "marketing", href: "/admin/marketing", icon: Tag },
+    {
+        type: 'group',
+        title: 'marketing',
+        icon: Tag,
+        items: [
+            { name: "configuración", href: "/admin/marketing", icon: Settings2 },
+            { name: "suscriptores", href: "/admin/marketing/suscriptores", icon: User },
+        ]
+    },
     { name: "pedidos", href: "/admin/pedidos", icon: ShoppingCart },
     { name: "usuarios", href: "/admin/usuarios", icon: User },
     { name: "estadísticas", href: "/admin/estadisticas", icon: BarChart3 },
