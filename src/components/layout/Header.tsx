@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingBag, User, Facebook, Instagram, Twitter, Menu, ChevronDown, LogOut, LayoutDashboard, X, Youtube, Music } from "lucide-react";
+import { ShoppingBag, User, Facebook, Instagram, Twitter, Menu, ChevronDown, LogOut, LayoutDashboard, X, Youtube } from "lucide-react";
+import { TikTokIcon } from "@/components/icons/TikTokIcon";
 import { useCartStore } from "@/store/useCartStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { AuthModal } from "@/components/auth/AuthModal";
@@ -134,8 +135,8 @@ export const Header = () => {
                                 </a>
                             )}
                             {socialLinks.tiktokUrl && (
-                                <a href={socialLinks.tiktokUrl} target="_blank" rel="noopener noreferrer">
-                                    <Music className="h-3.5 w-3.5 text-white/70 hover:text-white cursor-pointer transition-colors" />
+                                <a href={socialLinks.tiktokUrl} target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white cursor-pointer transition-colors">
+                                    <TikTokIcon className="h-3.5 w-3.5" />
                                 </a>
                             )}
                         </div>

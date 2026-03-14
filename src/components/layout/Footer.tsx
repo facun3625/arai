@@ -1,6 +1,7 @@
 "use client";
 
-import { Facebook, Instagram, Twitter, Youtube, Music } from "lucide-react";
+import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
+import { TikTokIcon } from "@/components/icons/TikTokIcon";
 import { useEffect, useState } from "react";
 
 export const Footer = () => {
@@ -102,7 +103,7 @@ export const Footer = () => {
                         )}
                         {socialLinks.tiktokUrl && (
                             <a href={socialLinks.tiktokUrl} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center hover:bg-white hover:text-primary transition-all duration-500 group">
-                                <Music className="h-5 w-5" />
+                                <TikTokIcon className="h-5 w-5" />
                             </a>
                         )}
                     </div>
@@ -110,14 +111,22 @@ export const Footer = () => {
             </div>
 
             <div className="max-w-7xl mx-auto border-t border-white/10 mt-20 pt-10 flex flex-col md:flex-row justify-between items-center gap-6 relative z-10">
-                <p className="text-[11px] text-white/30 font-medium">
-                    © {new Date().getFullYear()} Araí Yerba Mate. Todos los derechos reservados.
+                <p className="text-[11px] text-white/30 font-medium lowercase">
+                    © {new Date().getFullYear()} araí yerba mate. todos los derechos reservados.
                 </p>
-                <div className="flex gap-6 opacity-40 hover:opacity-100 transition-opacity duration-500">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-4 brightness-0 invert" />
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-6 brightness-0 invert" />
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-4 brightness-0 invert" />
-                </div>
+                <a
+                    href="https://kubbo.com.ar"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 opacity-40 hover:opacity-100 transition-all duration-500 group"
+                >
+                    <img
+                        src="/images/proceso/logo_verde.png"
+                        alt="Kubbo"
+                        className="h-5 w-auto brightness-0 invert transition-transform group-hover:scale-110"
+                    />
+                    <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/60 group-hover:text-white whitespace-nowrap">desarrollos de web apps</span>
+                </a>
             </div>
         </footer>
     );

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Plus, Trash2, Edit2, CheckCircle2, XCircle, Save, Percent, DollarSign, Tag, Monitor, Image as ImageIcon, Loader2, Coins, Gift, Settings2, Sparkles, Truck, Instagram, Facebook, Twitter } from "lucide-react";
+import { TikTokIcon } from "@/components/icons/TikTokIcon";
 
 export default function MarketingPage() {
     const [activeTab, setActiveTab] = useState<"settings" | "coupons" | "popups" | "points">("settings");
@@ -437,7 +438,7 @@ export default function MarketingPage() {
 
                                     <div className="space-y-2">
                                         <label className="text-[11px] text-white/60 font-medium uppercase tracking-widest flex items-center gap-2">
-                                            <Sparkles className="h-3.5 w-3.5" /> TikTok
+                                            <TikTokIcon className="h-3.5 w-3.5" /> TikTok
                                         </label>
                                         <input
                                             type="text"
