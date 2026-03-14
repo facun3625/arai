@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  name      String?
+  lastName  String?
+  email     String    @unique
+  password  String
+  role      String    @default("USER")
+  dni       String?
+  phone     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  addresses Address[]
+  orders    Order[]
+}
+
+model Address {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  street     String
+  number     String
+  apartment  String?
+  city       String
+  province   String
+  zipCode    String
+  dni        String?
+  phone      String?
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[] @relation("CategoryToProduct")
+}
+
+model Product {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  description String?    // Características/Descripción
+  type        String     @default("SIMPLE") // SIMPLE o VARIABLE
+  videoUrl    String?
+  categories  Category[] @relation("CategoryToProduct")
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Para productos simples, los valores se guardan aquí.
+  // Para productos variables, estos pueden ser nulos o actuar como valores por defecto.
+  price          Float      @default(0)
+  compareAtPrice Float?     // Precio anterior (tachado)
+  stock          Int        @default(0)
+  featuredImage  String?    // Imagen principal para la tienda
+  images         String     @default("[]") // JSON string de URLs
+  weight         Float?     // Peso en kg
+  width          Float?     // Ancho en cm
+  height         Float?     // Alto en cm
+  length         Float?     // Largo en cm
+
+  addons      String     @default("[]") // JSON string de complementos (blends, hierbas, etc)
+  variants    Variant[]
+}
+
+model Variant {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  // Valores específicos por variación
+  price          Float    @default(0)
+  compareAtPrice Float?   // Precio anterior por variante
+  stock          Int      @default(0)
+  images         String   @default("[]") // JSON string de URLs
+  weight    Float?
+  width     Float?
+  height    Float?
+  length    Float?
+  
+  // Combinación de atributos (ej: { "talle": "S", "color": "Rojo" })
+  attributes String   @default("{}") // Almacenamos como JSON string por simplicidad en SQLite
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Attribute {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  terms     String
+  isAddon   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StoreSettings {
+  id                    String   @id @default("global") // Usamos un id fijo 'global'
+  freeShippingThreshold Float    @default(0) // 0 significa desactivado
+  bankTransferDiscount  Float    @default(15) // Descuento porcentual por transferencia
+  updatedAt             DateTime @updatedAt
+}
+
+model Coupon {
+  id                String   @id @default(cuid())
+  code              String   @unique
+  discountType      String   @default("PERCENTAGE") // PERCENTAGE o FIXED
+  discountValue     Float
+  isActive          Boolean  @default(true)
+  minPurchaseAmount Float?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Order {
+  id               String      @id @default(cuid())
+  userId           String?
+  user             User?       @relation(fields: [userId], references: [id])
+  status           String      @default("PENDING") // PENDING, PAID, SHIPPED, COMPLETED, CANCELLED
+  total            Float
+  subtotal         Float
+  shippingCost     Float
+  discount         Float       @default(0)
+  paymentMethod    String      // transferencia, mercadopago
+  paymentProof     String?     // URL del comprobante de transferencia
+  shippingAddress  String      // Almacenamos el JSON de la dirección
+  contactEmail     String
+  contactName      String
+  contactLastName  String
+  contactPhone     String
+  contactDni       String?
+  items            OrderItem[]
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  variantId String?
+  name      String
+  quantity  Int
+  price     Float
+  image     String?
+}
