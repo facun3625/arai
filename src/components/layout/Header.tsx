@@ -179,7 +179,6 @@ export const Header = () => {
                                 { name: 'Proceso Productivo', href: '/proceso' },
                                 { name: 'Videos', href: '/videos' },
                                 { name: 'Cómo Comprar', href: '/como-comprar' },
-                                { name: 'Contacto', href: '/contacto' },
                                 { name: 'Tienda', href: '/tienda', isButton: true },
                             ].map((item) => (
                                 <Link
