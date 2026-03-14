@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { useAuthStore } from "@/store/useAuthStore";
-import { Plus, Trash2, Edit2, CheckCircle2, XCircle, Save, Percent, DollarSign, Tag, Monitor, Image as ImageIcon, Loader2, Coins, Gift, Settings2, Sparkles, Truck } from "lucide-react";
+import { Plus, Trash2, Edit2, CheckCircle2, XCircle, Save, Percent, DollarSign, Tag, Monitor, Image as ImageIcon, Loader2, Coins, Gift, Settings2, Sparkles, Truck, Instagram, Facebook, Twitter } from "lucide-react";
 
 export default function MarketingPage() {
     const [activeTab, setActiveTab] = useState<"settings" | "coupons" | "popups" | "points" | "subscribers">("settings");
@@ -14,7 +14,13 @@ export default function MarketingPage() {
         freeShippingThreshold: 0,
         bankTransferDiscount: 15,
         pointsEnabled: false,
-        pointsRatio: 0.01
+        pointsRatio: 0.01,
+        instagramUrl: "",
+        facebookUrl: "",
+        xUrl: "",
+        youtubeUrl: "",
+        tiktokUrl: "",
+        whatsappNumber: ""
     });
     const [isSavingSettings, setIsSavingSettings] = useState(false);
 
@@ -363,6 +369,98 @@ export default function MarketingPage() {
                                         onChange={(e) => setSettings({ ...settings, bankTransferDiscount: Number(e.target.value) })}
                                         className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-[14px] text-white focus:outline-none focus:border-primary transition-colors font-mono"
                                     />
+                                </div>
+                            </div>
+
+                            <hr className="border-white/10" />
+
+                            <div className="space-y-6">
+                                <div>
+                                    <h2 className="text-white text-lg font-medium tracking-tight mb-1">
+                                        Redes Sociales y WhatsApp
+                                    </h2>
+                                    <p className="text-[12px] text-white/40">Configurá los enlaces que aparecerán en el Header y Footer del sitio.</p>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[11px] text-white/60 font-medium uppercase tracking-widest flex items-center gap-2">
+                                            <Instagram className="h-3.5 w-3.5" /> Instagram
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="https://instagram.com/tu-usuario"
+                                            value={settings.instagramUrl}
+                                            onChange={(e) => setSettings({ ...settings, instagramUrl: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-[11px] text-white/60 font-medium uppercase tracking-widest flex items-center gap-2">
+                                            <Facebook className="h-3.5 w-3.5" /> Facebook
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="https://facebook.com/tu-pagina"
+                                            value={settings.facebookUrl}
+                                            onChange={(e) => setSettings({ ...settings, facebookUrl: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-[11px] text-white/60 font-medium uppercase tracking-widest flex items-center gap-2">
+                                            <Twitter className="h-3.5 w-3.5" /> X (Ex Twitter)
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="https://x.com/tu-usuario"
+                                            value={settings.xUrl}
+                                            onChange={(e) => setSettings({ ...settings, xUrl: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-[11px] text-white/60 font-medium uppercase tracking-widest flex items-center gap-2">
+                                            <Monitor className="h-3.5 w-3.5" /> YouTube
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="https://youtube.com/@tu-canal"
+                                            value={settings.youtubeUrl}
+                                            onChange={(e) => setSettings({ ...settings, youtubeUrl: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-[11px] text-white/60 font-medium uppercase tracking-widest flex items-center gap-2">
+                                            <Sparkles className="h-3.5 w-3.5" /> TikTok
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="https://tiktok.com/@tu-usuario"
+                                            value={settings.tiktokUrl}
+                                            onChange={(e) => setSettings({ ...settings, tiktokUrl: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-[11px] text-white/60 font-medium uppercase tracking-widest flex items-center gap-2 text-primary">
+                                            <Plus className="h-3.5 w-3.5" /> WhatsApp (Número completo)
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="Ej: 5493411234567"
+                                            value={settings.whatsappNumber}
+                                            onChange={(e) => setSettings({ ...settings, whatsappNumber: e.target.value })}
+                                            className="w-full bg-white/5 border border-primary/20 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                        />
+                                        <p className="text-[10px] text-white/30 italic">Sin espacios, sin el +, incluyendo código de país y área.</p>
+                                    </div>
                                 </div>
                             </div>
 

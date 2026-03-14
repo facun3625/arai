@@ -1,11 +1,37 @@
 "use client";
 
 import { MessageSquare } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export const WhatsAppButton = () => {
+    const [whatsappNumber, setWhatsappNumber] = useState("");
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await fetch("/api/settings");
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.whatsappNumber) {
+                        setWhatsappNumber(data.whatsappNumber);
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to fetch whatsapp number", error);
+            }
+        };
+        fetchSettings();
+
+        const handleSettingsUpdated = () => fetchSettings();
+        window.addEventListener("settings-updated", handleSettingsUpdated);
+        return () => window.removeEventListener("settings-updated", handleSettingsUpdated);
+    }, []);
+
+    const waLink = whatsappNumber ? `https://wa.me/${whatsappNumber}` : "https://wa.me/5491112345678";
+
     return (
         <a
-            href="https://wa.me/5491112345678"
+            href={waLink}
             target="_blank"
             rel="noopener noreferrer"
             className="fixed bottom-8 right-8 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-[0_10px_30px_rgba(37,211,102,0.4)] hover:scale-110 hover:shadow-[0_15px_40px_rgba(37,211,102,0.6)] transition-all duration-300 group overflow-hidden"

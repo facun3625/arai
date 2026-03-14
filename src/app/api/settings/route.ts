@@ -18,7 +18,13 @@ export async function GET() {
                     freeShippingThreshold: 0,
                     bankTransferDiscount: 15,
                     pointsEnabled: false,
-                    pointsRatio: 0.01
+                    pointsRatio: 0.01,
+                    instagramUrl: "",
+                    facebookUrl: "",
+                    xUrl: "",
+                    youtubeUrl: "",
+                    tiktokUrl: "",
+                    whatsappNumber: ""
                 }
             });
         }
@@ -41,6 +47,12 @@ export async function POST(request: Request) {
                 bankTransferDiscount: Number(body.bankTransferDiscount) || 0,
                 pointsEnabled: body.pointsEnabled ?? false,
                 pointsRatio: Number(body.pointsRatio) || 0,
+                instagramUrl: body.instagramUrl ?? "",
+                facebookUrl: body.facebookUrl ?? "",
+                xUrl: body.xUrl ?? "",
+                youtubeUrl: body.youtubeUrl ?? "",
+                tiktokUrl: body.tiktokUrl ?? "",
+                whatsappNumber: body.whatsappNumber ?? "",
             },
             create: {
                 id: "global",
@@ -48,6 +60,12 @@ export async function POST(request: Request) {
                 bankTransferDiscount: Number(body.bankTransferDiscount) || 15,
                 pointsEnabled: body.pointsEnabled ?? false,
                 pointsRatio: Number(body.pointsRatio) || 0.01,
+                instagramUrl: body.instagramUrl ?? "",
+                facebookUrl: body.facebookUrl ?? "",
+                xUrl: body.xUrl ?? "",
+                youtubeUrl: body.youtubeUrl ?? "",
+                tiktokUrl: body.tiktokUrl ?? "",
+                whatsappNumber: body.whatsappNumber ?? "",
             }
         });
 

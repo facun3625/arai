@@ -118,6 +118,15 @@ model StoreSettings {
   bankTransferDiscount  Float    @default(15) // Descuento porcentual por transferencia
   pointsEnabled         Boolean  @default(false)
   pointsRatio           Float    @default(0.01) // Puntos por cada $1 gastado (e.g. 0.01 = 1 punto cada 100 pesos)
+  
+  // Redes Sociales y Contacto
+  instagramUrl          String?
+  facebookUrl           String?
+  xUrl                  String?
+  youtubeUrl            String?
+  tiktokUrl             String?
+  whatsappNumber        String?
+
   updatedAt             DateTime @updatedAt
 }
 

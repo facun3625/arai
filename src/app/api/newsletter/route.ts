@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-// Refreshing module
-import { prisma } from "@/lib/prisma";
+import { PrismaClient } from "@prisma/client";
+
+const localPrisma = new PrismaClient();
 
 export async function POST(req: Request) {
     try {
@@ -13,14 +14,14 @@ export async function POST(req: Request) {
             );
         }
 
-        // Defensive access to the model
-        const subscriberModel = (prisma as any).subscriber || (prisma as any).Subscriber;
+        // Defensive access to the model on local instance
+        const subscriberModel = (localPrisma as any).subscriber || (localPrisma as any).Subscriber;
 
         if (!subscriberModel) {
-            const availableModels = Object.keys(prisma).filter(k => !k.startsWith('$') && !k.startsWith('_'));
-            console.error("Prisma subscriber model not found. Available models:", availableModels);
+            const availableModels = Object.keys(localPrisma).filter(k => !k.startsWith('$') && !k.startsWith('_'));
+            console.error("Local Prisma subscriber model not found. Available models:", availableModels);
             return NextResponse.json(
-                { error: `Error: Modelo 'subscriber' no encontrado. Modelos disponibles: ${availableModels.join(', ')}` },
+                { error: `[REFRESHED-V2] Error: Modelo 'subscriber' no encontrado. Modelos disponibles: ${availableModels.join(', ')}` },
                 { status: 500 }
             );
         }

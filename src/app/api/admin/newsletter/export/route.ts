@@ -3,8 +3,14 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {
     try {
-        // Basic CSV generation
-        const subscribers = await prisma.subscriber.findMany({
+        // Defensive access to the model
+        const subscriberModel = (prisma as any).subscriber || (prisma as any).Subscriber;
+
+        if (!subscriberModel) {
+            return NextResponse.json({ error: "Modelo no cargado" }, { status: 500 });
+        }
+
+        const subscribers = await subscriberModel.findMany({
             orderBy: { createdAt: "desc" },
         });
 

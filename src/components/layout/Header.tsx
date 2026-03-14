@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingBag, User, Facebook, Instagram, Twitter, Menu, ChevronDown, LogOut, LayoutDashboard, X } from "lucide-react";
+import { ShoppingBag, User, Facebook, Instagram, Twitter, Menu, ChevronDown, LogOut, LayoutDashboard, X, Youtube, Music } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { AuthModal } from "@/components/auth/AuthModal";
@@ -14,6 +14,14 @@ export const Header = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [bankDiscount, setBankDiscount] = useState<number | null>(null);
+    const [socialLinks, setSocialLinks] = useState({
+        instagramUrl: "",
+        facebookUrl: "",
+        xUrl: "",
+        youtubeUrl: "",
+        tiktokUrl: "",
+        whatsappNumber: ""
+    });
 
     const { user, isAuthenticated, logout } = useAuthStore();
     const items = useCartStore((state) => state.items);
@@ -43,6 +51,14 @@ export const Header = () => {
                     if (data && data.bankTransferDiscount !== undefined) {
                         setBankDiscount(data.bankTransferDiscount);
                     }
+                    setSocialLinks({
+                        instagramUrl: data.instagramUrl || "",
+                        facebookUrl: data.facebookUrl || "",
+                        xUrl: data.xUrl || "",
+                        youtubeUrl: data.youtubeUrl || "",
+                        tiktokUrl: data.tiktokUrl || "",
+                        whatsappNumber: data.whatsappNumber || ""
+                    });
                 }
             } catch (error) {
                 console.error("Failed to fetch settings for header", error);
@@ -97,9 +113,31 @@ export const Header = () => {
                             <span className="flex items-center gap-1 cursor-pointer hover:text-white text-white uppercase text-[9px]">Español</span>
                         </div>
                         <div className="flex items-center gap-2 border-l border-white/10 pl-4">
-                            <Facebook className="h-3.5 w-3.5 text-white/70 hover:text-white cursor-pointer" />
-                            <Instagram className="h-3.5 w-3.5 text-white/70 hover:text-white cursor-pointer" />
-                            <Twitter className="h-3.5 w-3.5 text-white/70 hover:text-white cursor-pointer" />
+                            {socialLinks.facebookUrl && (
+                                <a href={socialLinks.facebookUrl} target="_blank" rel="noopener noreferrer">
+                                    <Facebook className="h-3.5 w-3.5 text-white/70 hover:text-white cursor-pointer transition-colors" />
+                                </a>
+                            )}
+                            {socialLinks.instagramUrl && (
+                                <a href={socialLinks.instagramUrl} target="_blank" rel="noopener noreferrer">
+                                    <Instagram className="h-3.5 w-3.5 text-white/70 hover:text-white cursor-pointer transition-colors" />
+                                </a>
+                            )}
+                            {socialLinks.xUrl && (
+                                <a href={socialLinks.xUrl} target="_blank" rel="noopener noreferrer">
+                                    <Twitter className="h-3.5 w-3.5 text-white/70 hover:text-white cursor-pointer transition-colors" />
+                                </a>
+                            )}
+                            {socialLinks.youtubeUrl && (
+                                <a href={socialLinks.youtubeUrl} target="_blank" rel="noopener noreferrer">
+                                    <Youtube className="h-3.5 w-3.5 text-white/70 hover:text-white cursor-pointer transition-colors" />
+                                </a>
+                            )}
+                            {socialLinks.tiktokUrl && (
+                                <a href={socialLinks.tiktokUrl} target="_blank" rel="noopener noreferrer">
+                                    <Music className="h-3.5 w-3.5 text-white/70 hover:text-white cursor-pointer transition-colors" />
+                                </a>
+                            )}
                         </div>
                     </div>
                 </div>

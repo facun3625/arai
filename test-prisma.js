@@ -1,15 +1,18 @@
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 async function main() {
-    try {
-        const count = await prisma.subscriber.count();
-        console.log('Subscriber count:', count);
-    } catch (e) {
-        console.error('Error accessing subscriber:', e.message);
-    } finally {
-        await prisma.$disconnect();
+    console.log("Checking for 'subscriber' model...");
+    const models = Object.keys(prisma).filter(k => !k.startsWith('$'));
+    console.log("Available models:", models);
+
+    if (prisma.subscriber || prisma.Subscriber) {
+        console.log("SUCCESS: 'subscriber' model found!");
+    } else {
+        console.log("FAILURE: 'subscriber' model NOT found.");
     }
 }
 
-main();
+main()
+    .catch(e => console.error(e))
+    .finally(async () => await prisma.$disconnect());

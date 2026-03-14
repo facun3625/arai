@@ -1,6 +1,36 @@
-import { Facebook, Instagram, Twitter } from "lucide-react";
+import { Facebook, Instagram, Twitter, Youtube, Music } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export const Footer = () => {
+    const [settings, setSettings] = useState<any>(null);
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await fetch("/api/settings");
+                if (res.ok) {
+                    const data = await res.json();
+                    setSettings(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch settings for footer", error);
+            }
+        };
+        fetchSettings();
+
+        const handleSettingsUpdated = () => fetchSettings();
+        window.addEventListener("settings-updated", handleSettingsUpdated);
+        return () => window.removeEventListener("settings-updated", handleSettingsUpdated);
+    }, []);
+
+    const socialLinks = settings || {
+        instagramUrl: "",
+        facebookUrl: "",
+        xUrl: "",
+        youtubeUrl: "",
+        tiktokUrl: "",
+        whatsappNumber: ""
+    };
     return (
         <footer className="bg-primary text-white py-20 px-4 relative overflow-hidden">
             {/* Sutil textura o gradiente de fondo */}
@@ -36,8 +66,8 @@ export const Footer = () => {
                             info@arayerba.com
                         </li>
                         <li className="flex flex-col gap-1">
-                            <span className="text-[10px] uppercase text-white/30">Teléfono</span>
-                            +54 9 11 1234 5678
+                            <span className="text-[10px] uppercase text-white/30">Teléfono / WhatsApp</span>
+                            {socialLinks.whatsappNumber ? `+${socialLinks.whatsappNumber}` : "+54 9 11 1234 5678"}
                         </li>
                         <li className="flex flex-col gap-1">
                             <span className="text-[10px] uppercase text-white/30">Ubicación</span>
@@ -48,15 +78,31 @@ export const Footer = () => {
                 <div>
                     <h4 className="text-[11px] font-bold text-white mb-8 uppercase opacity-40">seguinos</h4>
                     <div className="flex gap-4">
-                        <a href="#" className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center hover:bg-white hover:text-primary transition-all duration-500 group">
-                            <Instagram className="h-5 w-5" />
-                        </a>
-                        <a href="#" className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center hover:bg-white hover:text-primary transition-all duration-500 group">
-                            <Facebook className="h-5 w-5" />
-                        </a>
-                        <a href="#" className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center hover:bg-white hover:text-primary transition-all duration-500 group">
-                            <Twitter className="h-5 w-5" />
-                        </a>
+                        {socialLinks.instagramUrl && (
+                            <a href={socialLinks.instagramUrl} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center hover:bg-white hover:text-primary transition-all duration-500 group">
+                                <Instagram className="h-5 w-5" />
+                            </a>
+                        )}
+                        {socialLinks.facebookUrl && (
+                            <a href={socialLinks.facebookUrl} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center hover:bg-white hover:text-primary transition-all duration-500 group">
+                                <Facebook className="h-5 w-5" />
+                            </a>
+                        )}
+                        {socialLinks.xUrl && (
+                            <a href={socialLinks.xUrl} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center hover:bg-white hover:text-primary transition-all duration-500 group">
+                                <Twitter className="h-5 w-5" />
+                            </a>
+                        )}
+                        {socialLinks.youtubeUrl && (
+                            <a href={socialLinks.youtubeUrl} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center hover:bg-white hover:text-primary transition-all duration-500 group">
+                                <Youtube className="h-5 w-5" />
+                            </a>
+                        )}
+                        {socialLinks.tiktokUrl && (
+                            <a href={socialLinks.tiktokUrl} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center hover:bg-white hover:text-primary transition-all duration-500 group">
+                                <Music className="h-5 w-5" />
+                            </a>
+                        )}
                     </div>
                 </div>
             </div>
