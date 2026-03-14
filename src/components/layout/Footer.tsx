@@ -1,3 +1,5 @@
+"use client";
+
 import { Facebook, Instagram, Twitter, Youtube, Music } from "lucide-react";
 import { useEffect, useState } from "react";
 

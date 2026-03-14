@@ -6,7 +6,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { Plus, Trash2, Edit2, CheckCircle2, XCircle, Save, Percent, DollarSign, Tag, Monitor, Image as ImageIcon, Loader2, Coins, Gift, Settings2, Sparkles, Truck, Instagram, Facebook, Twitter } from "lucide-react";
 
 export default function MarketingPage() {
-    const [activeTab, setActiveTab] = useState<"settings" | "coupons" | "popups" | "points" | "subscribers">("settings");
+    const [activeTab, setActiveTab] = useState<"settings" | "coupons" | "popups" | "points">("settings");
     const { user } = useAuthStore();
 
     // Configuración Global
@@ -82,7 +82,13 @@ export default function MarketingPage() {
                     freeShippingThreshold: data.freeShippingThreshold || 0,
                     bankTransferDiscount: data.bankTransferDiscount || 15,
                     pointsEnabled: data.pointsEnabled || false,
-                    pointsRatio: data.pointsRatio || 0.01
+                    pointsRatio: data.pointsRatio || 0.01,
+                    instagramUrl: data.instagramUrl || "",
+                    facebookUrl: data.facebookUrl || "",
+                    xUrl: data.xUrl || "",
+                    youtubeUrl: data.youtubeUrl || "",
+                    tiktokUrl: data.tiktokUrl || "",
+                    whatsappNumber: data.whatsappNumber || ""
                 });
             }
         } catch (error) {
@@ -321,12 +327,6 @@ export default function MarketingPage() {
                     >
                         Cupones de Descuento
                     </button>
-                    <button
-                        onClick={() => setActiveTab("subscribers")}
-                        className={`text-[12px] font-medium tracking-wide pb-2 px-1 border-b-2 transition-all ${activeTab === 'subscribers' ? 'text-primary border-primary' : 'text-white/40 border-transparent hover:text-white/70'}`}
-                    >
-                        Suscriptores
-                    </button>
                 </div>
 
                 {/* TAB 1: SETTINGS */}
@@ -390,7 +390,7 @@ export default function MarketingPage() {
                                         <input
                                             type="text"
                                             placeholder="https://instagram.com/tu-usuario"
-                                            value={settings.instagramUrl}
+                                            value={settings.instagramUrl || ""}
                                             onChange={(e) => setSettings({ ...settings, instagramUrl: e.target.value })}
                                             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
                                         />
@@ -403,7 +403,7 @@ export default function MarketingPage() {
                                         <input
                                             type="text"
                                             placeholder="https://facebook.com/tu-pagina"
-                                            value={settings.facebookUrl}
+                                            value={settings.facebookUrl || ""}
                                             onChange={(e) => setSettings({ ...settings, facebookUrl: e.target.value })}
                                             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
                                         />
@@ -416,7 +416,7 @@ export default function MarketingPage() {
                                         <input
                                             type="text"
                                             placeholder="https://x.com/tu-usuario"
-                                            value={settings.xUrl}
+                                            value={settings.xUrl || ""}
                                             onChange={(e) => setSettings({ ...settings, xUrl: e.target.value })}
                                             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
                                         />
@@ -429,7 +429,7 @@ export default function MarketingPage() {
                                         <input
                                             type="text"
                                             placeholder="https://youtube.com/@tu-canal"
-                                            value={settings.youtubeUrl}
+                                            value={settings.youtubeUrl || ""}
                                             onChange={(e) => setSettings({ ...settings, youtubeUrl: e.target.value })}
                                             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
                                         />
@@ -442,7 +442,7 @@ export default function MarketingPage() {
                                         <input
                                             type="text"
                                             placeholder="https://tiktok.com/@tu-usuario"
-                                            value={settings.tiktokUrl}
+                                            value={settings.tiktokUrl || ""}
                                             onChange={(e) => setSettings({ ...settings, tiktokUrl: e.target.value })}
                                             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
                                         />
@@ -455,7 +455,7 @@ export default function MarketingPage() {
                                         <input
                                             type="text"
                                             placeholder="Ej: 5493411234567"
-                                            value={settings.whatsappNumber}
+                                            value={settings.whatsappNumber || ""}
                                             onChange={(e) => setSettings({ ...settings, whatsappNumber: e.target.value })}
                                             className="w-full bg-white/5 border border-primary/20 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
                                         />
