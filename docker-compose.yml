@@ -1,0 +1,41 @@
+services:
+  arai-db:
+    image: postgres:15-alpine
+    container_name: arai-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-arai_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-arai_password}
+      POSTGRES_DB: ${POSTGRES_DB:-arai_db}
+    volumes:
+      - arai-db-data:/var/lib/postgresql/data
+    networks:
+      - arai-network
+
+  arai-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: arai-app
+    restart: always
+    ports:
+      - "3002:3000"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-arai_user}:${POSTGRES_PASSWORD:-arai_password}@arai-db:5432/${POSTGRES_DB:-arai_db}?schema=public
+      NEXTAUTH_URL: https://yerbamatearai.com.ar
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      RESEND_DOMAIN: yerbamatearai.com.ar
+    depends_on:
+      - arai-db
+    networks:
+      - arai-network
+
+networks:
+  arai-network:
+    driver: bridge
+
+volumes:
+  arai-db-data:
