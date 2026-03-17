@@ -31,7 +31,7 @@ services:
     depends_on:
       - arai-db
     volumes:
-      - ./public/uploads:/app/public/uploads
+      - ./uploads:/app/public/uploads
     networks:
       - arai-network
 
