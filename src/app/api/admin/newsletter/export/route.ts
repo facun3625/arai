@@ -16,11 +16,11 @@ export async function GET(req: Request) {
 
         const csvRows = [
             ["ID", "Email", "Activo", "Fecha Suscripción"],
-            ...subscribers.map((s) => [
+            ...subscribers.map((s: any) => [
                 s.id,
                 s.email,
                 s.isActive ? "Sí" : "No",
-                s.createdAt.toISOString(),
+                s.createdAt instanceof Date ? s.createdAt.toISOString() : String(s.createdAt),
             ]),
         ];
 
