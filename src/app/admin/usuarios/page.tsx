@@ -9,10 +9,12 @@ import {
     Calendar,
     ShoppingBag,
     Shield,
-    MoreVertical,
-    Filter,
     ArrowUpRight,
-    SearchX
+    SearchX,
+    Key,
+    CheckCircle2,
+    AlertCircle,
+    MoreVertical
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -71,6 +73,58 @@ export default function AdminUsuariosPage() {
 
     const [userToDelete, setUserToDelete] = useState<any>(null);
 
+    // Password Management State
+    const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+    const [userForPassword, setUserForPassword] = useState<any>(null);
+    const [newPassword, setNewPassword] = useState("");
+    const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+    const [passwordStatus, setPasswordStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+    const handleUpdatePassword = async () => {
+        if (!currentUser?.id || !userForPassword?.id || !newPassword) return;
+        setIsUpdatingPassword(true);
+        setPasswordStatus('idle');
+        try {
+            const res = await fetch(`/api/admin/users?adminId=${currentUser.id}&targetId=${userForPassword.id}`, {
+                method: 'PATCH',
+                body: JSON.stringify({ password: newPassword }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (res.ok) {
+                setPasswordStatus('success');
+                setNewPassword("");
+                setTimeout(() => {
+                    setIsPasswordModalOpen(false);
+                    setPasswordStatus('idle');
+                }, 2000);
+            } else {
+                setPasswordStatus('error');
+            }
+        } catch (error) {
+            console.error("Error updating password:", error);
+            setPasswordStatus('error');
+        } finally {
+            setIsUpdatingPassword(null as any); // Reset loading state
+            setIsUpdatingPassword(false);
+        }
+    };
+
+    const handleUpdateRole = async (targetId: string, newRole: string) => {
+        if (!currentUser?.id) return;
+        try {
+            const res = await fetch(`/api/admin/users?adminId=${currentUser.id}&targetId=${targetId}`, {
+                method: 'PATCH',
+                body: JSON.stringify({ role: newRole }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (res.ok) {
+                setUsers(users.map(u => u.id === targetId ? { ...u, role: newRole } : u));
+            }
+        } catch (error) {
+            console.error("Error updating role:", error);
+        }
+    };
+
     return (
         <AdminLayout>
             <div className="space-y-8 animate-in fade-in duration-700">
@@ -110,6 +164,68 @@ export default function AdminUsuariosPage() {
                                             "Eliminar Todo"
                                         )}
                                     </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Password Reset Modal */}
+                {isPasswordModalOpen && userForPassword && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 overflow-hidden">
+                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => !isUpdatingPassword && setIsPasswordModalOpen(false)} />
+                        <div className="bg-[#1A1F1C] border border-white/10 w-full max-w-md rounded-[32px] p-8 relative z-10 shadow-2xl animate-in zoom-in duration-300">
+                            <div className="flex flex-col items-center gap-6 text-center">
+                                <div className={`h-16 w-16 rounded-full flex items-center justify-center border transition-colors ${
+                                    passwordStatus === 'success' ? 'bg-green-500/10 border-green-500/20' : 
+                                    passwordStatus === 'error' ? 'bg-red-500/10 border-red-500/20' : 
+                                    'bg-primary/10 border-primary/20'
+                                }`}>
+                                    {passwordStatus === 'success' ? (
+                                        <CheckCircle2 className="h-8 w-8 text-green-500" />
+                                    ) : passwordStatus === 'error' ? (
+                                        <AlertCircle className="h-8 w-8 text-red-500" />
+                                    ) : (
+                                        <Key className="h-8 w-8 text-primary" />
+                                    )}
+                                </div>
+                                <div className="space-y-2">
+                                    <h3 className="text-xl font-medium text-white font-montserrat tracking-tight">Cambiar Contraseña</h3>
+                                    <p className="text-white/40 text-[13px] leading-relaxed">
+                                        Ingresa una nueva contraseña para <span className="text-white font-medium">{userForPassword.name} {userForPassword.lastName}</span>.
+                                    </p>
+                                </div>
+                                
+                                <div className="w-full space-y-4">
+                                    <input 
+                                        type="text" 
+                                        placeholder="Nueva contraseña (min 6 carac.)"
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-5 py-4 text-[13px] text-white focus:outline-none focus:border-primary transition-all placeholder:text-white/20"
+                                        autoFocus
+                                    />
+
+                                    <div className="flex gap-3 w-full pt-2">
+                                        <button
+                                            onClick={() => setIsPasswordModalOpen(false)}
+                                            disabled={isUpdatingPassword}
+                                            className="flex-1 px-6 py-3.5 rounded-2xl bg-white/5 border border-white/5 text-white/60 text-[13px] font-medium hover:bg-white/10 transition-all disabled:opacity-50"
+                                        >
+                                            Cancelar
+                                        </button>
+                                        <button
+                                            onClick={handleUpdatePassword}
+                                            disabled={isUpdatingPassword || newPassword.length < 6}
+                                            className="flex-1 px-6 py-3.5 rounded-2xl bg-primary text-white text-[13px] font-medium hover:bg-primary/90 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                        >
+                                            {isUpdatingPassword ? (
+                                                <div className="h-4 w-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                                            ) : (
+                                                "Actualizar"
+                                            )}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -198,8 +314,21 @@ export default function AdminUsuariosPage() {
                                                 {u.email}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-6 text-[12px] text-white/40 font-light">
-                                            {u.role}
+                                        <td className="px-6 py-6">
+                                            <select 
+                                                value={u.role}
+                                                onChange={(e) => handleUpdateRole(u.id, e.target.value)}
+                                                className={`
+                                                    bg-white/[0.03] border border-white/5 rounded-lg px-2 py-1 text-[11px] font-medium outline-none transition-all
+                                                    ${u.role === 'ADMIN' ? 'text-primary border-primary/20' : 
+                                                      u.role === 'TEST' ? 'text-amber-400 border-amber-400/20' : 
+                                                      'text-white/40 border-white/10'}
+                                                `}
+                                            >
+                                                <option value="USER" className="bg-[#1A1F1C] text-white/60">CLIENTE</option>
+                                                <option value="ADMIN" className="bg-[#1A1F1C] text-primary">ADMIN</option>
+                                                <option value="TEST" className="bg-[#1A1F1C] text-amber-400">TESTER</option>
+                                            </select>
                                         </td>
                                         <td className="px-6 py-6">
                                             <div className="flex items-center gap-2">
@@ -214,17 +343,30 @@ export default function AdminUsuariosPage() {
                                                 </span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-6 text-right">
-                                            <button
-                                                onClick={() => {
-                                                    setUserToDelete(u);
-                                                    setIsDeleteModalOpen(true);
-                                                }}
-                                                className="p-2 hover:bg-red-500/10 rounded-lg transition-colors text-white/20 hover:text-red-500 group/delete"
-                                                title="Eliminar usuario y toda su actividad"
-                                            >
-                                                <MoreVertical className="h-4 w-4" />
-                                            </button>
+                                         <td className="px-6 py-6 text-right">
+                                            <div className="flex items-center justify-end gap-2">
+                                                <button
+                                                    onClick={() => {
+                                                        setUserForPassword(u);
+                                                        setIsPasswordModalOpen(true);
+                                                        setPasswordStatus('idle');
+                                                    }}
+                                                    className="p-2 hover:bg-primary/10 rounded-lg transition-colors text-white/20 hover:text-primary"
+                                                    title="Blanquear contraseña"
+                                                >
+                                                    <Key className="h-4 w-4" />
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        setUserToDelete(u);
+                                                        setIsDeleteModalOpen(true);
+                                                    }}
+                                                    className="p-2 hover:bg-red-500/10 rounded-lg transition-colors text-white/20 hover:text-red-500 group/delete"
+                                                    title="Eliminar usuario y toda su actividad"
+                                                >
+                                                    <MoreVertical className="h-4 w-4" />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}

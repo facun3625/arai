@@ -18,6 +18,8 @@ export const metadata: Metadata = {
   description: "plataforma e-commerce multi-franquicia para araí yerba mate.",
 };
 
+import { MaintenanceGuard } from "@/components/layout/MaintenanceGuard";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,14 +29,16 @@ export default function RootLayout({
     <html lang="es">
       <body className={montserrat.className}>
         <Providers>
-          <SessionSync />
-          <Header />
-          <SideCart />
-          <main className="min-h-screen bg-white">
-            {children}
-          </main>
-          <Footer />
-          <WhatsAppButton />
+          <MaintenanceGuard>
+            <SessionSync />
+            <Header />
+            <SideCart />
+            <main className="min-h-screen bg-white">
+              {children}
+            </main>
+            <Footer />
+            <WhatsAppButton />
+          </MaintenanceGuard>
         </Providers>
       </body>
     </html>

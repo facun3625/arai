@@ -70,3 +70,56 @@ export async function DELETE(req: Request) {
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
+export async function PATCH(req: Request) {
+    try {
+        const { searchParams } = new URL(req.url);
+        const adminId = searchParams.get("adminId");
+        const targetId = searchParams.get("targetId");
+
+        if (!adminId || !targetId) {
+            return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
+        }
+
+        const { password, role } = await req.json();
+
+        const admin = await prisma.user.findUnique({
+            where: { id: adminId }
+        });
+
+        if (!admin || admin.role !== 'ADMIN') {
+            return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        }
+
+        const updateData: any = {};
+
+        if (password) {
+            if (password.length < 6) {
+                return NextResponse.json({ error: "Password must be at least 6 characters" }, { status: 400 });
+            }
+            const bcrypt = await import('bcryptjs');
+            updateData.password = await bcrypt.hash(password, 10);
+        }
+
+        if (role) {
+            const validRoles = ['USER', 'ADMIN', 'TEST'];
+            if (!validRoles.includes(role)) {
+                return NextResponse.json({ error: "Invalid role" }, { status: 400 });
+            }
+            updateData.role = role;
+        }
+
+        if (Object.keys(updateData).length === 0) {
+            return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
+        }
+
+        await prisma.user.update({
+            where: { id: targetId },
+            data: updateData
+        });
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error("DEBUG: Failed to update user password", error);
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    }
+}

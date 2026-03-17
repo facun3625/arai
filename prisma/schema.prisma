@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -23,6 +23,7 @@ model User {
   points    Int       @default(0)
   pointTransactions PointTransaction[]
   coupons   Coupon[]
+  abandonedCarts AbandonedCart[]
 }
 
 model Address {
@@ -126,6 +127,7 @@ model StoreSettings {
   youtubeUrl            String?
   tiktokUrl             String?
   whatsappNumber        String?
+  maintenanceMode       Boolean  @default(false)
 
   updatedAt             DateTime @updatedAt
 }
@@ -214,4 +216,21 @@ model Subscriber {
   email     String   @unique
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
+}
+
+model AbandonedCart {
+  id          String   @id @default(cuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId   String?  @unique
+  email       String?
+  phone       String?
+  name        String?
+  items       String   @default("[]")
+  total       Float    @default(0)
+  lastActive  DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([lastActive])
 }

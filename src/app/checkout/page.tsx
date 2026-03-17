@@ -63,6 +63,42 @@ export default function CheckoutPage() {
         }
     }, [isAuthenticated, user]);
 
+    // Track partial contact info for abandoned cart recovery
+    useEffect(() => {
+        if (!isHydrated) return;
+
+        const syncContactInfo = async () => {
+            if (contactInfo.email || contactInfo.phone) {
+                const sessionId = localStorage.getItem("arai_cart_session");
+                const subtotal = items.reduce((total, item) => {
+                    const price = Number(item.price);
+                    return total + (isNaN(price) ? 0 : price) * item.quantity;
+                }, 0);
+
+                try {
+                    await fetch("/api/user/cart/sync", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            sessionId,
+                            userId: user?.id,
+                            email: contactInfo.email,
+                            phone: contactInfo.phone,
+                            name: contactInfo.firstName ? `${contactInfo.firstName} ${contactInfo.lastName}` : null,
+                            items,
+                            total: subtotal,
+                        }),
+                    });
+                } catch (err) {
+                    console.error("Partial sync failed", err);
+                }
+            }
+        };
+
+        const timer = setTimeout(syncContactInfo, 2000); // Debounce
+        return () => clearTimeout(timer);
+    }, [contactInfo.email, contactInfo.phone, contactInfo.firstName, contactInfo.lastName, items, isHydrated]);
+
     const [shippingAddress, setShippingAddress] = useState({
         street: "",
         number: "",

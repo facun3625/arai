@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { resend, EMAIL_FROM } from '@/lib/mail';
+import { OrderTemplate } from '@/components/emails/OrderTemplate';
 
 export async function POST(request: Request) {
     try {
@@ -25,9 +27,20 @@ export async function POST(request: Request) {
         }
 
         const order = await prisma.$transaction(async (tx) => {
+            // Verify if user exists if userId is provided
+            let validUserId = null;
+            if (userId && userId.trim() !== "") {
+                const userExists = await tx.user.findUnique({
+                    where: { id: userId }
+                });
+                if (userExists) {
+                    validUserId = userId;
+                }
+            }
+
             const newOrder = await tx.order.create({
                 data: {
-                    userId,
+                    userId: validUserId,
                     status: 'PENDING',
                     subtotal: Number(subtotal),
                     shippingCost: Number(shippingCost),
@@ -58,16 +71,43 @@ export async function POST(request: Request) {
                 }
             });
 
-            // If a redemption coupon was used, deactivate it
+            // If a redemption coupon was used, deactivate it (if it exists)
             if (couponCode && couponCode.toUpperCase().startsWith('CANJE-')) {
-                await tx.coupon.update({
-                    where: { code: couponCode.toUpperCase() },
-                    data: { isActive: false }
+                const coupon = await tx.coupon.findUnique({
+                    where: { code: couponCode.toUpperCase() }
                 });
+
+                if (coupon) {
+                    await tx.coupon.update({
+                        where: { code: couponCode.toUpperCase() },
+                        data: { isActive: false }
+                    });
+                }
             }
 
             return newOrder;
         });
+
+        // 3. Send Confirmation Email (Async, don't block response)
+        try {
+            if (order.contactEmail) {
+                await resend.emails.send({
+                    from: EMAIL_FROM,
+                    to: order.contactEmail,
+                    subject: `¡Confirmación de tu pedido #${order.id.slice(-6).toUpperCase()}! - Araí Yerba Mate`,
+                    react: OrderTemplate({
+                        customerName: order.contactName,
+                        orderId: order.id,
+                        items: order.items,
+                        total: order.total,
+                        shippingAddress: JSON.parse(order.shippingAddress)
+                    })
+                });
+            }
+        } catch (emailError) {
+            console.error('Error sending order confirmation email:', emailError);
+            // We don't throw here as the order was already created successfully
+        }
 
         return NextResponse.json({
             order,

@@ -7,6 +7,7 @@ import {
     LayoutDashboard,
     Package,
     ShoppingCart,
+    ShoppingBag,
     BarChart3,
     ArrowLeft,
     LogOut,
@@ -41,6 +42,7 @@ const menuItems: MenuNode[] = [
         title: 'marketing',
         icon: Tag,
         items: [
+            { name: "carritos abandonados", href: "/admin/carritos-abandonados", icon: ShoppingBag },
             { name: "configuración", href: "/admin/marketing", icon: Settings2 },
             { name: "suscriptores", href: "/admin/marketing/suscriptores", icon: User },
         ]

@@ -4,6 +4,14 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
     try {
         const coupons = await prisma.coupon.findMany({
+            include: {
+                user: {
+                    select: {
+                        name: true,
+                        email: true
+                    }
+                }
+            },
             orderBy: { createdAt: 'desc' }
         });
         return NextResponse.json(coupons);

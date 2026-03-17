@@ -24,7 +24,8 @@ export async function GET() {
                     xUrl: "",
                     youtubeUrl: "",
                     tiktokUrl: "",
-                    whatsappNumber: ""
+                    whatsappNumber: "",
+                    maintenanceMode: false
                 }
             });
         }
@@ -53,6 +54,7 @@ export async function POST(request: Request) {
                 youtubeUrl: body.youtubeUrl ?? "",
                 tiktokUrl: body.tiktokUrl ?? "",
                 whatsappNumber: body.whatsappNumber ?? "",
+                maintenanceMode: body.maintenanceMode ?? false,
             },
             create: {
                 id: "global",
@@ -66,6 +68,7 @@ export async function POST(request: Request) {
                 youtubeUrl: body.youtubeUrl ?? "",
                 tiktokUrl: body.tiktokUrl ?? "",
                 whatsappNumber: body.whatsappNumber ?? "",
+                maintenanceMode: body.maintenanceMode ?? false,
             }
         });
 

@@ -14,7 +14,8 @@ import {
     FileText,
     ExternalLink,
     Loader2,
-    ChevronDown
+    ChevronDown,
+    X
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -28,6 +29,7 @@ export default function AdminPedidosPage() {
     const [selectedOrder, setSelectedOrder] = useState<any>(null);
     const [statusUpdating, setStatusUpdating] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
+    const [showProofModal, setShowProofModal] = useState(false);
     const ITEMS_PER_PAGE = 20;
 
     const STATUS_MAP: Record<string, string> = {
@@ -450,15 +452,14 @@ export default function AdminPedidosPage() {
                                                         Verifica el comprobante antes de procesar.
                                                     </p>
                                                     {selectedOrder.paymentProof ? (
-                                                        <a
-                                                            href={selectedOrder.paymentProof}
-                                                            target="_blank"
-                                                            className="mt-3 flex items-center gap-2 text-[10px] font-bold text-white bg-white/10 hover:bg-white/20 p-2 rounded-lg transition-all"
+                                                        <button
+                                                            onClick={() => setShowProofModal(true)}
+                                                            className="mt-3 w-full flex items-center justify-center gap-2 text-[10px] font-bold text-white bg-primary hover:bg-primary-dark p-3 rounded-xl transition-all shadow-lg shadow-primary/20"
                                                         >
-                                                            <FileText className="h-3 w-3" />
+                                                            <Eye className="h-3 w-3" />
                                                             VER COMPROBANTE
                                                             <ExternalLink className="h-3 w-3 ml-auto opacity-40" />
-                                                        </a>
+                                                        </button>
                                                     ) : (
                                                         <div className="mt-3 px-2 py-1 bg-white/5 rounded-md text-[9px] text-white/30 italic">
                                                             Comprobante no adjuntado aún
@@ -544,6 +545,64 @@ export default function AdminPedidosPage() {
                     </div>
                 </div>
 
+                {/* Proof Modal */}
+                <AnimatePresence>
+                    {showProofModal && selectedOrder?.paymentProof && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8"
+                        >
+                            {/* Backdrop */}
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                onClick={() => setShowProofModal(false)}
+                                className="absolute inset-0 bg-black/90 backdrop-blur-xl"
+                            />
+
+                            {/* Content */}
+                            <motion.div
+                                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                                animate={{ scale: 1, opacity: 1, y: 0 }}
+                                exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                                className="relative bg-[#111] border border-white/10 rounded-[32px] overflow-hidden max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl"
+                            >
+                                <div className="p-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+                                    <div>
+                                        <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-1">Comprobante de Pago</p>
+                                        <h3 className="text-white font-medium">Pedido #{selectedOrder.id.slice(-6).toUpperCase()}</h3>
+                                    </div>
+                                    <button
+                                        onClick={() => setShowProofModal(false)}
+                                        className="h-10 w-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-all border border-white/5"
+                                    >
+                                        <X className="h-5 w-5" />
+                                    </button>
+                                </div>
+                                <div className="flex-1 overflow-y-auto p-4 md:p-8 flex items-center justify-center bg-black/20">
+                                    <img
+                                        src={selectedOrder.paymentProof}
+                                        alt="Comprobante de transferencia"
+                                        className="max-w-full h-auto rounded-2xl shadow-2xl"
+                                    />
+                                </div>
+                                <div className="p-6 border-t border-white/5 flex justify-end bg-white/[0.02]">
+                                    <a
+                                        href={selectedOrder.paymentProof}
+                                        target="_blank"
+                                        className="flex items-center gap-2 text-[11px] font-bold text-white bg-white/5 hover:bg-white/10 px-6 py-3 rounded-xl transition-all border border-white/5 uppercase tracking-widest"
+                                    >
+                                        <ExternalLink className="h-3.5 w-3.5" />
+                                        Abrir original
+                                    </a>
+                                </div>
+                            </motion.div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
         </AdminLayout>
     );

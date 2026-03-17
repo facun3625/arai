@@ -1,7 +1,18 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 
-const localPrisma = new PrismaClient();
+export async function GET(req: Request) {
+    try {
+        const subscribers = await prisma.subscriber.findMany({
+            where: { isActive: true },
+            orderBy: { createdAt: 'desc' }
+        });
+        return NextResponse.json(subscribers);
+    } catch (error: any) {
+        console.error("DEBUG: Failed to fetch subscribers", error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+}
 
 export async function POST(req: Request) {
     try {
@@ -14,19 +25,7 @@ export async function POST(req: Request) {
             );
         }
 
-        // Defensive access to the model on local instance
-        const subscriberModel = (localPrisma as any).subscriber || (localPrisma as any).Subscriber;
-
-        if (!subscriberModel) {
-            const availableModels = Object.keys(localPrisma).filter(k => !k.startsWith('$') && !k.startsWith('_'));
-            console.error("Local Prisma subscriber model not found. Available models:", availableModels);
-            return NextResponse.json(
-                { error: `[REFRESHED-V2] Error: Modelo 'subscriber' no encontrado. Modelos disponibles: ${availableModels.join(', ')}` },
-                { status: 500 }
-            );
-        }
-
-        const subscriber = await subscriberModel.upsert({
+        const subscriber = await prisma.subscriber.upsert({
             where: { email },
             update: { isActive: true },
             create: { email },

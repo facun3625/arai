@@ -77,3 +77,35 @@ export const useCartStore = create<CartState>()(
     }
   )
 );
+
+// Synchronization Logic
+if (typeof window !== "undefined") {
+  let sessionId = localStorage.getItem("arai_cart_session");
+  if (!sessionId) {
+    sessionId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    localStorage.setItem("arai_cart_session", sessionId);
+  }
+
+  useCartStore.subscribe((state) => {
+    const authData = JSON.parse(localStorage.getItem("auth-storage") || "{}");
+    const user = authData?.state?.user;
+
+    const subtotal = state.items.reduce((total, item) => {
+      const price = Number(item.price);
+      return total + (isNaN(price) ? 0 : price) * item.quantity;
+    }, 0);
+
+    fetch("/api/user/cart/sync", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sessionId,
+        userId: user?.id,
+        email: user?.email,
+        name: user?.name,
+        items: state.items,
+        total: subtotal,
+      }),
+    }).catch(err => console.error("Sync failed:", err));
+  });
+}

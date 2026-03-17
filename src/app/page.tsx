@@ -13,7 +13,8 @@ import {
   ChevronRight,
   Star,
   Loader2,
-  Image as LucideImage
+  Image as LucideImage,
+  ChevronLeft
 } from "lucide-react";
 import { PopupOverlay } from "@/components/ui/PopupOverlay";
 
@@ -22,6 +23,7 @@ export default function Home() {
   const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   // Newsletter states
   const [newsletterEmail, setNewsletterEmail] = useState("");
@@ -42,7 +44,11 @@ export default function Home() {
         // Filter categories that have at least one product
         const activeCategories = catsData.filter((cat: any) => (cat._count?.products || 0) > 0);
         setCategories(activeCategories);
-        setProducts(prodsData.slice(0, 8)); // Show top 8 products
+
+        // Fetch top sellers instead of just first products
+        const topSellersRes = await fetch("/api/products/top-sellers");
+        const topSellersData = await topSellersRes.json();
+        setProducts(topSellersData);
       } catch (error) {
         console.error("Error fetching home data:", error);
       } finally {
@@ -203,22 +209,22 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* Transition Banner Section - Now without text and with entrance animation */}
-      <section className="relative w-full h-[350px] md:h-[500px] overflow-hidden">
+      {/* Transition Banner Section - Respecting natural image height */}
+      <section className="relative w-full overflow-hidden bg-white">
         <motion.div
-          initial={{ opacity: 0, scale: 1.1 }}
+          initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
-          className="absolute inset-0 z-0"
+          transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full relative"
         >
-          <Image
+          <img
             src="/images/proceso/banner.png"
             alt="Yerba Mate Araí Experience"
-            fill
-            className="object-cover"
+            className="w-full h-auto block"
           />
-          <div className="absolute inset-0 bg-black/30" />
+          {/* Subtle overlay to blend if needed, but keeping it clean as per user request for padding */}
+          {/* <div className="absolute inset-0 bg-black/5" /> */}
         </motion.div>
       </section>
 
@@ -308,63 +314,115 @@ export default function Home() {
             <h2 className="text-4xl md:text-5xl font-light text-gray-900 tracking-tight">Favoritos de la <span className="font-bold">comunidad.</span></h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
-            {products.map((product) => {
-              const images = typeof product.images === "string" ? JSON.parse(product.images) : (product.images || []);
-              const mainImage = product.featuredImage || images[0] || "/placeholder.png";
-              const displayPrice = product.type === "VARIABLE" && product.variants?.length > 0
-                ? Math.min(...product.variants.map((v: any) => v.price))
-                : product.price;
+          <div className="relative group">
+            {/* Edge mask for continuity */}
+            <div
+              className={`absolute right-0 top-0 bottom-12 w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none transition-opacity duration-500 ${scrollProgress > 0.95 ? 'opacity-0' : 'opacity-100'}`}
+            ></div>
 
-              const hasDiscount = product.compareAtPrice && product.compareAtPrice > displayPrice;
+            <div
+              onScroll={(e) => {
+                const container = e.currentTarget;
+                const progress = container.scrollLeft / (container.scrollWidth - container.clientWidth);
+                setScrollProgress(progress);
+              }}
+              className="flex overflow-x-auto gap-8 pb-12 no-scrollbar snap-x scroll-smooth -mx-6 px-6"
+            >
+              {products.map((product) => {
+                const images = typeof product.images === "string" ? JSON.parse(product.images) : (product.images || []);
+                const mainImage = product.featuredImage || images[0] || "/placeholder.png";
+                const displayPrice = product.type === "VARIABLE" && product.variants?.length > 0
+                  ? Math.min(...product.variants.map((v: any) => v.price))
+                  : product.price;
 
-              return (
-                <Link
-                  key={product.id}
-                  href={`/producto/${product.slug}`}
-                  className="group flex flex-col space-y-6"
-                >
-                  <div className="aspect-[4/5] bg-gray-50 rounded-[32px] overflow-hidden relative shadow-2xl shadow-gray-100/50 group-hover:shadow-primary/10 transition-all duration-700">
-                    <img src={mainImage} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" alt={product.name} />
+                const hasDiscount = product.compareAtPrice && product.compareAtPrice > displayPrice;
 
-                    {hasDiscount && (
-                      <div className="absolute top-6 left-6 bg-primary text-white text-[10px] font-bold px-4 py-2 rounded-full uppercase tracking-widest shadow-xl">
-                        -{Math.round(((product.compareAtPrice - displayPrice) / product.compareAtPrice) * 100)}%
-                      </div>
-                    )}
+                return (
+                  <motion.div
+                    key={product.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="flex-none w-[300px] snap-start"
+                  >
+                    <Link
+                      href={`/producto/${product.slug}`}
+                      className="group flex flex-col space-y-6 h-full"
+                    >
+                      <div className="aspect-[4/5] bg-gray-50 rounded-[32px] overflow-hidden relative shadow-2xl shadow-gray-100/50 group-hover:shadow-primary/10 transition-all duration-700">
+                        <img src={mainImage} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" alt={product.name} />
 
-                    <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-
-                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 translate-y-12 group-hover:translate-y-0 transition-transform duration-700 w-4/5">
-                      <div className="bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 border border-white/20">
-                        <ShoppingBag className="h-4 w-4 text-primary" />
-                        <span className="text-[10px] font-bold text-gray-900 uppercase tracking-widest">Ver Detalles</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4 px-2">
-                    <div className="space-y-1">
-                      <p className="text-[10px] font-bold text-primary/40 uppercase tracking-widest">
-                        {product.categories?.[0]?.name || "Original Line"}
-                      </p>
-                      <h3 className="text-xl font-medium text-gray-900 line-clamp-1 group-hover:text-primary transition-colors leading-tight capitalize">{product.name}</h3>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex flex-col -space-y-1">
                         {hasDiscount && (
-                          <span className="text-xs text-gray-300 line-through font-medium">$ {product.compareAtPrice.toLocaleString('es-AR')}</span>
+                          <div className="absolute top-6 left-6 bg-primary text-white text-[10px] font-bold px-4 py-2 rounded-full uppercase tracking-widest shadow-xl z-10">
+                            -{Math.round(((product.compareAtPrice - displayPrice) / product.compareAtPrice) * 100)}%
+                          </div>
                         )}
-                        <p className="text-2xl font-bold text-primary tracking-tight">$ {displayPrice.toLocaleString('es-AR')}</p>
+
+                        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+                        {/* Hover Overlay - Ver Detalles - Adjusted to fix cutoff */}
+                        <div className="absolute bottom-6 left-0 right-0 px-6 transform translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 z-20">
+                          <div className="bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 border border-white/20 w-full transform group-hover:scale-105 transition-transform">
+                            <ShoppingBag className="h-4 w-4 text-primary" />
+                            <span className="text-[10px] font-bold text-gray-900 uppercase tracking-widest">Ver Detalles</span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center group-hover:bg-primary transition-all duration-500">
-                        <ChevronRight className="h-5 w-5 text-gray-300 group-hover:text-white" />
+
+                      <div className="space-y-4 px-2 flex-grow">
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-bold text-primary/40 uppercase tracking-widest">
+                            {product.categories?.[0]?.name || "Original Line"}
+                          </p>
+                          <h3 className="text-xl font-medium text-gray-900 line-clamp-1 group-hover:text-primary transition-colors leading-tight capitalize">{product.name}</h3>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex flex-col -space-y-1">
+                            {hasDiscount && (
+                              <span className="text-xs text-gray-300 line-through font-medium">$ {product.compareAtPrice.toLocaleString('es-AR')}</span>
+                            )}
+                            <p className="text-2xl font-bold text-primary tracking-tight">$ {displayPrice.toLocaleString('es-AR')}</p>
+                          </div>
+                          <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center group-hover:bg-primary transition-all duration-500">
+                            <ChevronRight className="h-5 w-5 text-gray-300 group-hover:text-white" />
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* Scroll Progress Bar */}
+            <div className="mt-8 max-w-[200px] mx-auto h-1 bg-gray-100 rounded-full overflow-hidden">
+              <motion.div
+                className="h-full bg-primary"
+                style={{ width: `${Math.max(10, scrollProgress * 100)}%` }}
+              />
+            </div>
+
+            {/* Navigation Buttons for desktop */}
+            <div className="hidden md:block">
+              <button
+                onClick={(e) => {
+                  const container = (e.currentTarget.parentElement?.previousElementSibling?.previousElementSibling as HTMLDivElement);
+                  container.scrollBy({ left: -320, behavior: 'smooth' });
+                }}
+                className={`absolute -left-6 top-1/2 -translate-y-1/2 w-12 h-12 bg-white rounded-full shadow-xl flex items-center justify-center text-primary border border-gray-100 transition-all z-30 ${scrollProgress > 0.01 ? 'opacity-40 hover:opacity-100 hover:scale-110' : 'opacity-0 pointer-events-none'}`}
+              >
+                <ChevronLeft className="h-6 w-6" />
+              </button>
+              <button
+                onClick={(e) => {
+                  const container = (e.currentTarget.parentElement?.previousElementSibling?.previousElementSibling as HTMLDivElement);
+                  container.scrollBy({ left: 320, behavior: 'smooth' });
+                }}
+                className={`absolute -right-6 top-1/2 -translate-y-1/2 w-12 h-12 bg-white rounded-full shadow-xl flex items-center justify-center text-primary border border-gray-100 transition-all z-30 ${scrollProgress < 0.99 ? 'opacity-40 hover:opacity-100 hover:scale-110' : 'opacity-0 pointer-events-none'}`}
+              >
+                <ChevronRight className="h-6 w-6" />
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -397,8 +455,8 @@ export default function Home() {
                 type="submit"
                 disabled={isSubscribing || newsletterStatus === "success"}
                 className={`h-16 px-10 rounded-2xl text-[12px] font-bold transition-all shadow-2xl relative overflow-hidden ${newsletterStatus === "success"
-                    ? "bg-green-600 text-white cursor-default"
-                    : "bg-primary text-white hover:scale-105 shadow-primary/20"
+                  ? "bg-green-600 text-white cursor-default"
+                  : "bg-primary text-white hover:scale-105 shadow-primary/20"
                   }`}
               >
                 {isSubscribing ? (

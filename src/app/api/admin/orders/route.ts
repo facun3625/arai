@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { resend, EMAIL_FROM } from "@/lib/mail";
+import { StatusUpdateTemplate } from "@/components/emails/StatusUpdateTemplate";
 
 export async function GET(req: Request) {
     try {
@@ -32,7 +34,15 @@ export async function GET(req: Request) {
             }
         });
 
-        return NextResponse.json({ orders });
+        // Parse shippingAddress from JSON string to object
+        const parsedOrders = orders.map(order => ({
+            ...order,
+            shippingAddress: typeof order.shippingAddress === 'string'
+                ? JSON.parse(order.shippingAddress)
+                : order.shippingAddress
+        }));
+
+        return NextResponse.json({ orders: parsedOrders });
     } catch (error) {
         console.error("DEBUG: Failed to fetch admin orders", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
@@ -97,6 +107,45 @@ export async function PATCH(req: Request) {
                 console.error("DEBUG: Failed to award points", error);
                 // No fallamos la actualización del pedido por un error en puntos
             }
+        }
+
+        // 3. Send Status Notification Email
+        try {
+            const orderWithContact = await prisma.order.findUnique({
+                where: { id: orderId }
+            });
+
+            if (orderWithContact && orderWithContact.contactEmail) {
+                let emailSubject = "";
+                let emailMessage = "";
+                let friendlyStatus = "";
+
+                if (status === "PAID") {
+                    emailSubject = "¡Recibimos tu pago! - Araí Yerba Mate";
+                    emailMessage = "Hemos verificado tu comprobante de pago con éxito. Ahora estamos preparando todo para que disfrutes de tu Yerba Araí.";
+                    friendlyStatus = "PAGO CONFIRMADO";
+                } else if (status === "COMPLETED" || status === "SHIPPED") {
+                    emailSubject = "¡Tu pedido está en camino! - Araí Yerba Mate";
+                    emailMessage = "Estamos muy contentos de avisarte que tu pedido ha sido despachado. ¡Pronto llegará a tus manos!";
+                    friendlyStatus = "EN CAMINO / COMPLETADO";
+                }
+
+                if (emailSubject) {
+                    await resend.emails.send({
+                        from: EMAIL_FROM,
+                        to: orderWithContact.contactEmail,
+                        subject: emailSubject,
+                        react: StatusUpdateTemplate({
+                            customerName: orderWithContact.contactName,
+                            orderId: orderWithContact.id,
+                            newStatus: friendlyStatus,
+                            message: emailMessage
+                        })
+                    });
+                }
+            }
+        } catch (emailError) {
+            console.error("DEBUG: Failed to send status update email", emailError);
         }
 
         return NextResponse.json({ order: updatedOrder });

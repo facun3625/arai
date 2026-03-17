@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { useAuthStore } from "@/store/useAuthStore";
-import { Plus, Trash2, Edit2, CheckCircle2, XCircle, Save, Percent, DollarSign, Tag, Monitor, Image as ImageIcon, Loader2, Coins, Gift, Settings2, Sparkles, Truck, Instagram, Facebook, Twitter } from "lucide-react";
+import { Plus, Trash2, Edit2, CheckCircle2, XCircle, Save, Percent, DollarSign, Tag, Monitor, Image as ImageIcon, Loader2, Coins, Gift, Settings2, Sparkles, Truck, Instagram, Facebook, Twitter, Mail, Send, ExternalLink, Users } from "lucide-react";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
 
 export default function MarketingPage() {
-    const [activeTab, setActiveTab] = useState<"settings" | "coupons" | "popups" | "points">("settings");
+    const [activeTab, setActiveTab] = useState<"settings" | "coupons" | "popups" | "points" | "user-coupons" | "email-marketing">("settings");
+    const [searchQuery, setSearchQuery] = useState("");
     const { user } = useAuthStore();
 
     // Configuración Global
@@ -21,7 +22,8 @@ export default function MarketingPage() {
         xUrl: "",
         youtubeUrl: "",
         tiktokUrl: "",
-        whatsappNumber: ""
+        whatsappNumber: "",
+        maintenanceMode: false
     });
     const [isSavingSettings, setIsSavingSettings] = useState(false);
 
@@ -67,12 +69,38 @@ export default function MarketingPage() {
     // Estado para confirmación de eliminación en línea
     const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
+    // Email Marketing
+    const [subscribersCount, setSubscribersCount] = useState(0);
+    const [isSendingEmail, setIsSendingEmail] = useState(false);
+    const [audienceStats, setAudienceStats] = useState<any>({});
+    const [emailForm, setEmailForm] = useState({
+        subject: "",
+        content: "",
+        buttonText: "",
+        buttonUrl: "",
+        audience: "ALL"
+    });
+
     useEffect(() => {
         fetchSettings();
         fetchCoupons();
         fetchPopups();
         fetchRewards();
+        fetchAudienceStats();
     }, []);
+
+    const fetchAudienceStats = async () => {
+        try {
+            const res = await fetch(`/api/admin/marketing/audience-stats?adminId=${user?.id}`);
+            const data = await res.json();
+            if (data.stats) {
+                setAudienceStats(data.stats);
+                setSubscribersCount(data.stats.ALL || 0);
+            }
+        } catch (error) {
+            console.error("Error fetching audience stats:", error);
+        }
+    };
 
     const fetchSettings = async () => {
         try {
@@ -89,7 +117,8 @@ export default function MarketingPage() {
                     xUrl: data.xUrl || "",
                     youtubeUrl: data.youtubeUrl || "",
                     tiktokUrl: data.tiktokUrl || "",
-                    whatsappNumber: data.whatsappNumber || ""
+                    whatsappNumber: data.whatsappNumber || "",
+                    maintenanceMode: data.maintenanceMode || false
                 });
             }
         } catch (error) {
@@ -291,6 +320,40 @@ export default function MarketingPage() {
         }
     };
 
+    const handleSendEmail = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!emailForm.subject || !emailForm.content) {
+            showToast("Asunto y contenido son obligatorios", "error");
+            return;
+        }
+
+        if (!confirm("¿Estás seguro de enviar este correo a todos los suscriptores?")) return;
+
+        setIsSendingEmail(true);
+        try {
+            const res = await fetch("/api/admin/marketing/send-mass-email", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    ...emailForm,
+                    adminId: user?.id
+                })
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                showToast(`¡Campaña enviada con éxito! 🚀`, "success");
+                setEmailForm({ subject: "", content: "", buttonText: "", buttonUrl: "", audience: "ALL", customEmailsRaw: "", customEmails: [] } as any);
+            } else {
+                showToast(data.error || "Error al enviar el correo", "error");
+            }
+        } catch (error) {
+            showToast("Error de conexión al enviar correo", "error");
+        } finally {
+            setIsSendingEmail(false);
+        }
+    };
+
     return (
         <AdminLayout>
             <div className="space-y-8 animate-in fade-in duration-700">
@@ -327,6 +390,18 @@ export default function MarketingPage() {
                         className={`text-[12px] font-medium tracking-wide pb-2 px-1 border-b-2 transition-all ${activeTab === 'coupons' ? 'text-primary border-primary' : 'text-white/40 border-transparent hover:text-white/70'}`}
                     >
                         Cupones de Descuento
+                    </button>
+                    <button
+                        onClick={() => setActiveTab("user-coupons")}
+                        className={`text-[12px] font-medium tracking-wide pb-2 px-1 border-b-2 transition-all ${activeTab === 'user-coupons' ? 'text-primary border-primary' : 'text-white/40 border-transparent hover:text-white/70'}`}
+                    >
+                        Canjes de Usuarios
+                    </button>
+                    <button
+                        onClick={() => setActiveTab("email-marketing")}
+                        className={`text-[12px] font-medium tracking-wide pb-2 px-1 border-b-2 transition-all ${activeTab === 'email-marketing' ? 'text-primary border-primary' : 'text-white/40 border-transparent hover:text-white/70'}`}
+                    >
+                        Email Marketing
                     </button>
                 </div>
 
@@ -371,6 +446,36 @@ export default function MarketingPage() {
                                         className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-[14px] text-white focus:outline-none focus:border-primary transition-colors font-mono"
                                     />
                                 </div>
+                            </div>
+
+                            <hr className="border-white/10" />
+
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h2 className="text-white text-lg font-medium tracking-tight mb-1 flex items-center gap-2">
+                                            <Monitor className="h-5 w-5 text-red-500" /> Modo Mantenimiento
+                                        </h2>
+                                        <p className="text-[12px] text-white/40 italic">Bloquea el acceso al sitio para todos excepto administradores y testers.</p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => setSettings({ ...settings, maintenanceMode: !settings.maintenanceMode })}
+                                        className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${settings.maintenanceMode 
+                                            ? 'bg-red-500/20 text-red-500 border border-red-500/30' 
+                                            : 'bg-white/5 text-white/40 border border-white/10 hover:border-white/20'}`}
+                                    >
+                                        {settings.maintenanceMode ? 'ACTIVO (SITIO CERRADO)' : 'DESACTIVADO (SITIO PÚBLICO)'}
+                                    </button>
+                                </div>
+                                {settings.maintenanceMode && (
+                                    <div className="p-4 bg-red-500/5 border border-red-500/10 rounded-2xl animate-in fade-in slide-in-from-top-2 duration-300">
+                                        <p className="text-[11px] text-red-400 leading-relaxed italic">
+                                            ⚠️ <strong>Atención:</strong> El sitio mostrará un cartel de "En Mantenimiento" a todos los visitantes. 
+                                            Como administrador, tu acceso sigue habilitado para que puedas realizar pruebas.
+                                        </p>
+                                    </div>
+                                )}
                             </div>
 
                             <hr className="border-white/10" />
@@ -474,6 +579,188 @@ export default function MarketingPage() {
                                 Guardar Configuraciones
                             </button>
                         </form>
+                    </div>
+                )}
+
+                {/* TAB: EMAIL MARKETING */}
+                {activeTab === "email-marketing" && (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl">
+                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="bg-primary/5 border border-primary/20 rounded-3xl p-6 flex items-center gap-6">
+                                <div className="h-14 w-14 rounded-2xl bg-primary/20 flex items-center justify-center">
+                                    <Users className="h-7 w-7 text-primary" />
+                                </div>
+                                <div>
+                                    <h2 className="text-white text-lg font-medium tracking-tight">Audiencia Alcanzada</h2>
+                                    <p className="text-2xl font-bold text-primary">
+                                        {emailForm.audience === 'CUSTOM_LIST'
+                                            ? ((emailForm as any).customEmails || []).length
+                                            : (audienceStats[emailForm.audience] || 0)}
+                                        <span className="text-[10px] text-white/40 uppercase font-light tracking-widest ml-2">
+                                            {emailForm.audience === 'ALL' && 'Total de Reach'}
+                                            {emailForm.audience === 'ABANDONED_CART' && 'Carritos Abandonados'}
+                                            {emailForm.audience === 'CUSTOMERS' && 'Clientes que Compraron'}
+                                            {emailForm.audience === 'REGISTERED' && 'Usuarios Registrados'}
+                                            {emailForm.audience === 'CUSTOM_LIST' && 'Correos Manuales'}
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 space-y-6">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <Mail className="h-5 w-5 text-primary" />
+                                    <h2 className="text-white font-medium tracking-tight">Redactar Nueva Campaña</h2>
+                                </div>
+
+                                <form onSubmit={handleSendEmail} className="space-y-6">
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Seleccionar Audiencia</label>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            {[
+                                                { id: 'ALL', label: 'Todos', info: 'Susc. + Clientes' },
+                                                { id: 'ABANDONED_CART', label: 'Carritos Abr.', info: 'Emails capturados' },
+                                                { id: 'CUSTOMERS', label: 'Compradores', info: 'Tienen pedidos' },
+                                                { id: 'REGISTERED', label: 'Registrados', info: 'Todos los usuarios' },
+                                                { id: 'CUSTOM_LIST', label: 'Lista Manual', info: 'Pegar correos' }
+                                            ].map((group) => (
+                                                <button
+                                                    key={group.id}
+                                                    type="button"
+                                                    onClick={() => setEmailForm({ ...emailForm, audience: group.id })}
+                                                    className={`p-3 rounded-xl border text-left transition-all ${emailForm.audience === group.id
+                                                        ? 'bg-primary/20 border-primary text-primary'
+                                                        : 'bg-white/5 border-white/10 text-white/60 hover:border-white/20'}`}
+                                                >
+                                                    <p className="text-[12px] font-bold">{group.label}</p>
+                                                    <p className="text-[9px] uppercase tracking-wider opacity-60">
+                                                        {group.id === 'CUSTOM_LIST'
+                                                            ? 'Ingresa los mails'
+                                                            : `${group.info} (${audienceStats[group.id] || 0})`}
+                                                    </p>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {emailForm.audience === 'CUSTOM_LIST' && (
+                                        <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
+                                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Correos (uno por línea o separados por coma)</label>
+                                            <textarea
+                                                value={(emailForm as any).customEmailsRaw || ""}
+                                                onChange={(e) => {
+                                                    const raw = e.target.value;
+                                                    const emails = raw.split(/[\n,]+/).map(em => em.trim()).filter(em => em.includes("@"));
+                                                    setEmailForm({
+                                                        ...emailForm,
+                                                        ...({ customEmailsRaw: raw, customEmails: emails } as any)
+                                                    });
+                                                }}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors min-h-[100px] font-mono"
+                                                placeholder="mate@tienda.com&#10;yerba@tienda.com"
+                                            />
+                                            <p className="text-[10px] text-primary mt-1">
+                                                Detectados: {((emailForm as any).customEmails || []).length} correos válidos.
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Asunto del Correo</label>
+                                        <input
+                                            type="text"
+                                            value={emailForm.subject}
+                                            onChange={(e) => setEmailForm({ ...emailForm, subject: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[14px] text-white focus:outline-none focus:border-primary transition-colors"
+                                            placeholder="Ej: ¡Nuevos ingresos de mates premium! 🧉"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Cuerpo del Mensaje</label>
+                                        <textarea
+                                            value={emailForm.content}
+                                            onChange={(e) => setEmailForm({ ...emailForm, content: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[14px] text-white focus:outline-none focus:border-primary transition-colors min-h-[200px] resize-none"
+                                            placeholder="Escribí el contenido de tu correo aquí..."
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-1.5">
+                                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Texto del Botón (Opcional)</label>
+                                            <input
+                                                type="text"
+                                                value={emailForm.buttonText}
+                                                onChange={(e) => setEmailForm({ ...emailForm, buttonText: e.target.value })}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                                placeholder="Ver Tienda"
+                                            />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">URL del Botón (Opcional)</label>
+                                            <input
+                                                type="text"
+                                                value={emailForm.buttonUrl}
+                                                onChange={(e) => setEmailForm({ ...emailForm, buttonUrl: e.target.value })}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                                placeholder="https://arai-yerba.com/tienda"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        disabled={isSendingEmail || (audienceStats[emailForm.audience] || 0) === 0}
+                                        className="w-full bg-primary hover:bg-primary-dark disabled:bg-white/5 disabled:text-white/20 text-white py-4 rounded-xl text-[13px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-3 shadow-xl shadow-primary/10 hover:-translate-y-0.5"
+                                    >
+                                        {isSendingEmail ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                                        {isSendingEmail ? 'Enviando...' : `Enviar Campaña a ${emailForm.audience === 'CUSTOM_LIST' ? ((emailForm as any).customEmails || []).length : (audienceStats[emailForm.audience] || 0)} personas`}
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        {/* Vista Previa Simplificada */}
+                        <div className="hidden lg:block space-y-4 animate-in fade-in slide-in-from-right-4 duration-700">
+                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Vista Previa (Sugerida)</label>
+                            <div className="bg-white rounded-3xl overflow-hidden shadow-2xl shadow-black/20 animate-in fade-in slide-in-from-right-4 duration-500">
+                                <div className="bg-[#1a432e] py-8 flex flex-col items-center justify-center">
+                                    <img
+                                        src="/arai_logo.png"
+                                        alt="Araí"
+                                        className="h-12 w-auto"
+                                    />
+                                </div>
+                                <div className="p-10 space-y-8 min-h-[400px]">
+                                    <div className="space-y-4">
+                                        <h3 className="text-[#1a1a1a] text-3xl font-bold text-center leading-tight">
+                                            {emailForm.subject || "Tu Asunto Aquí"}
+                                        </h3>
+                                        <div className="w-12 h-1 bg-primary/20 mx-auto rounded-full" />
+                                    </div>
+                                    <div className="text-[#444444] text-[15px] leading-relaxed whitespace-pre-wrap text-center">
+                                        {emailForm.content || "Escribí algo arriba para verlo reflejado acá..."}
+                                    </div>
+
+                                    {emailForm.buttonText && (
+                                        <div className="flex justify-center pt-4">
+                                            <div className="bg-[#0c120e] text-white px-8 py-4 rounded-xl text-[13px] font-bold uppercase tracking-widest shadow-lg">
+                                                {emailForm.buttonText}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="pt-12 border-t border-gray-100 mt-auto">
+                                        <p className="text-[#aaaaaa] text-[10px] text-center uppercase tracking-[0.2em]">
+                                            Araí Yerba Mate · {new Date().getFullYear()}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 )}
 
@@ -681,156 +968,291 @@ export default function MarketingPage() {
 
                 {/* TAB 2: COUPONS */}
                 {activeTab === "coupons" && (
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        {/* Formulario */}
-                        <div className="lg:col-span-1 space-y-6">
-                            <form onSubmit={handleCreateCoupon} className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 space-y-4">
-                                <h2 className="text-[14px] text-white font-medium mb-4 flex items-center gap-2">
-                                    <Tag className="h-4 w-4 text-primary" /> Crear Cupón
-                                </h2>
+                    <div className="space-y-12">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            {/* Formulario */}
+                            <div className="lg:col-span-1 space-y-6">
+                                <form onSubmit={handleCreateCoupon} className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 space-y-4">
+                                    <h2 className="text-[14px] text-white font-medium mb-4 flex items-center gap-2">
+                                        <Tag className="h-4 w-4 text-primary" /> Crear Cupón de Campaña
+                                    </h2>
 
-                                <div className="space-y-1.5">
-                                    <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Código (Ej: VERANO20)</label>
-                                    <input
-                                        type="text"
-                                        value={couponForm.code}
-                                        onChange={(e) => setCouponForm({ ...couponForm, code: e.target.value.toUpperCase() })}
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors uppercase font-mono"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Tipo</label>
-                                        <select
-                                            value={couponForm.discountType}
-                                            onChange={(e) => setCouponForm({ ...couponForm, discountType: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors appearance-none"
-                                        >
-                                            <option value="PERCENTAGE">Porcentaje (%)</option>
-                                            <option value="FIXED">Monto Fijo ($)</option>
-                                        </select>
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Valor</label>
+                                        <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Código (Ej: VERANO20)</label>
                                         <input
-                                            type="number"
-                                            value={couponForm.discountValue}
-                                            onChange={(e) => setCouponForm({ ...couponForm, discountValue: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                            type="text"
+                                            value={couponForm.code}
+                                            onChange={(e) => setCouponForm({ ...couponForm, code: e.target.value.toUpperCase() })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors uppercase font-mono"
                                             required
                                         />
                                     </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-1.5">
+                                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Tipo</label>
+                                            <select
+                                                value={couponForm.discountType}
+                                                onChange={(e) => setCouponForm({ ...couponForm, discountType: e.target.value })}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors appearance-none"
+                                            >
+                                                <option value="PERCENTAGE">Porcentaje (%)</option>
+                                                <option value="FIXED">Monto Fijo ($)</option>
+                                            </select>
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Valor</label>
+                                            <input
+                                                type="number"
+                                                value={couponForm.discountValue}
+                                                onChange={(e) => setCouponForm({ ...couponForm, discountValue: e.target.value })}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Monto de Compra Mínima (Opcional)</label>
+                                        <div className="relative">
+                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40">$</span>
+                                            <input
+                                                type="number"
+                                                value={couponForm.minPurchaseAmount}
+                                                onChange={(e) => setCouponForm({ ...couponForm, minPurchaseAmount: e.target.value })}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl pl-7 pr-3 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                                placeholder="0"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        disabled={isSubmittingCoupon}
+                                        className="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-xl text-[12px] font-medium transition-all flex items-center justify-center gap-2 mt-4 shadow-lg shadow-primary/10"
+                                    >
+                                        {isSubmittingCoupon ? <Plus className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                                        Crear Cupón de Campaña
+                                    </button>
+
+                                    <div className="bg-primary/5 border border-primary/10 p-4 rounded-2xl">
+                                        <p className="text-[11px] text-primary/70 italic flex items-center gap-2">
+                                            <Sparkles className="h-3.5 w-3.5" />
+                                            Estos cupones son para tus promociones manuales.
+                                        </p>
+                                    </div>
+                                </form>
+                            </div>
+
+                            {/* Listado de Cupones de Administración */}
+                            <div className="lg:col-span-2 space-y-4">
+                                <div className="flex items-center justify-between px-2">
+                                    <div>
+                                        <h2 className="text-white font-medium tracking-tight">Cupones de Campaña</h2>
+                                        <p className="text-[11px] text-white/40 uppercase tracking-widest">Creados manualmente</p>
+                                    </div>
+                                    <span className="text-[10px] bg-white/5 border border-white/10 px-3 py-1 rounded-full text-white/40 font-bold uppercase tracking-widest">
+                                        {coupons.filter(c => !c.userId).length} Activos
+                                    </span>
                                 </div>
 
-                                <div className="space-y-1.5">
-                                    <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Monto de Compra Mínima (Opcional)</label>
-                                    <div className="relative">
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40">$</span>
-                                        <input
-                                            type="number"
-                                            value={couponForm.minPurchaseAmount}
-                                            onChange={(e) => setCouponForm({ ...couponForm, minPurchaseAmount: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl pl-7 pr-3 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
-                                            placeholder="0"
-                                        />
+                                <div className="bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden">
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-left border-collapse">
+                                            <thead>
+                                                <tr className="border-b border-white/5 bg-white/[0.02]">
+                                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Código</th>
+                                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Descuento</th>
+                                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Condiciones</th>
+                                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium text-right">Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-white/5">
+                                                {isLoadingCoupons ? (
+                                                    <tr>
+                                                        <td colSpan={4} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
+                                                            Cargando cupones...
+                                                        </td>
+                                                    </tr>
+                                                ) : coupons.filter(c => !c.userId).length === 0 ? (
+                                                    <tr>
+                                                        <td colSpan={4} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
+                                                            No hay cupones de campaña.
+                                                        </td>
+                                                    </tr>
+                                                ) : coupons.filter(c => !c.userId).map((c) => (
+                                                    <tr key={c.id} className={`hover:bg-white/[0.02] transition-colors group ${!c.isActive ? 'opacity-50 grayscale' : ''}`}>
+                                                        <td className="px-6 py-4">
+                                                            <span className="text-[13px] font-bold text-primary font-mono bg-primary/10 px-2 py-1 rounded">
+                                                                {c.code}
+                                                            </span>
+                                                            {!c.isActive && <span className="ml-2 text-[9px] text-red-400 border border-red-400/20 px-1.5 py-0.5 rounded uppercase font-bold tracking-widest">Inactivo</span>}
+                                                        </td>
+                                                        <td className="px-6 py-4 text-[13px] text-white">
+                                                            {c.discountType === 'PERCENTAGE' ? `${c.discountValue}% OFF` : `$${c.discountValue.toLocaleString('es-AR')} OFF`}
+                                                        </td>
+                                                        <td className="px-6 py-4 text-[11px] text-white/60">
+                                                            {c.minPurchaseAmount ? `Compra mín. $${c.minPurchaseAmount.toLocaleString('es-AR')}` : 'Sin restricciones'}
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            <div className="flex items-center justify-end gap-3 transition-opacity">
+                                                                {confirmDeleteId === c.id ? (
+                                                                    <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-2 duration-300">
+                                                                        <button
+                                                                            onClick={() => confirmDeleteCoupon(c.id)}
+                                                                            className="text-[10px] bg-red-500/20 text-red-500 border border-red-500/30 px-2 py-1 rounded hover:bg-red-500 hover:text-white transition-all font-bold uppercase tracking-tight"
+                                                                        >
+                                                                            Borrar
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={() => setConfirmDeleteId(null)}
+                                                                            className="text-[10px] text-white/40 hover:text-white transition-colors uppercase font-medium"
+                                                                        >
+                                                                            No
+                                                                        </button>
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                        <button
+                                                                            onClick={() => handleToggleCoupon(c.id, c.isActive)}
+                                                                            title={c.isActive ? "Desactivar" : "Activar"}
+                                                                            className="text-white/40 hover:text-white"
+                                                                        >
+                                                                            {c.isActive ? <XCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={() => handleDeleteClick(c.id)}
+                                                                            title="Eliminar"
+                                                                            className="text-red-400/60 hover:text-red-400"
+                                                                        >
+                                                                            <Trash2 className="h-4 w-4" />
+                                                                        </button>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
-
-                                <button
-                                    type="submit"
-                                    disabled={isSubmittingCoupon}
-                                    className="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-xl text-[12px] font-medium transition-all flex items-center justify-center gap-2 mt-4"
-                                >
-                                    {isSubmittingCoupon ? <Plus className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                                    Crear Cupón
-                                </button>
-                            </form>
+                            </div>
                         </div>
 
-                        {/* Listado */}
-                        <div className="lg:col-span-2">
-                            <div className="bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden">
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-left border-collapse">
-                                        <thead>
-                                            <tr className="border-b border-white/5 bg-white/[0.02]">
-                                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Código</th>
-                                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Descuento</th>
-                                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Condiciones</th>
-                                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium text-right">Acciones</th>
+                    </div>
+                )}
+
+                {/* TAB 3: USER COUPONS (REDEMPTIONS) */}
+                {activeTab === "user-coupons" && (
+                    <div className="space-y-6">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-2">
+                            <div>
+                                <h2 className="text-white font-medium tracking-tight text-lg">Canjes de Usuarios</h2>
+                                <p className="text-[11px] text-white/40 uppercase tracking-widest">Cupones generados automáticamente por el sistema de puntos</p>
+                            </div>
+
+                            <div className="relative w-full md:w-80">
+                                <Tag className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
+                                <input
+                                    type="text"
+                                    placeholder="Buscar por usuario, email o código..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-11 pr-4 text-[13px] text-white focus:outline-none focus:border-primary transition-all placeholder:text-white/20"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr className="border-b border-white/5 bg-white/[0.02]">
+                                            <th className="px-6 py-5 text-[10px] uppercase tracking-widest text-white/40 font-medium">Socio / Usuario</th>
+                                            <th className="px-6 py-5 text-[10px] uppercase tracking-widest text-white/40 font-medium">Código</th>
+                                            <th className="px-6 py-5 text-[10px] uppercase tracking-widest text-white/40 font-medium">Beneficio</th>
+                                            <th className="px-6 py-5 text-[10px] uppercase tracking-widest text-white/40 font-medium">Fecha</th>
+                                            <th className="px-6 py-5 text-[10px] uppercase tracking-widest text-white/40 font-medium">Estado</th>
+                                            <th className="px-6 py-5 text-[10px] uppercase tracking-widest text-white/40 font-medium text-right">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-white/5">
+                                        {isLoadingCoupons ? (
+                                            <tr>
+                                                <td colSpan={6} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
+                                                    Cargando historial de canjes...
+                                                </td>
                                             </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-white/5">
-                                            {isLoadingCoupons ? (
-                                                <tr>
-                                                    <td colSpan={4} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
-                                                        Cargando cupones...
-                                                    </td>
-                                                </tr>
-                                            ) : coupons.length === 0 ? (
-                                                <tr>
-                                                    <td colSpan={4} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
-                                                        No hay cupones creados.
-                                                    </td>
-                                                </tr>
-                                            ) : coupons.map((c) => (
-                                                <tr key={c.id} className={`hover:bg-white/[0.02] transition-colors group ${!c.isActive ? 'opacity-50 grayscale' : ''}`}>
-                                                    <td className="px-6 py-4">
-                                                        <span className="text-[13px] font-bold text-primary font-mono bg-primary/10 px-2 py-1 rounded">
-                                                            {c.code}
-                                                        </span>
-                                                        {!c.isActive && <span className="ml-2 text-[9px] text-red-400 border border-red-400/20 px-1.5 py-0.5 rounded uppercase font-bold tracking-widest">Inactivo</span>}
-                                                    </td>
-                                                    <td className="px-6 py-4 text-[13px] text-white">
-                                                        {c.discountType === 'PERCENTAGE' ? `${c.discountValue}% OFF` : `$${c.discountValue.toLocaleString('es-AR')} OFF`}
-                                                    </td>
-                                                    <td className="px-6 py-4 text-[11px] text-white/60">
-                                                        {c.minPurchaseAmount ? `Compra mín. $${c.minPurchaseAmount.toLocaleString('es-AR')}` : 'Sin restricciones'}
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        <div className="flex items-center justify-end gap-3 transition-opacity">
-                                                            {confirmDeleteId === c.id ? (
-                                                                <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-2 duration-300">
-                                                                    <button
-                                                                        onClick={() => confirmDeleteCoupon(c.id)}
-                                                                        className="text-[10px] bg-red-500/20 text-red-500 border border-red-500/30 px-2 py-1 rounded hover:bg-red-500 hover:text-white transition-all font-bold uppercase tracking-tight"
-                                                                    >
-                                                                        Borrar
-                                                                    </button>
-                                                                    <button
-                                                                        onClick={() => setConfirmDeleteId(null)}
-                                                                        className="text-[10px] text-white/40 hover:text-white transition-colors uppercase font-medium"
-                                                                    >
-                                                                        No
-                                                                    </button>
-                                                                </div>
-                                                            ) : (
-                                                                <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                    <button
-                                                                        onClick={() => handleToggleCoupon(c.id, c.isActive)}
-                                                                        title={c.isActive ? "Desactivar" : "Activar"}
-                                                                        className="text-white/40 hover:text-white"
-                                                                    >
-                                                                        {c.isActive ? <XCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
-                                                                    </button>
-                                                                    <button
-                                                                        onClick={() => handleDeleteClick(c.id)}
-                                                                        title="Eliminar"
-                                                                        className="text-red-400/60 hover:text-red-400"
-                                                                    >
-                                                                        <Trash2 className="h-4 w-4" />
-                                                                    </button>
-                                                                </div>
-                                                            )}
+                                        ) : coupons.filter(c => {
+                                            if (!c.userId) return false;
+                                            const query = searchQuery.toLowerCase();
+                                            return (
+                                                c.user?.name?.toLowerCase().includes(query) ||
+                                                c.user?.email?.toLowerCase().includes(query) ||
+                                                c.code.toLowerCase().includes(query)
+                                            );
+                                        }).length === 0 ? (
+                                            <tr>
+                                                <td colSpan={6} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
+                                                    {searchQuery ? "No se encontraron canjes para tu búsqueda." : "Aún no hay canjes registrados."}
+                                                </td>
+                                            </tr>
+                                        ) : coupons.filter(c => {
+                                            if (!c.userId) return false;
+                                            const query = searchQuery.toLowerCase();
+                                            return (
+                                                c.user?.name?.toLowerCase().includes(query) ||
+                                                c.user?.email?.toLowerCase().includes(query) ||
+                                                c.code.toLowerCase().includes(query)
+                                            );
+                                        }).map((c) => (
+                                            <tr key={c.id} className="hover:bg-white/[0.04] transition-all group">
+                                                <td className="px-6 py-4">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[13px] font-medium text-white">{c.user?.name || "Usuario Desconocido"}</span>
+                                                        <span className="text-[11px] text-white/40">{c.user?.email || "Sin email"}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <code className="text-[12px] font-bold text-primary font-mono bg-primary/10 px-2 py-1 rounded border border-primary/20">
+                                                        {c.code}
+                                                    </code>
+                                                </td>
+                                                <td className="px-6 py-4 text-[13px] text-white">
+                                                    {c.discountType === 'PERCENTAGE' ? `${c.discountValue}% OFF` : `$${c.discountValue.toLocaleString('es-AR')} OFF`}
+                                                </td>
+                                                <td className="px-6 py-4 text-[11px] text-white/40">
+                                                    {new Date(c.createdAt).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className={`inline-flex px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest ${c.isActive
+                                                        ? 'bg-green-500/10 text-green-400 border border-green-500/20'
+                                                        : 'bg-red-500/10 text-red-400 border border-red-500/20 opacity-50'
+                                                        }`}>
+                                                        {c.isActive ? 'Disponible' : 'Utilizado'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    {confirmDeleteId === c.id ? (
+                                                        <div className="flex items-center justify-end gap-2">
+                                                            <button onClick={() => confirmDeleteCoupon(c.id)} className="text-[9px] bg-red-500 text-white px-2 py-1 rounded font-bold uppercase">Borrar</button>
+                                                            <button onClick={() => setConfirmDeleteId(null)} className="text-[9px] text-white/40 uppercase">No</button>
                                                         </div>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                                    ) : (
+                                                        <button
+                                                            onClick={() => setConfirmDeleteId(c.id)}
+                                                            className="text-white/20 hover:text-red-400 transition-colors"
+                                                            title="Eliminar canje"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </button>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
