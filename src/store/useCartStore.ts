@@ -9,6 +9,7 @@ export interface Product {
   price: number;
   image: string;
   quantity: number;
+  weight?: number;
   variant?: string;
   addons?: Record<string, string[]>;
 }

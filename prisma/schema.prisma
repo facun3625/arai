@@ -8,39 +8,39 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(cuid())
-  name      String?
-  lastName  String?
-  email     String    @unique
-  password  String?
-  role      String    @default("USER")
-  dni       String?
-  phone     String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  addresses Address[]
-  orders    Order[]
-  points    Int       @default(0)
+  id                String             @id @default(cuid())
+  name              String?
+  lastName          String?
+  email             String             @unique
+  password          String?
+  role              String             @default("USER")
+  dni               String?
+  phone             String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  points            Int                @default(0)
+  abandonedCarts    AbandonedCart[]
+  addresses         Address[]
+  coupons           Coupon[]
+  orders            Order[]
   pointTransactions PointTransaction[]
-  coupons   Coupon[]
-  abandonedCarts AbandonedCart[]
 }
 
 model Address {
-  id         String   @id @default(cuid())
-  userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  street     String
-  number     String
-  apartment  String?
-  city       String
-  province   String
-  zipCode    String
-  dni        String?
-  phone      String?
-  isDefault  Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        String   @id @default(cuid())
+  userId    String
+  street    String
+  number    String
+  apartment String?
+  city      String
+  province  String
+  zipCode   String
+  dni       String?
+  phone     String?
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Category {
@@ -55,52 +55,43 @@ model Category {
 }
 
 model Product {
-  id          String     @id @default(cuid())
-  name        String
-  slug        String     @unique
-  description String?    // Características/Descripción
-  type        String     @default("SIMPLE") // SIMPLE o VARIABLE
-  videoUrl    String?
-  categories  Category[] @relation("CategoryToProduct")
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-
-  // Para productos simples, los valores se guardan aquí.
-  // Para productos variables, estos pueden ser nulos o actuar como valores por defecto.
+  id             String     @id @default(cuid())
+  name           String
+  slug           String     @unique
+  description    String?
+  type           String     @default("SIMPLE")
+  videoUrl       String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
   price          Float      @default(0)
-  compareAtPrice Float?     // Precio anterior (tachado)
+  compareAtPrice Float?
   stock          Int        @default(0)
-  featuredImage  String?    // Imagen principal para la tienda
-  images         String     @default("[]") // JSON string de URLs
-  weight         Float?     // Peso en kg
-  width          Float?     // Ancho en cm
-  height         Float?     // Alto en cm
-  length         Float?     // Largo en cm
-
-  addons      String     @default("[]") // JSON string de complementos (blends, hierbas, etc)
-  variants    Variant[]
+  featuredImage  String?
+  images         String     @default("[]")
+  weight         Float?
+  width          Float?
+  height         Float?
+  length         Float?
+  addons         String     @default("[]")
+  variants       Variant[]
+  categories     Category[] @relation("CategoryToProduct")
 }
 
 model Variant {
-  id        String   @id @default(cuid())
-  productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  
-  // Valores específicos por variación
+  id             String   @id @default(cuid())
+  productId      String
   price          Float    @default(0)
-  compareAtPrice Float?   // Precio anterior por variante
+  compareAtPrice Float?
   stock          Int      @default(0)
-  images         String   @default("[]") // JSON string de URLs
-  weight    Float?
-  width     Float?
-  height    Float?
-  length    Float?
-  
-  // Combinación de atributos (ej: { "talle": "S", "color": "Rojo" })
-  attributes String   @default("{}") // Almacenamos como JSON string por simplicidad en SQLite
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  images         String   @default("[]")
+  weight         Float?
+  width          Float?
+  height         Float?
+  length         Float?
+  attributes     String   @default("{}")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  product        Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model Attribute {
@@ -114,101 +105,98 @@ model Attribute {
 }
 
 model StoreSettings {
-  id                    String   @id @default("global") // Usamos un id fijo 'global'
-  freeShippingThreshold Float    @default(0) // 0 significa desactivado
-  bankTransferDiscount  Float    @default(15) // Descuento porcentual por transferencia
+  id                    String   @id @default("global")
+  freeShippingThreshold Float    @default(0)
+  bankTransferDiscount  Float    @default(15)
   pointsEnabled         Boolean  @default(false)
-  pointsRatio           Float    @default(0.01) // Puntos por cada $1 gastado (e.g. 0.01 = 1 punto cada 100 pesos)
-  
-  // Redes Sociales y Contacto
+  pointsRatio           Float    @default(0.01)
   instagramUrl          String?
   facebookUrl           String?
   xUrl                  String?
   youtubeUrl            String?
   tiktokUrl             String?
   whatsappNumber        String?
-  maintenanceMode       Boolean  @default(false)
-
   updatedAt             DateTime @updatedAt
+  maintenanceMode       Boolean  @default(false)
 }
 
 model Coupon {
   id                String   @id @default(cuid())
   code              String   @unique
-  discountType      String   @default("PERCENTAGE") // PERCENTAGE o FIXED
+  discountType      String   @default("PERCENTAGE")
   discountValue     Float
   isActive          Boolean  @default(true)
   minPurchaseAmount Float?
-  userId            String?  // Optional, to track who generated/owns it
-  user              User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+  user              User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Order {
-  id               String      @id @default(cuid())
-  userId           String?
-  user             User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status           String      @default("PENDING") // PENDING, PAID, SHIPPED, COMPLETED, CANCELLED
-  total            Float
-  subtotal         Float
-  shippingCost     Float
-  discount         Float       @default(0)
-  couponCode       String?     // Código del cupón aplicado
-  paymentMethod    String      // transferencia, mercadopago
-  paymentProof     String?     // URL del comprobante de transferencia
-  shippingAddress  String      // Almacenamos el JSON de la dirección
-  contactEmail     String
-  contactName      String
-  contactLastName  String
-  contactPhone     String
-  contactDni       String?
-  items            OrderItem[]
-  createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @updatedAt
+  id              String      @id @default(cuid())
+  userId          String?
+  status          String      @default("PENDING")
+  total           Float
+  subtotal        Float
+  shippingCost    Float
+  discount        Float       @default(0)
+  couponCode      String?
+  paymentMethod   String
+  paymentProof    String?
+  shippingAddress String
+  contactEmail    String
+  contactName     String
+  contactLastName String
+  contactPhone    String
+  contactDni      String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  user            User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items           OrderItem[]
 }
 
 model OrderItem {
   id        String  @id @default(cuid())
   orderId   String
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productId String
   variantId String?
   name      String
   quantity  Int
   price     Float
   image     String?
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
 model Popup {
   id               String   @id @default(cuid())
-  location         String   @unique // HOME o SHOP
+  location         String   @unique
   isActive         Boolean  @default(false)
   imageUrl         String
-  displayFrequency String   @default("SESSION") // SESSION or ALWAYS
+  displayFrequency String   @default("SESSION")
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 }
 
 model PointReward {
-  id              String   @id @default(cuid())
-  title           String
-  pointsRequired  Int
-  discountValue   Float
-  discountType    String   @default("FIXED") // PERCENTAGE o FIXED
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(cuid())
+  title          String
+  pointsRequired Int
+  discountValue  Float
+  discountType   String   @default("FIXED")
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 model PointTransaction {
   id          String   @id @default(cuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  orderId     String?  // Opcional, para trazar puntos ganados en pedidos
-  amount      Int      // Positivo para carga, negativo para canje
+  orderId     String?
+  amount      Int
   description String
   createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Subscriber {
@@ -219,27 +207,27 @@ model Subscriber {
 }
 
 model AbandonedCart {
-  id          String   @id @default(cuid())
-  userId      String?
-  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sessionId   String?  @unique
-  email       String?
-  phone       String?
-  name        String?
-  items       String   @default("[]")
-  total       Float    @default(0)
-  lastActive  DateTime @default(now())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(cuid())
+  userId     String?
+  sessionId  String?  @unique
+  email      String?
+  phone      String?
+  name       String?
+  items      String   @default("[]")
+  total      Float    @default(0)
+  lastActive DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([lastActive])
 }
 
 model SentCampaign {
-  id          String   @id @default(cuid())
-  subject     String
-  content     String
-  audience    String
-  sentCount   Int      @default(0)
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  subject   String
+  content   String
+  audience  String
+  sentCount Int      @default(0)
+  createdAt DateTime @default(now())
 }

@@ -29,6 +29,7 @@
     "resend": "^6.9.3",
     "tailwind-merge": "^3.5.0",
     "uuid": "^13.0.0",
+    "xml2js": "^0.6.2",
     "zustand": "^5.0.11"
   },
   "devDependencies": {
@@ -37,6 +38,7 @@
     "@types/node": "^20.19.37",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/xml2js": "^0.4.14",
     "bcryptjs": "^3.0.3",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
