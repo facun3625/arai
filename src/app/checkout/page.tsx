@@ -360,9 +360,10 @@ export default function CheckoutPage() {
                 throw new Error(errorData.error || "Error al crear el pedido");
             }
 
+            const { order } = await orderRes.json();
+
             // 2. Save address and update profile if requested and user is logged in
             if (isAuthenticated && user && saveAddress && !selectedSavedAddressId) {
-                // Save Address
                 await fetch('/api/user/address', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -375,7 +376,6 @@ export default function CheckoutPage() {
                     }),
                 });
 
-                // Update User Profile (DNI/Phone)
                 await fetch('/api/user/profile', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -390,12 +390,44 @@ export default function CheckoutPage() {
                 });
             }
 
-            // 3. Clear Cart
-            clearCart();
+            // 3. Handle Mercado Pago Redirection if selected
+            if (selectedPayment === 'mercadopago') {
+                const prefRes = await fetch('/api/payments/mercadopago/preference', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        orderId: order.id,
+                        items: items,
+                        customerEmail: contactInfo.email,
+                        subtotal,
+                        shippingCost: effectiveShippingCost,
+                        discount: totalDiscount
+                    })
+                });
 
-            // 4. Success feedback and redirect to Orders
-            setNotification({ message: "¡Compra realizada con éxito! Tu pedido ha sido registrado.", type: 'success' });
-            setTimeout(() => router.push('/mi-cuenta/pedidos'), 2000);
+                if (prefRes.ok) {
+                    const { init_point } = await prefRes.json();
+                    if (init_point) {
+                        // Clear Cart ONLY if preference was successful
+                        clearCart();
+                        window.location.href = init_point;
+                        return;
+                    }
+                }
+                
+                // If preference fails, show warning but order is already created
+                setNotification({ 
+                    message: "Pedido creado, pero hubo un problema al conectar con Mercado Pago. Por favor, contáctanos.", 
+                    type: 'error' 
+                });
+                setTimeout(() => router.push('/mi-cuenta/pedidos'), 3000);
+            } else {
+                // Clear cart for transferency
+                clearCart();
+                // Success feedback and redirect to Orders for Transferency
+                setNotification({ message: "¡Compra realizada con éxito! Tu pedido ha sido registrado.", type: 'success' });
+                setTimeout(() => router.push('/mi-cuenta/pedidos'), 2000);
+            }
         } catch (error: any) {
             console.error("Error finalizing purchase:", error);
             setNotification({
@@ -416,7 +448,7 @@ export default function CheckoutPage() {
         );
     }
 
-    if (items.length === 0) {
+    if (items.length === 0 && !isProcessing) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-[#fafafa] font-montserrat px-4">
                 <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
