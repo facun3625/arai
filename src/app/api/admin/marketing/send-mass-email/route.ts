@@ -100,6 +100,16 @@ export async function POST(req: Request) {
             console.log(`DEBUG: Batch sent. Count: ${sentCount}`);
         }
 
+        // 4. Record the campaign in history
+        await prisma.sentCampaign.create({
+            data: {
+                subject,
+                content,
+                audience,
+                sentCount: sentCount
+            }
+        });
+
         return NextResponse.json({
             success: true,
             message: `Campania enviada con éxito a ${sentCount} suscriptores.`,

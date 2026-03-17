@@ -234,3 +234,12 @@ model AbandonedCart {
 
   @@index([lastActive])
 }
+
+model SentCampaign {
+  id          String   @id @default(cuid())
+  subject     String
+  content     String
+  audience    String
+  sentCount   Int      @default(0)
+  createdAt   DateTime @default(now())
+}

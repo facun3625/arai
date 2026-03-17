@@ -80,6 +80,11 @@ export default function MarketingPage() {
         buttonUrl: "",
         audience: "ALL"
     });
+    const [campaigns, setCampaigns] = useState<any[]>([]);
+    const [isLoadingCampaigns, setIsLoadingCampaigns] = useState(false);
+    
+    // Confirmation Modal State
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
 
     useEffect(() => {
         fetchSettings();
@@ -87,7 +92,23 @@ export default function MarketingPage() {
         fetchPopups();
         fetchRewards();
         fetchAudienceStats();
+        fetchCampaigns();
     }, []);
+
+    const fetchCampaigns = async () => {
+        setIsLoadingCampaigns(true);
+        try {
+            const res = await fetch(`/api/admin/marketing/campaigns?adminId=${user?.id}`);
+            const data = await res.json();
+            if (data.campaigns) {
+                setCampaigns(data.campaigns);
+            }
+        } catch (error) {
+            console.error("Error fetching campaigns:", error);
+        } finally {
+            setIsLoadingCampaigns(false);
+        }
+    };
 
     const fetchAudienceStats = async () => {
         try {
@@ -327,8 +348,11 @@ export default function MarketingPage() {
             return;
         }
 
-        if (!confirm("¿Estás seguro de enviar este correo a todos los suscriptores?")) return;
+        setShowConfirmModal(true);
+    };
 
+    const confirmAndSendEmail = async () => {
+        setShowConfirmModal(false);
         setIsSendingEmail(true);
         try {
             const res = await fetch("/api/admin/marketing/send-mass-email", {
@@ -344,6 +368,7 @@ export default function MarketingPage() {
             if (res.ok) {
                 showToast(`¡Campaña enviada con éxito! 🚀`, "success");
                 setEmailForm({ subject: "", content: "", buttonText: "", buttonUrl: "", audience: "ALL", customEmailsRaw: "", customEmails: [] } as any);
+                fetchCampaigns();
             } else {
                 showToast(data.error || "Error al enviar el correo", "error");
             }
@@ -713,11 +738,11 @@ export default function MarketingPage() {
 
                                     <button
                                         type="submit"
-                                        disabled={isSendingEmail || (audienceStats[emailForm.audience] || 0) === 0}
+                                        disabled={isSendingEmail || (emailForm.audience === 'CUSTOM_LIST' ? ((emailForm as any).customEmails || []).length === 0 : (audienceStats[emailForm.audience] || 0) === 0)}
                                         className="w-full bg-primary hover:bg-primary-dark disabled:bg-white/5 disabled:text-white/20 text-white py-4 rounded-xl text-[13px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-3 shadow-xl shadow-primary/10 hover:-translate-y-0.5"
                                     >
                                         {isSendingEmail ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
-                                        {isSendingEmail ? 'Enviando...' : `Enviar Campaña a ${emailForm.audience === 'CUSTOM_LIST' ? ((emailForm as any).customEmails || []).length : (audienceStats[emailForm.audience] || 0)} personas`}
+                                        {isSendingEmail ? 'Enviando...' : `Preparar Campaña para ${emailForm.audience === 'CUSTOM_LIST' ? ((emailForm as any).customEmails || []).length : (audienceStats[emailForm.audience] || 0)} personas`}
                                     </button>
                                 </form>
                             </div>
@@ -760,6 +785,65 @@ export default function MarketingPage() {
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                        {/* Historial de Campañas */}
+                        <div className="lg:col-span-2 space-y-6 mt-12">
+                            <div className="flex items-center gap-3">
+                                <Mail className="h-5 w-5 text-primary" />
+                                <h2 className="text-white font-medium tracking-tight">Historial de Campañas</h2>
+                            </div>
+
+                            {isLoadingCampaigns ? (
+                                <div className="flex items-center justify-center p-12 bg-white/[0.02] border border-white/5 rounded-3xl">
+                                    <Loader2 className="h-8 w-8 text-primary animate-spin" />
+                                </div>
+                            ) : campaigns.length === 0 ? (
+                                <div className="p-12 text-center bg-white/[0.02] border border-white/5 rounded-3xl">
+                                    <p className="text-white/40 text-[13px] italic">Todavía no enviaste ninguna campaña masiva.</p>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {campaigns.map((camp) => (
+                                        <div key={camp.id} className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 space-y-4 hover:border-white/10 transition-colors">
+                                            <div className="flex justify-between items-start">
+                                                <div className="px-2 py-1 rounded bg-primary/10 text-primary text-[9px] font-bold uppercase tracking-widest">
+                                                    {camp.audience === 'ALL' && 'Todos'}
+                                                    {camp.audience === 'ABANDONED_CART' && 'Carritos Abr.'}
+                                                    {camp.audience === 'CUSTOMERS' && 'Compradores'}
+                                                    {camp.audience === 'REGISTERED' && 'Registrados'}
+                                                    {camp.audience === 'CUSTOM_LIST' && 'Lista Manual'}
+                                                </div>
+                                                <span className="text-white/20 text-[10px] font-mono">
+                                                    {new Date(camp.createdAt).toLocaleDateString()}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <h3 className="text-white text-[14px] font-medium line-clamp-1">{camp.subject}</h3>
+                                                <p className="text-white/40 text-[11px] line-clamp-2 mt-1">{camp.content}</p>
+                                            </div>
+                                            <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <Users className="h-3.5 w-3.5 text-white/40" />
+                                                    <span className="text-white/60 text-[11px] font-bold">{camp.sentCount} <span className="text-[9px] font-light">destinatarios</span></span>
+                                                </div>
+                                                <button 
+                                                    onClick={() => setEmailForm({
+                                                        subject: camp.subject,
+                                                        content: camp.content,
+                                                        buttonText: "",
+                                                        buttonUrl: "",
+                                                        audience: camp.audience
+                                                    })}
+                                                    className="text-[10px] text-primary hover:underline font-bold uppercase tracking-tight"
+                                                >
+                                                    Reutilizar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
@@ -1405,6 +1489,41 @@ export default function MarketingPage() {
                                 {toast.type === 'success' ? '¡Todo listo!' : '¡Ups! Algo falló'}
                             </p>
                             <p className="text-xs opacity-80 mt-0.5">{toast.message}</p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* CUSTOM CONFIRMATION MODAL */}
+            {showConfirmModal && (
+                <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="bg-[#0c120e] border border-white/10 rounded-[32px] p-8 max-w-md w-full shadow-2xl animate-in zoom-in-95 duration-300 space-y-6">
+                        <div className="h-16 w-16 bg-primary/20 rounded-2xl flex items-center justify-center mx-auto mb-2">
+                            <Send className="h-8 w-8 text-primary" />
+                        </div>
+                        <div className="text-center space-y-2">
+                            <h3 className="text-xl font-medium text-white tracking-tight">¿Lanzamos la campaña?</h3>
+                            <p className="text-white/40 text-[13px] leading-relaxed">
+                                Estás por enviar este correo a <span className="text-primary font-bold">
+                                    {emailForm.audience === 'CUSTOM_LIST' 
+                                        ? ((emailForm as any).customEmails || []).length 
+                                        : (audienceStats[emailForm.audience] || 0)} personas
+                                </span>. Esta acción no se puede deshacer.
+                            </p>
+                        </div>
+                        <div className="flex flex-col gap-3">
+                            <button
+                                onClick={confirmAndSendEmail}
+                                className="w-full bg-primary hover:bg-primary-dark text-white py-4 rounded-2xl text-[13px] font-bold uppercase tracking-widest transition-all shadow-lg shadow-primary/10"
+                            >
+                                Sí, enviar ahora 🚀
+                            </button>
+                            <button
+                                onClick={() => setShowConfirmModal(false)}
+                                className="w-full bg-white/5 hover:bg-white/10 text-white/40 py-4 rounded-2xl text-[13px] font-bold uppercase tracking-widest transition-all"
+                            >
+                                No, revisar de nuevo
+                            </button>
                         </div>
                     </div>
                 </div>
