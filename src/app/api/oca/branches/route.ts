@@ -15,13 +15,22 @@ export async function GET(req: Request) {
         const url = `http://webservice.oca.com.ar/ePak_tracking/Oep_TrackEPak.asmx/GetCentrosImposicionConServiciosByCP?idCodigoPostal=${zipCode}`;
 
         const response = await fetch(url);
+        if (!response.ok) {
+            console.error("OCA Branches HTTP Error:", response.status);
+            return NextResponse.json({ branches: [] });
+        }
         const xmlData = await response.text();
         
         const result = await parseStringPromise(xmlData);
-        const centers = result?.DataSet?.diffgram?.[0]?.NewDataSet?.[0]?.Table;
+        let centers = result?.DataSet?.diffgram?.[0]?.NewDataSet?.[0]?.Table 
+                   || result?.DataSet?.Table;
 
-        if (!centers || !Array.isArray(centers)) {
+        if (!centers) {
             return NextResponse.json({ branches: [] });
+        }
+
+        if (!Array.isArray(centers)) {
+            centers = [centers];
         }
 
         const formattedBranches = centers.map((c: any) => ({

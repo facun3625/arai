@@ -541,11 +541,30 @@ export default function CheckoutPage() {
                                             <div className="col-span-full md:col-span-1">
                                                 <select required className="w-full px-5 py-4 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-gray-700 appearance-none" value={shippingAddress.province} onChange={(e) => setShippingAddress({ ...shippingAddress, province: e.target.value })}>
                                                     <option value="" disabled>Provincia *</option>
-                                                    <option value="Misiones">Misiones</option>
-                                                    <option value="Buenos Aires">Buenos Aires</option>
                                                     <option value="CABA">CABA</option>
-                                                    <option value="Santa Fe">Santa Fe</option>
+                                                    <option value="Buenos Aires">Buenos Aires</option>
+                                                    <option value="Catamarca">Catamarca</option>
+                                                    <option value="Chaco">Chaco</option>
+                                                    <option value="Chubut">Chubut</option>
                                                     <option value="Córdoba">Córdoba</option>
+                                                    <option value="Corrientes">Corrientes</option>
+                                                    <option value="Entre Ríos">Entre Ríos</option>
+                                                    <option value="Formosa">Formosa</option>
+                                                    <option value="Jujuy">Jujuy</option>
+                                                    <option value="La Pampa">La Pampa</option>
+                                                    <option value="La Rioja">La Rioja</option>
+                                                    <option value="Mendoza">Mendoza</option>
+                                                    <option value="Misiones">Misiones</option>
+                                                    <option value="Neuquén">Neuquén</option>
+                                                    <option value="Río Negro">Río Negro</option>
+                                                    <option value="Salta">Salta</option>
+                                                    <option value="San Juan">San Juan</option>
+                                                    <option value="San Luis">San Luis</option>
+                                                    <option value="Santa Cruz">Santa Cruz</option>
+                                                    <option value="Santa Fe">Santa Fe</option>
+                                                    <option value="Santiago del Estero">Santiago del Estero</option>
+                                                    <option value="Tierra del Fuego">Tierra del Fuego</option>
+                                                    <option value="Tucumán">Tucumán</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -693,6 +712,36 @@ export default function CheckoutPage() {
                                                             </div>
                                                         </label>
                                                     )}
+                                                    {(!ocaQuote && !ocaBranches.length && !isCalculatingShipping) && (
+                                                        <div className="p-6 bg-amber-50 rounded-2xl border border-amber-100 text-center">
+                                                            <p className="text-amber-800 text-sm font-medium mb-1">No pudimos obtener tarifas automáticas</p>
+                                                            <p className="text-amber-600 text-xs">Esto puede deberse a un Código Postal inválido o un problema temporal con OCA.</p>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Fallback Option if everything else fails or just as extra option */}
+                                                    <label className={`block border ${selectedShippingMethod === 'acordar' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-gray-200 bg-white hover:border-gray-300'} rounded-2xl p-5 cursor-pointer transition-all`}>
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex items-center gap-4">
+                                                                <input 
+                                                                    type="radio" 
+                                                                    name="shipping" 
+                                                                    checked={selectedShippingMethod === 'acordar'}
+                                                                    onChange={() => {
+                                                                        setSelectedShippingMethod('acordar');
+                                                                        setSelectedShipping(0); // Price 0 or custom logic
+                                                                        setSelectedBranchId(null);
+                                                                    }} 
+                                                                    className="w-5 h-5 text-primary border-gray-300 focus:ring-primary" 
+                                                                />
+                                                                <div>
+                                                                    <p className="font-medium text-gray-900 text-sm">Envío a acordar / Otros medios</p>
+                                                                    <p className="text-xs text-gray-500 mt-1">Nos contactaremos contigo para coordinar el envío</p>
+                                                                </div>
+                                                            </div>
+                                                            <span className="font-bold text-gray-400 uppercase text-[10px] tracking-widest">A coordinar</span>
+                                                        </div>
+                                                    </label>
                                                 </>
                                             )}
                                         </div>
@@ -951,6 +1000,8 @@ export default function CheckoutPage() {
                                 <span className="text-gray-500">Costo de envío</span>
                                 {currentStep === 1 ? (
                                     <span className="text-xs text-gray-400 italic">calculando...</span>
+                                ) : selectedShipping === null ? (
+                                    <span className="text-xs text-gray-400 italic">Seleccione envío</span>
                                 ) : shippingCost === 0 ? (
                                     <span className="text-primary font-bold text-xs uppercase tracking-widest">Gratis</span>
                                 ) : (
