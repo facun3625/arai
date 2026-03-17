@@ -30,6 +30,8 @@ services:
       RESEND_DOMAIN: yerbamatearai.com.ar
     depends_on:
       - arai-db
+    volumes:
+      - ./public/uploads:/app/public/uploads
     networks:
       - arai-network
 
