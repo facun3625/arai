@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { writeFile } from "fs/promises";
+import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { v4 as uuidv4 } from "uuid";
 
@@ -23,7 +23,11 @@ export async function POST(req: Request) {
         // Generar nombre de archivo único
         const fileExtension = file.name.split('.').pop();
         const fileName = `${uuidv4()}.${fileExtension}`;
-        const path = join(process.cwd(), "public/uploads", fileName);
+        const uploadDir = join(process.cwd(), "public/uploads");
+        const path = join(uploadDir, fileName);
+        
+        console.log("Asegurando directorio:", uploadDir);
+        await mkdir(uploadDir, { recursive: true });
         
         console.log("Intentando escribir en:", path);
 
