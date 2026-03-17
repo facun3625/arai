@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
   experimental: {},
   images: {
     domains: ['lh3.googleusercontent.com'],
+    unoptimized: true,
   },
 };
 
