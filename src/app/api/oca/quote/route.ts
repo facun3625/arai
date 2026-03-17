@@ -28,6 +28,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "OCA no respondió correctamente" }, { status: 502 });
         }
         const xmlData = await response.text();
+        console.log("RAW OCA XML Response:", xmlData);
         
         // Use tagNameProcessors to strip prefixes for easier access
         const result = await parseStringPromise(xmlData, { 
