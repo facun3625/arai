@@ -55,6 +55,7 @@ export async function POST(request: Request) {
                     contactLastName: contactInfo.lastName,
                     contactPhone: contactInfo.phone,
                     contactDni: contactInfo.dni,
+                    shippingMethod: body.selectedShippingMethod || null,
                     items: {
                         create: items.map((item: any) => ({
                             productId: item.productId || item.id,

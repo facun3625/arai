@@ -351,7 +351,8 @@ export default function CheckoutPage() {
                         ? { ...shippingAddress, branchName: ocaBranches.find(b => b.id === selectedBranchId)?.name, isBranch: true } 
                         : shippingAddress,
                     contactInfo,
-                    couponCode: appliedCoupon?.code
+                    couponCode: appliedCoupon?.code,
+                    selectedShippingMethod
                 }),
             });
 
