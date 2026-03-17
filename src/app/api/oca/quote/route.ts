@@ -5,8 +5,9 @@ export async function POST(req: Request) {
     try {
         const { destinationZipCode, weight, volume, packagesCount } = await req.json();
 
-        let cuit = process.env.OCA_CUIT;
-        if (cuit && !cuit.includes("-")) {
+        // OCA usually expects CUIT as XX-XXXXXXXX-X
+        let cuit = process.env.OCA_CUIT?.replace(/-/g, "");
+        if (cuit && cuit.length === 11) {
             cuit = `${cuit.slice(0, 2)}-${cuit.slice(2, 10)}-${cuit.slice(10)}`;
         }
         const operativa = process.env.OCA_OPERATIVA;
@@ -19,6 +20,8 @@ export async function POST(req: Request) {
         // SOAP URL for Tariff
         const url = `http://webservice.oca.com.ar/ePak_tracking/Oep_TrackEPak.asmx/Tarifar_Envio_Corporativo?CUIT=${cuit}&Operativa=${operativa}&PesoTotal=${weight}&VolumenTotal=${volume}&CodigoPostalOrigen=${originZipCode}&CodigoPostalDestino=${destinationZipCode}&CantidadPaquetes=${packagesCount || 1}&ValorDeclarado=0`;
 
+        console.log("OCA Quote Request URL:", url);
+
         const response = await fetch(url);
         if (!response.ok) {
             console.error("OCA API HTTP Error:", response.status, await response.text());
@@ -26,19 +29,45 @@ export async function POST(req: Request) {
         }
         const xmlData = await response.text();
         
-        const result = await parseStringPromise(xmlData);
+        // Use tagNameProcessors to strip prefixes for easier access
+        const result = await parseStringPromise(xmlData, { 
+            explicitArray: false, 
+            ignoreAttrs: true,
+            tagNameProcessors: [(name) => name.replace(/.*:/, '')]
+        });
         
-        // Structure check for the Table in DataSet
-        const table = result?.DataSet?.diffgram?.[0]?.NewDataSet?.[0]?.Table?.[0] 
-                   || result?.DataSet?.Table?.[0]; // Fallback for some XML structures
+        console.log("Parsed OCA Result:", JSON.stringify(result, null, 2));
+        
+        // With prefixes stripped, access is much simpler
+        let table = result?.DataSet?.diffgram?.NewDataSet?.Table 
+                 || result?.DataSet?.Table 
+                 || result?.DataSet?.diffgram?.Table;
 
         if (!table) {
-            return NextResponse.json({ error: "No se pudo obtener cotización de OCA" }, { status: 400 });
+            // Last resort: search recursively for Table
+            const findTable = (obj: any): any => {
+                if (!obj || typeof obj !== 'object') return null;
+                if (obj.Table) return obj.Table;
+                for (const key in obj) {
+                    const found = findTable(obj[key]);
+                    if (found) return found;
+                }
+                return null;
+            };
+            table = findTable(result);
         }
 
+        if (!table || table.Error) {
+            console.error("OCA Validation Error:", table?.Error || "No Table found");
+            return NextResponse.json({ error: table?.Error || "No se pudo obtener cotización de OCA" }, { status: 400 });
+        }
+
+        const price = parseFloat(table.Total || table.Precio || "0");
+        const deliveryDays = parseInt(table.PlazoEntrega || "0");
+
         return NextResponse.json({
-            price: parseFloat(table.Precio?.[0] || "0"),
-            deliveryDays: parseInt(table.PlazoEntrega?.[0] || "0"),
+            price: price,
+            deliveryDays: deliveryDays,
             method: "OCA a Domicilio"
         });
 

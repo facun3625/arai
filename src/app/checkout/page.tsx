@@ -193,10 +193,16 @@ export default function CheckoutPage() {
         }));
     };
 
-    // OCA Shipping Logic
+    // OCA Shipping Logic - Trigger when entering step 2 (Shipping)
     useEffect(() => {
-        if (currentStep === 2 && shippingAddress.zipCode) {
+        const zip = shippingAddress.zipCode;
+        if (currentStep === 2 && zip && zip.length === 4) {
+            console.log("Triggering OCA calculation on Step 2 entry for zip:", zip);
             calculateOcaShipping();
+        } else if (currentStep === 1) {
+            // Optional: reset or keep, but let's ensure it's not selected if we go back
+            // setOcaQuote(null);
+            // setSelectedShipping(null);
         }
     }, [currentStep, shippingAddress.zipCode]);
 
@@ -223,6 +229,13 @@ export default function CheckoutPage() {
             const quoteData = await quoteRes.json();
             if (quoteData.price) {
                 setOcaQuote(quoteData);
+                // Proactively set as default if none selected
+                if (selectedShipping === null) {
+                    setSelectedShipping(quoteData.price);
+                    setSelectedShippingMethod('oca_domicilio');
+                }
+            } else if (quoteData.error) {
+                setNotification({ message: `OCA: ${quoteData.error}`, type: 'error' });
             }
 
             // 2. Get Branches
@@ -234,7 +247,12 @@ export default function CheckoutPage() {
         } catch (err) {
             console.error("Error calculating OCA shipping:", err);
             setNotification({ message: "No pudimos conectar con OCA. Intenta de nuevo.", type: 'error' });
+            setOcaQuote(null);
+            // Don't reset selectedShipping here if it was already set manually, 
+            // but for now let's keep it consistent.
+            setSelectedShipping(null);
         } finally {
+            console.log("OCA calculation finished.");
             setIsCalculatingShipping(false);
         }
     };
@@ -284,17 +302,15 @@ export default function CheckoutPage() {
         return total + (isNaN(price) ? 0 : price) * item.quantity;
     }, 0);
 
-    const shippingCost = selectedShipping || 0;
-
     // Calculate discounts
     let totalDiscount = 0;
 
     // 1. Coupon Discount is evaluated first on subtotal
     if (appliedCoupon) {
         if (appliedCoupon.discountType === 'PERCENTAGE') {
-            totalDiscount += subtotal * (appliedCoupon.discountValue / 100);
+            totalDiscount = subtotal * (appliedCoupon.discountValue / 100);
         } else {
-            totalDiscount += appliedCoupon.discountValue;
+            totalDiscount = appliedCoupon.discountValue;
         }
     }
 
@@ -303,7 +319,9 @@ export default function CheckoutPage() {
         totalDiscount += subtotal * 0.15;
     }
 
-    const total = Math.max(0, subtotal + shippingCost - totalDiscount);
+    // Shipping cost only counts if not null
+    const effectiveShippingCost = selectedShipping !== null ? selectedShipping : 0;
+    const total = Math.max(0, subtotal + effectiveShippingCost - totalDiscount);
 
     const handleNextStep = (e: React.FormEvent) => {
         e.preventDefault();
@@ -324,7 +342,7 @@ export default function CheckoutPage() {
                     userId: user?.id,
                     items,
                     subtotal,
-                    shippingCost,
+                    shippingCost: effectiveShippingCost,
                     total,
                     discount: totalDiscount,
                     paymentMethod: selectedPayment,
@@ -583,6 +601,44 @@ export default function CheckoutPage() {
                                                 </label>
                                             </div>
                                         )}
+
+                                        {/* Coupon Input - Moved here by user request */}
+                                        <div className="mt-8 bg-white border border-gray-200 rounded-2xl p-4 shadow-sm border-dashed border-primary/20">
+                                            <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-3 px-1">Cupón de Descuento</p>
+                                            {appliedCoupon ? (
+                                                <div className="flex items-center justify-between w-full bg-primary/5 p-3 rounded-xl border border-primary/10">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-xs font-bold text-primary uppercase tracking-widest leading-none mb-1">{appliedCoupon.code}</span>
+                                                        <span className="text-[10px] text-gray-500">
+                                                            {appliedCoupon.discountType === 'PERCENTAGE' ? `${appliedCoupon.discountValue}% OFF en productos` : `$${appliedCoupon.discountValue} OFF en productos`}
+                                                        </span>
+                                                    </div>
+                                                    <button type="button" onClick={handleRemoveCoupon} className="text-[10px] text-red-500 font-bold uppercase hover:underline">
+                                                        Quitar
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center gap-2 w-full">
+                                                    <div className="relative flex-1">
+                                                        <input
+                                                            type="text"
+                                                            placeholder="¿Tienes un cupón?"
+                                                            value={couponCodeInput}
+                                                            onChange={(e) => setCouponCodeInput(e.target.value.toUpperCase())}
+                                                            className="w-full bg-gray-50/50 border border-gray-100 text-xs rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none uppercase"
+                                                        />
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        disabled={!couponCodeInput.trim() || isValidatingCoupon}
+                                                        onClick={handleApplyCoupon}
+                                                        className="bg-[#0c120e] text-white px-6 py-3 rounded-xl text-xs font-bold uppercase disabled:opacity-50 transition-all flex items-center shadow-lg"
+                                                    >
+                                                        {isValidatingCoupon ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Aplicar'}
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
                                     </section>
 
                                     <button type="submit" className="w-full h-16 bg-[#0c120e] hover:bg-black text-white rounded-2xl font-medium text-xs uppercase tracking-widest flex items-center justify-center gap-3 shadow-2xl transition-all hover:-translate-y-1 active:scale-95 group mt-8">
@@ -959,38 +1015,7 @@ export default function CheckoutPage() {
 
                         {/* Totals Calculation */}
                         <div className="space-y-4 mb-6">
-                            {/* Coupon Input */}
-                            <div className="bg-white border border-gray-200 rounded-xl p-3 flex items-center justify-between mb-2 shadow-sm">
-                                {appliedCoupon ? (
-                                    <div className="flex items-center justify-between w-full">
-                                        <div className="flex flex-col">
-                                            <span className="text-xs font-bold text-primary uppercase tracking-widest">{appliedCoupon.code}</span>
-                                            <span className="text-[10px] text-gray-500">Cupón aplicado ({appliedCoupon.discountType === 'PERCENTAGE' ? `${appliedCoupon.discountValue}% OFF` : `$${appliedCoupon.discountValue} OFF`})</span>
-                                        </div>
-                                        <button onClick={handleRemoveCoupon} className="text-[10px] text-red-500 font-bold uppercase hover:underline">
-                                            Quitar
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <div className="flex items-center gap-2 w-full">
-                                        <input
-                                            type="text"
-                                            placeholder="Ingresar cupón de descuento"
-                                            value={couponCodeInput}
-                                            onChange={(e) => setCouponCodeInput(e.target.value.toUpperCase())}
-                                            className="w-full bg-transparent border-none text-xs focus:ring-0 px-2 outline-none uppercase"
-                                        />
-                                        <button
-                                            disabled={!couponCodeInput.trim() || isValidatingCoupon}
-                                            onClick={handleApplyCoupon}
-                                            className="bg-[#0c120e] text-white px-4 py-2 rounded-lg text-xs font-bold uppercase disabled:opacity-50 transition-all flex items-center"
-                                        >
-                                            {isValidatingCoupon ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Aplicar'}
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-
+                            {/* Coupon summary info (read only) */}
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-gray-500">Subtotal de productos</span>
                                 <span className="font-medium text-gray-900">$ {subtotal.toLocaleString('es-AR')}</span>
@@ -999,13 +1024,17 @@ export default function CheckoutPage() {
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-gray-500">Costo de envío</span>
                                 {currentStep === 1 ? (
-                                    <span className="text-xs text-gray-400 italic">calculando...</span>
-                                ) : selectedShipping === null ? (
-                                    <span className="text-xs text-gray-400 italic">Seleccione envío</span>
-                                ) : shippingCost === 0 ? (
-                                    <span className="text-primary font-bold text-xs uppercase tracking-widest">Gratis</span>
+                                    <span className="text-[10px] text-gray-400 italic">Se calcula en el siguiente paso</span>
+                                ) : isCalculatingShipping ? (
+                                    <span className="text-xs text-primary animate-pulse font-medium">calculando...</span>
+                                ) : (ocaQuote || selectedShipping !== null) ? (
+                                    <span className="font-medium text-gray-900">
+                                        $ {(selectedShipping || ocaQuote?.price || 0).toLocaleString('es-AR')}
+                                    </span>
+                                ) : shippingAddress.zipCode?.length === 4 ? (
+                                    <span className="text-xs text-red-400 italic">Error de conexión</span>
                                 ) : (
-                                    <span className="font-medium text-gray-900">$ {shippingCost.toLocaleString('es-AR')}</span>
+                                    <span className="text-xs text-gray-400 italic">Ingresa CP</span>
                                 )}
                             </div>
 
