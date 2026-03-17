@@ -154,3 +154,40 @@ export async function PATCH(req: Request) {
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
+
+export async function DELETE(req: Request) {
+    try {
+        const { searchParams } = new URL(req.url);
+        const orderId = searchParams.get("id");
+        const adminId = searchParams.get("adminId");
+
+        if (!adminId || !orderId) {
+            return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
+        }
+
+        const admin = await prisma.user.findUnique({
+            where: { id: adminId }
+        });
+
+        if (!admin || admin.role !== 'ADMIN') {
+            return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        }
+
+        // 1. Eliminar transacciones de puntos asociadas (Prisma cascade no lo hace si no está definido)
+        // Aunque definimos onDelete: Cascade en el esquema para pointTransaction -> user, 
+        // para orderId es opcional y no tiene cascade explícito en la relación inversa.
+        await prisma.pointTransaction.deleteMany({
+            where: { orderId: orderId }
+        });
+
+        // 2. Eliminar el pedido (OrderItem fallará por cascade definido en el schema)
+        await prisma.order.delete({
+            where: { id: orderId }
+        });
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error("DEBUG: Failed to delete order", error);
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    }
+}

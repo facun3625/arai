@@ -15,7 +15,8 @@ import {
     ExternalLink,
     Loader2,
     ChevronDown,
-    X
+    X,
+    Trash2
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -30,7 +31,33 @@ export default function AdminPedidosPage() {
     const [statusUpdating, setStatusUpdating] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [showProofModal, setShowProofModal] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const ITEMS_PER_PAGE = 20;
+
+    const handleDeleteOrder = async (orderId: string) => {
+        if (!confirm("¿Estás seguro de que deseas eliminar este pedido? Esta acción no se puede deshacer.")) return;
+        
+        setIsDeleting(true);
+        try {
+            const res = await fetch(`/api/admin/orders?id=${orderId}&adminId=${user?.id}`, {
+                method: "DELETE"
+            });
+
+            if (res.ok) {
+                setOrders(prev => prev.filter(o => o.id !== orderId));
+                setSelectedOrder(null);
+                // Notify sidebar to refresh badges
+                window.dispatchEvent(new CustomEvent('refreshAdminStats'));
+            } else {
+                const data = await res.json();
+                alert(data.error || "Error al eliminar pedido");
+            }
+        } catch (error) {
+            alert("Error de conexión");
+        } finally {
+            setIsDeleting(false);
+        }
+    };
 
     const STATUS_MAP: Record<string, string> = {
         'PENDING': 'Pendiente',
@@ -527,6 +554,26 @@ export default function AdminPedidosPage() {
                                                     </button>
                                                 ))}
                                             </div>
+                                        </div>
+
+                                        <div className="pt-8 mt-8 border-t border-white/5">
+                                            <button
+                                                onClick={() => handleDeleteOrder(selectedOrder.id)}
+                                                disabled={isDeleting}
+                                                className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all border border-red-500/20 group"
+                                            >
+                                                {isDeleting ? (
+                                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                                ) : (
+                                                    <>
+                                                        <Trash2 className="h-4 w-4 opacity-40 group-hover:opacity-100 transition-opacity" />
+                                                        ELIMINAR PEDIDO
+                                                    </>
+                                                )}
+                                            </button>
+                                            <p className="text-[9px] text-white/20 text-center mt-3 uppercase tracking-widest font-medium">
+                                                esta acción eliminará permanentemente el registro
+                                            </p>
                                         </div>
                                     </motion.div>
                                 ) : (
