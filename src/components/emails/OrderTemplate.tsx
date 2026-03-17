@@ -43,7 +43,7 @@ export const OrderTemplate = ({
                 <Container style={container}>
                     <Section style={logoContainer}>
                         <Img
-                            src="https://arai-yerba.com/arai_logo.png"
+                            src="https://yerbamatearai.com.ar/arai_logo.png"
                             width="120"
                             height="auto"
                             alt="Araí"

@@ -34,7 +34,7 @@ export const MarketingTemplate = ({
                 <Container style={container}>
                     <Section style={logoContainer}>
                         <Img
-                            src="https://arai-yerba.com/arai_logo.png"
+                            src="https://yerbamatearai.com.ar/arai_logo.png"
                             width="120"
                             height="auto"
                             alt="Araí"
@@ -65,7 +65,7 @@ export const MarketingTemplate = ({
                         <Text style={footerText}>
                             Araí Yerba Mate<br />
                             Recibiste este correo porque estás suscrito a nuestro newsletter.<br />
-                            <Link href="https://arai-yerba.com/unsubscribe" style={link}>Darse de baja</Link>
+                            <Link href="https://yerbamatearai.com.ar/unsubscribe" style={link}>Darse de baja</Link>
                         </Text>
                     </Section>
                 </Container>

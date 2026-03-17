@@ -33,7 +33,7 @@ export const StatusUpdateTemplate = ({
                 <Container style={container}>
                     <Section style={logoContainer}>
                         <Img
-                            src="https://arai-yerba.com/arai_logo.png"
+                            src="https://yerbamatearai.com.ar/arai_logo.png"
                             width="120"
                             height="auto"
                             alt="Araí"
@@ -54,7 +54,7 @@ export const StatusUpdateTemplate = ({
                     <Section style={buttonContainer}>
                         <Button
                             style={button}
-                            href="https://arai-yerba.com/mi-cuenta/pedidos"
+                            href="https://yerbamatearai.com.ar/mi-cuenta/pedidos"
                         >
                             Ver mi pedido
                         </Button>
