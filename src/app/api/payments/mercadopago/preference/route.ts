@@ -78,6 +78,10 @@ export async function POST(req: Request) {
 
     } catch (error: any) {
         console.error('Error creating MP preference:', error);
+        // Log the full cause if available (MP SDK often puts details here)
+        if (error.cause) {
+            console.error('MP Error Cause:', JSON.stringify(error.cause, null, 2));
+        }
         return NextResponse.json({ 
             error: 'Error al crear la preferencia de pago',
             details: error.message 
