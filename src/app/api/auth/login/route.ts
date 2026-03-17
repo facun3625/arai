@@ -32,7 +32,7 @@ export async function POST(request: Request) {
             where: { email }
         });
 
-        if (!user) {
+        if (!user || !user.password) {
             return NextResponse.json({ error: 'Credenciales inválidas' }, { status: 401 });
         }
 
