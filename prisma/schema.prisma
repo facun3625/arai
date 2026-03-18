@@ -263,3 +263,16 @@ model SentCampaign {
   sentCount Int      @default(0)
   createdAt DateTime @default(now())
 }
+
+model ZipCodeRestriction {
+  id        String   @id @default(cuid())
+  zipCode   String
+  type      String   // 'BLOCK_SALE' | 'BLOCK_SHIPPING'
+  message   String?  @db.Text
+  address   String?  @db.Text
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([zipCode, type])
+}

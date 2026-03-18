@@ -15,7 +15,10 @@ import {
     Loader2,
     Upload,
     ArrowRightIcon,
-    Trash2
+    Trash2,
+    Ban,
+    Store,
+    Phone
 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useEffect } from "react";
@@ -125,6 +128,8 @@ export default function CheckoutPage() {
     const [isProcessing, setIsProcessing] = useState(false);
     const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
     const [bankTransferInfo, setBankTransferInfo] = useState<{ cbu: string; alias: string; discount: number }>({ cbu: "", alias: "", discount: 15 });
+    const [restrictions, setRestrictions] = useState<any[]>([]);
+    const [activeRestriction, setActiveRestriction] = useState<any | null>(null);
 
     const fetchBankInfo = () => {
         fetch("/api/settings")
@@ -139,14 +144,43 @@ export default function CheckoutPage() {
                 }
             })
             .catch(() => { });
+        checkZipRestriction(shippingAddress.zipCode);
+    };
+
+    // Reactive Restriction Check
+    useEffect(() => {
+        if (shippingAddress.zipCode) {
+            const found = restrictions.find(r => r.zipCode === shippingAddress.zipCode);
+            setActiveRestriction(found || null);
+        } else {
+            setActiveRestriction(null);
+        }
+    }, [restrictions, shippingAddress.zipCode]);
+
+    const fetchRestrictions = () => {
+        fetch("/api/settings/restrictions")
+            .then(r => r.json())
+            .then(data => {
+                if (Array.isArray(data)) setRestrictions(data);
+            })
+            .catch(() => { });
     };
 
     useEffect(() => {
         fetchBankInfo();
-        const handleSettingsUpdate = () => fetchBankInfo();
+        fetchRestrictions();
+        const handleSettingsUpdate = () => {
+            fetchBankInfo();
+            fetchRestrictions();
+        };
         window.addEventListener("settings-updated", handleSettingsUpdate);
         return () => window.removeEventListener("settings-updated", handleSettingsUpdate);
     }, []);
+
+    const checkZipRestriction = (zip: string) => {
+        const found = restrictions.find(r => r.zipCode === zip);
+        setActiveRestriction(found || null);
+    };
 
     // Coupon State
     const [couponCodeInput, setCouponCodeInput] = useState("");
@@ -608,7 +642,10 @@ export default function CheckoutPage() {
                                             </div>
                                             <input type="text" placeholder="Número *" required className="w-full px-5 py-4 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" value={shippingAddress.number} onChange={(e) => setShippingAddress({ ...shippingAddress, number: e.target.value })} />
                                             <input type="text" placeholder="Piso / Depto" className="w-full px-5 py-4 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" value={shippingAddress.apartment} onChange={(e) => setShippingAddress({ ...shippingAddress, apartment: e.target.value })} />
-                                            <input type="text" placeholder="Código Postal *" required className="w-full px-5 py-4 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" value={shippingAddress.zipCode} onChange={(e) => setShippingAddress({ ...shippingAddress, zipCode: e.target.value })} />
+                                            <input type="text" placeholder="Código Postal *" required className="w-full px-5 py-4 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" value={shippingAddress.zipCode} onChange={(e) => {
+                                                const val = e.target.value;
+                                                setShippingAddress({ ...shippingAddress, zipCode: val });
+                                            }} />
                                             <div className="col-span-full md:col-span-2">
                                                 <input type="text" placeholder="Ciudad *" required className="w-full px-5 py-4 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" value={shippingAddress.city} onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })} />
                                             </div>
@@ -695,9 +732,45 @@ export default function CheckoutPage() {
                                                 </div>
                                             )}
                                         </div>
+                                        {/* Restriction Alert for BLOCK_SALE */}
+                                        {activeRestriction?.type === 'BLOCK_SALE' && (
+                                            <div className="mt-8 p-6 bg-red-50 border border-red-100 rounded-3xl space-y-4 animate-in zoom-in-95 duration-300">
+                                                <div className="flex items-center gap-3 text-red-600 mb-2">
+                                                    <Ban className="h-6 w-6" />
+                                                    <h3 className="font-bold text-sm uppercase tracking-widest">Venta no disponible en esta zona</h3>
+                                                </div>
+                                                <p className="text-sm text-gray-700 leading-relaxed font-medium">
+                                                    {activeRestriction.message || "En este código postal contamos con locales físicos y/o franquicias disponibles. Te invitamos a visitarlos o comunicarte directamente con ellos para realizar tu compra."}
+                                                </p>
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                                                    {activeRestriction.address && (
+                                                        <div className="flex items-start gap-3 bg-white p-4 rounded-2xl border border-red-100 shadow-sm">
+                                                            <Store className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                                                            <div className="space-y-1">
+                                                                <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Dirección</p>
+                                                                <p className="text-[11px] text-gray-600 font-medium leading-normal">{activeRestriction.address}</p>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    {activeRestriction.phone && (
+                                                        <div className="flex items-start gap-3 bg-white p-4 rounded-2xl border border-red-100 shadow-sm">
+                                                            <Phone className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                                                            <div className="space-y-1">
+                                                                <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Teléfono</p>
+                                                                <p className="text-[11px] text-gray-600 font-bold font-mono">{activeRestriction.phone}</p>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
                                     </section>
 
-                                    <button type="submit" className="w-full h-16 bg-[#0c120e] hover:bg-black text-white rounded-2xl font-medium text-xs uppercase tracking-widest flex items-center justify-center gap-3 shadow-2xl transition-all hover:-translate-y-1 active:scale-95 group mt-8">
+                                    <button 
+                                        type="submit" 
+                                        disabled={activeRestriction?.type === 'BLOCK_SALE'}
+                                        className="w-full h-16 bg-[#0c120e] hover:bg-black text-white rounded-2xl font-medium text-xs uppercase tracking-widest flex items-center justify-center gap-3 shadow-2xl transition-all hover:-translate-y-1 active:scale-95 group mt-8 disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed"
+                                    >
                                         Continuar con Envíos <ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-2" />
                                     </button>
                                 </div>
@@ -721,6 +794,18 @@ export default function CheckoutPage() {
 
                                         {/* Shipping Rates */}
                                         <div className="space-y-4">
+                                            {activeRestriction?.type === 'BLOCK_SHIPPING' && (
+                                                <div className="p-5 bg-orange-50 border border-orange-100 rounded-2xl flex items-start gap-4 mb-4">
+                                                    <Truck className="h-5 w-5 text-orange-500 shrink-0 mt-0.5" />
+                                                    <div>
+                                                        <h4 className="text-xs font-bold text-orange-700 uppercase tracking-widest mb-1">Entrega por Cadetería</h4>
+                                                        <p className="text-xs text-orange-600/80 leading-relaxed font-medium">
+                                                            {activeRestriction.message || "En este código postal los envíos por correo tradicional no están disponibles. Se realizará la entrega mediante nuestro servicio propio de cadetería."}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            )}
+
                                             {isCalculatingShipping ? (
                                                 <div className="py-12 flex flex-col items-center justify-center bg-gray-50 rounded-2xl border border-dashed border-gray-200">
                                                     <Loader2 className="h-8 w-8 text-primary animate-spin mb-4" />
@@ -728,78 +813,109 @@ export default function CheckoutPage() {
                                                 </div>
                                             ) : (
                                                 <>
-                                                    {ocaQuote && (
-                                                        <label className={`block border ${selectedShippingMethod === 'oca_domicilio' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-gray-200 bg-white hover:border-gray-300'} rounded-2xl p-5 cursor-pointer transition-all`}>
+                                                    {/* OCA options only if NOT BLOCKED */}
+                                                    {activeRestriction?.type !== 'BLOCK_SHIPPING' && (
+                                                        <>
+                                                            {ocaQuote && (
+                                                                <label className={`block border ${selectedShippingMethod === 'oca_domicilio' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-gray-200 bg-white hover:border-gray-300'} rounded-2xl p-5 cursor-pointer transition-all`}>
+                                                                    <div className="flex items-center justify-between">
+                                                                        <div className="flex items-center gap-4">
+                                                                            <input
+                                                                                type="radio"
+                                                                                name="shipping"
+                                                                                checked={selectedShippingMethod === 'oca_domicilio'}
+                                                                                onChange={() => {
+                                                                                    setSelectedShippingMethod('oca_domicilio');
+                                                                                    setSelectedShipping(ocaQuote.price);
+                                                                                    setSelectedBranchId(null);
+                                                                                }}
+                                                                                className="w-5 h-5 text-primary border-gray-300 focus:ring-primary"
+                                                                            />
+                                                                            <div>
+                                                                                <p className="font-medium text-gray-900 text-sm">OCA a Domicilio</p>
+                                                                                <p className="text-xs text-gray-500 mt-1">Llega en aprox. {ocaQuote.deliveryDays} días hábiles</p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <span className="font-medium text-gray-900">$ {ocaQuote.price.toLocaleString('es-AR')}</span>
+                                                                    </div>
+                                                                </label>
+                                                            )}
+
+                                                            {ocaBranches.length > 0 && (
+                                                                <div className={`border ${selectedShippingMethod === 'oca_sucursal' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-gray-200 bg-white hover:border-gray-300'} rounded-2xl p-5 transition-all`}>
+                                                                    <label className="flex items-center justify-between cursor-pointer mb-4">
+                                                                        <div className="flex items-center gap-4">
+                                                                            <input
+                                                                                type="radio"
+                                                                                name="shipping"
+                                                                                checked={selectedShippingMethod === 'oca_sucursal'}
+                                                                                onChange={() => {
+                                                                                    setSelectedShippingMethod('oca_sucursal');
+                                                                                    setSelectedShipping(ocaQuote?.price ? ocaQuote.price * 0.7 : 3500); // Usually cheaper
+                                                                                    if (ocaBranches.length === 1) setSelectedBranchId(ocaBranches[0].id);
+                                                                                }}
+                                                                                className="w-5 h-5 text-primary border-gray-300 focus:ring-primary"
+                                                                            />
+                                                                            <div>
+                                                                                <p className="font-medium text-gray-900 text-sm">Retiro en Sucursal OCA</p>
+                                                                                <p className="text-xs text-gray-500 mt-1">Más económico y rápido</p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <span className="font-medium text-gray-900">$ {(ocaQuote?.price ? ocaQuote.price * 0.7 : 3500).toLocaleString('es-AR')}</span>
+                                                                    </label>
+
+                                                                    {selectedShippingMethod === 'oca_sucursal' && (
+                                                                        <div className="space-y-3 mt-4 animate-fade-in">
+                                                                            <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold px-1">Selecciona la sucursal:</p>
+                                                                            <div className="grid grid-cols-1 gap-2">
+                                                                                {ocaBranches.map((branch) => (
+                                                                                    <button
+                                                                                        key={branch.id}
+                                                                                        type="button"
+                                                                                        onClick={() => setSelectedBranchId(branch.id)}
+                                                                                        className={`text-left p-3 rounded-xl border text-xs transition-all ${selectedBranchId === branch.id
+                                                                                            ? 'border-primary bg-primary/10 font-bold'
+                                                                                            : 'border-gray-100 bg-white hover:border-gray-200'}`}
+                                                                                    >
+                                                                                        <p className="text-gray-900">{branch.name}</p>
+                                                                                        <p className="text-gray-500 font-normal mt-0.5">{branch.address}, {branch.city}</p>
+                                                                                    </button>
+                                                                                ))}
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </>
+                                                    )}
+
+                                                    {/* Cadetería / Local Delivery (When restricted) */}
+                                                    {activeRestriction?.type === 'BLOCK_SHIPPING' && (
+                                                        <label className={`block border ${selectedShippingMethod === 'cadete' ? 'border-orange-500 bg-orange-500/5 ring-1 ring-orange-500' : 'border-gray-200 bg-white hover:border-gray-300'} rounded-2xl p-5 cursor-pointer transition-all`}>
                                                             <div className="flex items-center justify-between">
                                                                 <div className="flex items-center gap-4">
                                                                     <input
                                                                         type="radio"
                                                                         name="shipping"
-                                                                        checked={selectedShippingMethod === 'oca_domicilio'}
+                                                                        checked={selectedShippingMethod === 'cadete'}
                                                                         onChange={() => {
-                                                                            setSelectedShippingMethod('oca_domicilio');
-                                                                            setSelectedShipping(ocaQuote.price);
+                                                                            setSelectedShippingMethod('cadete');
+                                                                            setSelectedShipping(0); // Assuming free for now or fixed price?
                                                                             setSelectedBranchId(null);
                                                                         }}
-                                                                        className="w-5 h-5 text-primary border-gray-300 focus:ring-primary"
+                                                                        className="w-5 h-5 text-orange-500 border-gray-300 focus:ring-orange-500"
                                                                     />
                                                                     <div>
-                                                                        <p className="font-medium text-gray-900 text-sm">OCA a Domicilio</p>
-                                                                        <p className="text-xs text-gray-500 mt-1">Llega en aprox. {ocaQuote.deliveryDays} días hábiles</p>
+                                                                        <p className="font-bold text-gray-900 text-sm">Cadetería / Entrega Local</p>
+                                                                        <p className="text-xs text-gray-500 mt-1">Coordina la entrega con un cadete local</p>
                                                                     </div>
                                                                 </div>
-                                                                <span className="font-medium text-gray-900">$ {ocaQuote.price.toLocaleString('es-AR')}</span>
+                                                                <span className="font-bold text-orange-500 uppercase text-[10px] tracking-widest">A coordinar</span>
                                                             </div>
                                                         </label>
                                                     )}
 
-                                                    {ocaBranches.length > 0 && (
-                                                        <div className={`border ${selectedShippingMethod === 'oca_sucursal' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-gray-200 bg-white hover:border-gray-300'} rounded-2xl p-5 transition-all`}>
-                                                            <label className="flex items-center justify-between cursor-pointer mb-4">
-                                                                <div className="flex items-center gap-4">
-                                                                    <input
-                                                                        type="radio"
-                                                                        name="shipping"
-                                                                        checked={selectedShippingMethod === 'oca_sucursal'}
-                                                                        onChange={() => {
-                                                                            setSelectedShippingMethod('oca_sucursal');
-                                                                            setSelectedShipping(ocaQuote?.price ? ocaQuote.price * 0.7 : 3500); // Usually cheaper
-                                                                            if (ocaBranches.length === 1) setSelectedBranchId(ocaBranches[0].id);
-                                                                        }}
-                                                                        className="w-5 h-5 text-primary border-gray-300 focus:ring-primary"
-                                                                    />
-                                                                    <div>
-                                                                        <p className="font-medium text-gray-900 text-sm">Retiro en Sucursal OCA</p>
-                                                                        <p className="text-xs text-gray-500 mt-1">Más económico y rápido</p>
-                                                                    </div>
-                                                                </div>
-                                                                <span className="font-medium text-gray-900">$ {(ocaQuote?.price ? ocaQuote.price * 0.7 : 3500).toLocaleString('es-AR')}</span>
-                                                            </label>
-
-                                                            {selectedShippingMethod === 'oca_sucursal' && (
-                                                                <div className="space-y-3 mt-4 animate-fade-in">
-                                                                    <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold px-1">Selecciona la sucursal:</p>
-                                                                    <div className="grid grid-cols-1 gap-2">
-                                                                        {ocaBranches.map((branch) => (
-                                                                            <button
-                                                                                key={branch.id}
-                                                                                type="button"
-                                                                                onClick={() => setSelectedBranchId(branch.id)}
-                                                                                className={`text-left p-3 rounded-xl border text-xs transition-all ${selectedBranchId === branch.id
-                                                                                    ? 'border-primary bg-primary/10 font-bold'
-                                                                                    : 'border-gray-100 bg-white hover:border-gray-200'}`}
-                                                                            >
-                                                                                <p className="text-gray-900">{branch.name}</p>
-                                                                                <p className="text-gray-500 font-normal mt-0.5">{branch.address}, {branch.city}</p>
-                                                                            </button>
-                                                                        ))}
-                                                                    </div>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    )}
-
-                                                    {subtotal > 60000 && (
+                                                    {subtotal > 60000 && activeRestriction?.type !== 'BLOCK_SHIPPING' && (
                                                         <label className={`block border ${selectedShippingMethod === 'gratis' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-gray-200 bg-white hover:border-gray-300'} rounded-2xl p-5 cursor-pointer transition-all relative overflow-hidden`}>
                                                             <div className="absolute top-0 left-0 w-1 h-full bg-primary"></div>
                                                             <div className="flex items-center justify-between pl-3">

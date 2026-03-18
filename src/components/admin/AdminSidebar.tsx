@@ -58,6 +58,7 @@ const menuItems: MenuNode[] = [
             { name: "redes sociales", href: "/admin/ajustes/plataformas", icon: Monitor },
             { name: "plataformas de pago", href: "/admin/ajustes/pago", icon: DollarSign },
             { name: "plataformas de envío", href: "/admin/ajustes/envio", icon: Truck },
+            { name: "zonas restringidas", href: "/admin/ajustes/zonas", icon: Layers },
         ]
     },
     { name: "pedidos", href: "/admin/pedidos", icon: ShoppingCart },
