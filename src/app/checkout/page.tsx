@@ -138,7 +138,7 @@ export default function CheckoutPage() {
                     });
                 }
             })
-            .catch(() => {});
+            .catch(() => { });
     };
 
     useEffect(() => {
@@ -234,14 +234,14 @@ export default function CheckoutPage() {
         try {
             // Calculate total weight (default to 1kg if not specified)
             const totalWeight = items.reduce((sum, item) => sum + (Number(item.weight) || 1) * item.quantity, 0);
-            
+
             // 1. Get Quote
             const quoteRes = await fetch("/api/oca/quote", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    shippingAddress: selectedBranchId 
-                        ? { ...shippingAddress, branchName: ocaBranches.find(b => b.id === selectedBranchId)?.name } 
+                    shippingAddress: selectedBranchId
+                        ? { ...shippingAddress, branchName: ocaBranches.find(b => b.id === selectedBranchId)?.name }
                         : shippingAddress,
                     destinationZipCode: shippingAddress.zipCode,
                     weight: totalWeight,
@@ -370,8 +370,8 @@ export default function CheckoutPage() {
                     discount: totalDiscount,
                     paymentMethod: selectedPayment,
                     paymentProof: paymentProofUrl,
-                    shippingAddress: selectedBranchId 
-                        ? { ...shippingAddress, branchName: ocaBranches.find(b => b.id === selectedBranchId)?.name, isBranch: true } 
+                    shippingAddress: selectedBranchId
+                        ? { ...shippingAddress, branchName: ocaBranches.find(b => b.id === selectedBranchId)?.name, isBranch: true }
                         : shippingAddress,
                     contactInfo,
                     couponCode: appliedCoupon?.code,
@@ -438,11 +438,11 @@ export default function CheckoutPage() {
                         return;
                     }
                 }
-                
+
                 // If preference fails, show warning but order is already created
-                setNotification({ 
-                    message: "Pedido creado, pero hubo un problema al conectar con Mercado Pago. Por favor, contáctanos.", 
-                    type: 'error' 
+                setNotification({
+                    message: "Pedido creado, pero hubo un problema al conectar con Mercado Pago. Por favor, contáctanos.",
+                    type: 'error'
                 });
                 setTimeout(() => router.push('/mi-cuenta/pedidos'), 3000);
             } else {
@@ -732,16 +732,16 @@ export default function CheckoutPage() {
                                                         <label className={`block border ${selectedShippingMethod === 'oca_domicilio' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-gray-200 bg-white hover:border-gray-300'} rounded-2xl p-5 cursor-pointer transition-all`}>
                                                             <div className="flex items-center justify-between">
                                                                 <div className="flex items-center gap-4">
-                                                                    <input 
-                                                                        type="radio" 
-                                                                        name="shipping" 
+                                                                    <input
+                                                                        type="radio"
+                                                                        name="shipping"
                                                                         checked={selectedShippingMethod === 'oca_domicilio'}
                                                                         onChange={() => {
                                                                             setSelectedShippingMethod('oca_domicilio');
                                                                             setSelectedShipping(ocaQuote.price);
                                                                             setSelectedBranchId(null);
-                                                                        }} 
-                                                                        className="w-5 h-5 text-primary border-gray-300 focus:ring-primary" 
+                                                                        }}
+                                                                        className="w-5 h-5 text-primary border-gray-300 focus:ring-primary"
                                                                     />
                                                                     <div>
                                                                         <p className="font-medium text-gray-900 text-sm">OCA a Domicilio</p>
@@ -757,16 +757,16 @@ export default function CheckoutPage() {
                                                         <div className={`border ${selectedShippingMethod === 'oca_sucursal' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-gray-200 bg-white hover:border-gray-300'} rounded-2xl p-5 transition-all`}>
                                                             <label className="flex items-center justify-between cursor-pointer mb-4">
                                                                 <div className="flex items-center gap-4">
-                                                                    <input 
-                                                                        type="radio" 
-                                                                        name="shipping" 
+                                                                    <input
+                                                                        type="radio"
+                                                                        name="shipping"
                                                                         checked={selectedShippingMethod === 'oca_sucursal'}
                                                                         onChange={() => {
                                                                             setSelectedShippingMethod('oca_sucursal');
                                                                             setSelectedShipping(ocaQuote?.price ? ocaQuote.price * 0.7 : 3500); // Usually cheaper
                                                                             if (ocaBranches.length === 1) setSelectedBranchId(ocaBranches[0].id);
-                                                                        }} 
-                                                                        className="w-5 h-5 text-primary border-gray-300 focus:ring-primary" 
+                                                                        }}
+                                                                        className="w-5 h-5 text-primary border-gray-300 focus:ring-primary"
                                                                     />
                                                                     <div>
                                                                         <p className="font-medium text-gray-900 text-sm">Retiro en Sucursal OCA</p>
@@ -785,8 +785,8 @@ export default function CheckoutPage() {
                                                                                 key={branch.id}
                                                                                 type="button"
                                                                                 onClick={() => setSelectedBranchId(branch.id)}
-                                                                                className={`text-left p-3 rounded-xl border text-xs transition-all ${selectedBranchId === branch.id 
-                                                                                    ? 'border-primary bg-primary/10 font-bold' 
+                                                                                className={`text-left p-3 rounded-xl border text-xs transition-all ${selectedBranchId === branch.id
+                                                                                    ? 'border-primary bg-primary/10 font-bold'
                                                                                     : 'border-gray-100 bg-white hover:border-gray-200'}`}
                                                                             >
                                                                                 <p className="text-gray-900">{branch.name}</p>
@@ -804,16 +804,16 @@ export default function CheckoutPage() {
                                                             <div className="absolute top-0 left-0 w-1 h-full bg-primary"></div>
                                                             <div className="flex items-center justify-between pl-3">
                                                                 <div className="flex items-center gap-4">
-                                                                    <input 
-                                                                        type="radio" 
-                                                                        name="shipping" 
+                                                                    <input
+                                                                        type="radio"
+                                                                        name="shipping"
                                                                         checked={selectedShippingMethod === 'gratis'}
                                                                         onChange={() => {
                                                                             setSelectedShippingMethod('gratis');
                                                                             setSelectedShipping(0);
                                                                             setSelectedBranchId(null);
-                                                                        }} 
-                                                                        className="w-5 h-5 text-primary border-gray-300 focus:ring-primary" 
+                                                                        }}
+                                                                        className="w-5 h-5 text-primary border-gray-300 focus:ring-primary"
                                                                     />
                                                                     <div>
                                                                         <p className="font-medium text-primary text-sm flex items-center gap-2">Envío Gratuito Promocional</p>
@@ -835,16 +835,16 @@ export default function CheckoutPage() {
                                                     <label className={`block border ${selectedShippingMethod === 'acordar' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-gray-200 bg-white hover:border-gray-300'} rounded-2xl p-5 cursor-pointer transition-all`}>
                                                         <div className="flex items-center justify-between">
                                                             <div className="flex items-center gap-4">
-                                                                <input 
-                                                                    type="radio" 
-                                                                    name="shipping" 
+                                                                <input
+                                                                    type="radio"
+                                                                    name="shipping"
                                                                     checked={selectedShippingMethod === 'acordar'}
                                                                     onChange={() => {
                                                                         setSelectedShippingMethod('acordar');
                                                                         setSelectedShipping(0); // Price 0 or custom logic
                                                                         setSelectedBranchId(null);
-                                                                    }} 
-                                                                    className="w-5 h-5 text-primary border-gray-300 focus:ring-primary" 
+                                                                    }}
+                                                                    className="w-5 h-5 text-primary border-gray-300 focus:ring-primary"
                                                                 />
                                                                 <div>
                                                                     <p className="font-medium text-gray-900 text-sm">Envío a acordar / Otros medios</p>
