@@ -1,15 +1,27 @@
 import { MercadoPagoConfig, Preference } from 'mercadopago';
 import { NextResponse } from 'next/server';
-
-const client = new MercadoPagoConfig({
-    accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN || '',
-});
+import { prisma } from '@/lib/prisma';
 
 export async function POST(req: Request) {
     try {
-        const { orderId, items, customerEmail, subtotal, shippingCost, discount } = await req.json();
+        const { items, orderId, customer, subtotal, shippingCost, discount } = await req.json();
 
-        if (!orderId || !items || !customerEmail) {
+        // Get settings from DB
+        const settings = await prisma.storeSettings.findUnique({
+            where: { id: "global" }
+        });
+
+        // Check if Mercado Pago is enabled
+        if (settings && settings.mercadopagoEnabled === false) {
+            return NextResponse.json({ error: 'Mercado Pago se encuentra deshabilitado temporalmente.' }, { status: 403 });
+        }
+
+        const client = new MercadoPagoConfig({
+            accessToken: settings?.mercadopagoAccessToken || process.env.MERCADOPAGO_ACCESS_TOKEN || '',
+            options: { timeout: 5000 }
+        });
+
+        if (!orderId || !items || !customer?.email) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
@@ -56,7 +68,7 @@ export async function POST(req: Request) {
                 ? undefined 
                 : `${process.env.NEXTAUTH_URL}/api/payments/mercadopago/webhook`,
             payer: {
-                email: customerEmail,
+                email: customer?.email,
             },
             metadata: {
                 order_id: orderId,

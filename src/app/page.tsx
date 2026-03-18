@@ -42,13 +42,17 @@ export default function Home() {
         const prodsData = await prodsRes.json();
 
         // Filter categories that have at least one product
-        const activeCategories = catsData.filter((cat: any) => (cat._count?.products || 0) > 0);
-        setCategories(activeCategories);
+        if (Array.isArray(catsData)) {
+          const activeCategories = catsData.filter((cat: any) => (cat._count?.products || 0) > 0);
+          setCategories(activeCategories);
+        }
 
         // Fetch top sellers instead of just first products
         const topSellersRes = await fetch("/api/products/top-sellers");
         const topSellersData = await topSellersRes.json();
-        setProducts(topSellersData);
+        if (Array.isArray(topSellersData)) {
+          setProducts(topSellersData);
+        }
       } catch (error) {
         console.error("Error fetching home data:", error);
       } finally {

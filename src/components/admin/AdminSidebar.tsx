@@ -16,7 +16,10 @@ import {
     Settings2,
     Tag,
     ChevronDown,
-    Folder
+    Folder,
+    Monitor,
+    DollarSign,
+    Truck
 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import Image from "next/image";
@@ -47,6 +50,16 @@ const menuItems: MenuNode[] = [
             { name: "suscriptores", href: "/admin/marketing/suscriptores", icon: User },
         ]
     },
+    {
+        type: 'group',
+        title: 'ajustes',
+        icon: Settings2,
+        items: [
+            { name: "redes sociales", href: "/admin/ajustes/plataformas", icon: Monitor },
+            { name: "plataformas de pago", href: "/admin/ajustes/pago", icon: DollarSign },
+            { name: "plataformas de envío", href: "/admin/ajustes/envio", icon: Truck },
+        ]
+    },
     { name: "pedidos", href: "/admin/pedidos", icon: ShoppingCart },
     { name: "usuarios", href: "/admin/usuarios", icon: User },
     { name: "estadísticas", href: "/admin/estadisticas", icon: BarChart3 },
@@ -55,9 +68,21 @@ const menuItems: MenuNode[] = [
 export const AdminSidebar = () => {
     const pathname = usePathname();
     const { user, logout } = useAuthStore();
-    const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
-        'catálogo': true // Default open
-    });
+    const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+
+    // Auto-open groups that contain the active path
+    useEffect(() => {
+        const newOpenGroups: Record<string, boolean> = { ...openGroups };
+        menuItems.forEach(node => {
+            if ('type' in node && node.type === 'group') {
+                const isActive = node.items.some(item => pathname === item.href);
+                if (isActive) {
+                    newOpenGroups[node.title] = true;
+                }
+            }
+        });
+        setOpenGroups(newOpenGroups);
+    }, [pathname]);
 
     const toggleGroup = (title: string) => {
         setOpenGroups(prev => ({

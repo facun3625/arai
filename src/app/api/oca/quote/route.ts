@@ -1,17 +1,33 @@
 import { NextResponse } from "next/server";
 import { parseStringPromise } from "xml2js";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
     try {
-        const { destinationZipCode, weight, volume, packagesCount } = await req.json();
+        const { destinationZipCode, weight, volume, packagesCount, isBranch } = await req.json();
+
+        // Get settings from DB
+        const settings = await prisma.storeSettings.findUnique({
+            where: { id: "global" }
+        });
+
+        // Check if OCA is enabled
+        if (settings && settings.ocaEnabled === false) {
+            return NextResponse.json({ error: "El servicio de OCA se encuentra deshabilitado temporalmente." }, { status: 403 });
+        }
 
         // OCA usually expects CUIT as XX-XXXXXXXX-X
-        let cuit = process.env.OCA_CUIT?.replace(/-/g, "");
+        let cuit = settings?.ocaCuit?.replace(/-/g, "") || process.env.OCA_CUIT?.replace(/-/g, "");
         if (cuit && cuit.length === 11) {
             cuit = `${cuit.slice(0, 2)}-${cuit.slice(2, 10)}-${cuit.slice(10)}`;
         }
-        const operativa = process.env.OCA_OPERATIVA;
-        const originZipCode = process.env.OCA_ORIGIN_CP;
+
+        // Use sucursal operativa if isBranch is true
+        const operativa = isBranch 
+            ? (settings?.ocaOperativaSucursal || process.env.OCA_OPERATIVA_SUCURSAL || settings?.ocaOperativa || process.env.OCA_OPERATIVA)
+            : (settings?.ocaOperativa || process.env.OCA_OPERATIVA);
+            
+        const originZipCode = settings?.ocaOriginZipCode || process.env.OCA_ORIGIN_CP;
 
         if (!cuit || !operativa || !originZipCode) {
             return NextResponse.json({ error: "Configuración de OCA incompleta" }, { status: 500 });

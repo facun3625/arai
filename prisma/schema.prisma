@@ -108,6 +108,8 @@ model StoreSettings {
   id                    String   @id @default("global")
   freeShippingThreshold Float    @default(0)
   bankTransferDiscount  Float    @default(15)
+  bankTransferCbu       String?
+  bankTransferAlias     String?
   pointsEnabled         Boolean  @default(false)
   pointsRatio           Float    @default(0.01)
   instagramUrl          String?
@@ -116,6 +118,34 @@ model StoreSettings {
   youtubeUrl            String?
   tiktokUrl             String?
   whatsappNumber        String?
+  mercadopagoPublicKey  String?
+  mercadopagoAccessToken String?
+  mercadopagoEnabled     Boolean  @default(true)
+  
+  // PayPal - International
+  paypalClientId        String?
+  paypalSecret          String?
+  paypalEnabled         Boolean  @default(false)
+  paypalMode            String   @default("sandbox")
+
+  // Modo - Argentina
+  modoPublicKey         String?
+  modoPrivateKey        String?
+  modoMerchantId        String?
+  modoEnabled           Boolean  @default(false)
+
+  ocaCuit               String?
+  ocaOperativa          String?
+  ocaOperativaSucursal  String?
+  ocaOriginZipCode      String?
+  ocaEnabled            Boolean  @default(true)
+
+  // DHL - International
+  dhlAccountNumber      String?
+  dhlApiKey             String?
+  dhlSiteId             String?
+  dhlEnabled            Boolean  @default(false)
+
   updatedAt             DateTime @updatedAt
   maintenanceMode       Boolean  @default(false)
 }

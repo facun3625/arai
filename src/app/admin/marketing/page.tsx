@@ -17,12 +17,6 @@ export default function MarketingPage() {
         bankTransferDiscount: 15,
         pointsEnabled: false,
         pointsRatio: 0.01,
-        instagramUrl: "",
-        facebookUrl: "",
-        xUrl: "",
-        youtubeUrl: "",
-        tiktokUrl: "",
-        whatsappNumber: "",
         maintenanceMode: false
     });
     const [isSavingSettings, setIsSavingSettings] = useState(false);
@@ -50,8 +44,10 @@ export default function MarketingPage() {
 
     // Pop-ups
     const [popups, setPopups] = useState<any[]>([]);
+    const [editingPopups, setEditingPopups] = useState<Record<string, any>>({});
     const [isLoadingPopups, setIsLoadingPopups] = useState(false);
     const [isSavingPopup, setIsSavingPopup] = useState<string | null>(null);
+    const [lastSavedPopup, setLastSavedPopup] = useState<string | null>(null);
 
     // Puntos y Recompensas
     const [rewards, setRewards] = useState<any[]>([]);
@@ -133,12 +129,6 @@ export default function MarketingPage() {
                     bankTransferDiscount: data.bankTransferDiscount || 15,
                     pointsEnabled: data.pointsEnabled || false,
                     pointsRatio: data.pointsRatio || 0.01,
-                    instagramUrl: data.instagramUrl || "",
-                    facebookUrl: data.facebookUrl || "",
-                    xUrl: data.xUrl || "",
-                    youtubeUrl: data.youtubeUrl || "",
-                    tiktokUrl: data.tiktokUrl || "",
-                    whatsappNumber: data.whatsappNumber || "",
                     maintenanceMode: data.maintenanceMode || false
                 });
             }
@@ -219,6 +209,8 @@ export default function MarketingPage() {
             const data = await res.json();
             if (Array.isArray(data)) {
                 setPopups(data);
+                // Reset editing state after fetch
+                setEditingPopups({});
             }
         } catch (error) {
             console.error("Error fetching popups:", error);
@@ -227,7 +219,23 @@ export default function MarketingPage() {
         }
     };
 
-    const handleSavePopup = async (location: string, imageUrl: string, isActive: boolean, displayFrequency?: string) => {
+    const handleLocalPopupUpdate = (location: string, updates: Partial<any>) => {
+        const currentPopup = popups.find(p => p.location === location) || { location, imageUrl: "", isActive: false, displayFrequency: "SESSION" };
+        const baseEditing = editingPopups[location] || currentPopup;
+        
+        setEditingPopups({
+            ...editingPopups,
+            [location]: { ...baseEditing, ...updates }
+        });
+        
+        // Remove "success" state when user starts editing again
+        if (lastSavedPopup === location) setLastSavedPopup(null);
+    };
+
+    const handleSavePopup = async (location: string) => {
+        const popupToSave = editingPopups[location];
+        if (!popupToSave) return;
+
         setIsSavingPopup(location);
         try {
             const res = await fetch("/api/admin/popups", {
@@ -235,16 +243,16 @@ export default function MarketingPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     adminId: user?.id,
-                    location,
-                    imageUrl,
-                    isActive,
-                    displayFrequency: displayFrequency || "SESSION"
+                    ...popupToSave
                 })
             });
 
             if (res.ok) {
-                showToast(`Pop-up de ${location} actualizado ✨`, "success");
-                fetchPopups();
+                setLastSavedPopup(location);
+                // Clear the success message after 3 seconds
+                setTimeout(() => setLastSavedPopup(null), 3000);
+                
+                await fetchPopups();
             } else {
                 const errorData = await res.json();
                 showToast(errorData.error || "Error al guardar pop-up", "error");
@@ -455,23 +463,7 @@ export default function MarketingPage() {
 
                             <hr className="border-white/10" />
 
-                            <div className="space-y-4">
-                                <div>
-                                    <h2 className="text-white text-lg font-medium tracking-tight mb-1 flex items-center gap-2">
-                                        <Percent className="h-5 w-5 text-primary" /> Descuento por Transferencia
-                                    </h2>
-                                    <p className="text-[12px] text-white/40">Porcentaje de descuento automático que se aplica cuando el cliente elige Transferencia Bancaria.</p>
-                                </div>
-                                <div className="relative">
-                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40">%</span>
-                                    <input
-                                        type="number"
-                                        value={settings.bankTransferDiscount}
-                                        onChange={(e) => setSettings({ ...settings, bankTransferDiscount: Number(e.target.value) })}
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-[14px] text-white focus:outline-none focus:border-primary transition-colors font-mono"
-                                    />
-                                </div>
-                            </div>
+
 
                             <hr className="border-white/10" />
 
@@ -501,98 +493,6 @@ export default function MarketingPage() {
                                         </p>
                                     </div>
                                 )}
-                            </div>
-
-                            <hr className="border-white/10" />
-
-                            <div className="space-y-6">
-                                <div>
-                                    <h2 className="text-white text-lg font-medium tracking-tight mb-1">
-                                        Redes Sociales y WhatsApp
-                                    </h2>
-                                    <p className="text-[12px] text-white/40">Configurá los enlaces que aparecerán en el Header y Footer del sitio.</p>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="text-[11px] text-white/60 font-medium uppercase tracking-widest flex items-center gap-2">
-                                            <Instagram className="h-3.5 w-3.5" /> Instagram
-                                        </label>
-                                        <input
-                                            type="text"
-                                            placeholder="https://instagram.com/tu-usuario"
-                                            value={settings.instagramUrl || ""}
-                                            onChange={(e) => setSettings({ ...settings, instagramUrl: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
-                                        />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <label className="text-[11px] text-white/60 font-medium uppercase tracking-widest flex items-center gap-2">
-                                            <Facebook className="h-3.5 w-3.5" /> Facebook
-                                        </label>
-                                        <input
-                                            type="text"
-                                            placeholder="https://facebook.com/tu-pagina"
-                                            value={settings.facebookUrl || ""}
-                                            onChange={(e) => setSettings({ ...settings, facebookUrl: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
-                                        />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <label className="text-[11px] text-white/60 font-medium uppercase tracking-widest flex items-center gap-2">
-                                            <Twitter className="h-3.5 w-3.5" /> X (Ex Twitter)
-                                        </label>
-                                        <input
-                                            type="text"
-                                            placeholder="https://x.com/tu-usuario"
-                                            value={settings.xUrl || ""}
-                                            onChange={(e) => setSettings({ ...settings, xUrl: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
-                                        />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <label className="text-[11px] text-white/60 font-medium uppercase tracking-widest flex items-center gap-2">
-                                            <Monitor className="h-3.5 w-3.5" /> YouTube
-                                        </label>
-                                        <input
-                                            type="text"
-                                            placeholder="https://youtube.com/@tu-canal"
-                                            value={settings.youtubeUrl || ""}
-                                            onChange={(e) => setSettings({ ...settings, youtubeUrl: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
-                                        />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <label className="text-[11px] text-white/60 font-medium uppercase tracking-widest flex items-center gap-2">
-                                            <TikTokIcon className="h-3.5 w-3.5" /> TikTok
-                                        </label>
-                                        <input
-                                            type="text"
-                                            placeholder="https://tiktok.com/@tu-usuario"
-                                            value={settings.tiktokUrl || ""}
-                                            onChange={(e) => setSettings({ ...settings, tiktokUrl: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
-                                        />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <label className="text-[11px] text-white/60 font-medium uppercase tracking-widest flex items-center gap-2 text-primary">
-                                            <Plus className="h-3.5 w-3.5" /> WhatsApp (Número completo)
-                                        </label>
-                                        <input
-                                            type="text"
-                                            placeholder="Ej: 5493411234567"
-                                            value={settings.whatsappNumber || ""}
-                                            onChange={(e) => setSettings({ ...settings, whatsappNumber: e.target.value })}
-                                            className="w-full bg-white/5 border border-primary/20 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
-                                        />
-                                        <p className="text-[10px] text-white/30 italic">Sin espacios, sin el +, incluyendo código de país y área.</p>
-                                    </div>
-                                </div>
                             </div>
 
                             <button
@@ -1345,9 +1245,13 @@ export default function MarketingPage() {
                 {activeTab === "popups" && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {["HOME", "SHOP"].map((loc) => {
-                            const popup = popups.find(p => p.location === loc) || { location: loc, imageUrl: "", isActive: false, displayFrequency: "SESSION" };
+                            const originalPopup = popups.find(p => p.location === loc) || { location: loc, imageUrl: "", isActive: false, displayFrequency: "SESSION" };
+                            const popup = editingPopups[loc] || originalPopup;
+                            const hasChanges = JSON.stringify(popup) !== JSON.stringify(originalPopup);
+                            const isSaved = lastSavedPopup === loc;
+
                             return (
-                                <div key={loc} className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 space-y-6">
+                                <div key={loc} className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 space-y-6 relative group transition-all duration-500 hover:border-white/10">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-3">
                                             <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -1358,12 +1262,18 @@ export default function MarketingPage() {
                                                 <p className="text-[11px] text-white/40 uppercase tracking-widest">Configuración visual</p>
                                             </div>
                                         </div>
-                                        <button
-                                            onClick={() => handleSavePopup(loc, popup.imageUrl, !popup.isActive, popup.displayFrequency)}
-                                            className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${popup.isActive ? 'bg-primary/20 text-primary border border-primary/30' : 'bg-white/5 text-white/40 border border-white/10'}`}
-                                        >
-                                            {popup.isActive ? 'Activo' : 'Inactivo'}
-                                        </button>
+                                        {/* Status Switch for Popups */}
+                                        <div className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-2xl border border-white/5">
+                                            <span className={`text-[9px] font-bold uppercase tracking-widest ${popup.isActive ? 'text-primary' : 'text-white/20'}`}>
+                                                {popup.isActive ? 'Activo' : 'Inactivo'}
+                                            </span>
+                                            <button
+                                                onClick={() => handleLocalPopupUpdate(loc, { isActive: !popup.isActive })}
+                                                className={`relative w-11 h-5 rounded-full transition-all duration-300 ${popup.isActive ? 'bg-primary' : 'bg-white/10'}`}
+                                            >
+                                                <div className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-all duration-300 ${popup.isActive ? 'translate-x-6' : 'translate-x-0'}`} />
+                                            </button>
+                                        </div>
                                     </div>
 
                                     <div className="space-y-4">
@@ -1389,7 +1299,7 @@ export default function MarketingPage() {
                                                                 const res = await fetch('/api/upload', { method: 'POST', body: formData });
                                                                 const data = await res.json();
                                                                 if (data.url) {
-                                                                    handleSavePopup(loc, data.url, popup.isActive, popup.displayFrequency);
+                                                                    handleLocalPopupUpdate(loc, { imageUrl: data.url });
                                                                 }
                                                             }}
                                                         />
@@ -1416,7 +1326,7 @@ export default function MarketingPage() {
                                                             const res = await fetch('/api/upload', { method: 'POST', body: formData });
                                                             const data = await res.json();
                                                             if (data.url) {
-                                                                handleSavePopup(loc, data.url, popup.isActive, popup.displayFrequency);
+                                                                handleLocalPopupUpdate(loc, { imageUrl: data.url });
                                                             }
                                                         }}
                                                     />
@@ -1432,13 +1342,13 @@ export default function MarketingPage() {
                                             <label className="text-[11px] text-white/60 font-medium">Frecuencia de aparición</label>
                                             <div className="grid grid-cols-2 gap-2">
                                                 <button
-                                                    onClick={() => handleSavePopup(loc, popup.imageUrl, popup.isActive, "SESSION")}
+                                                    onClick={() => handleLocalPopupUpdate(loc, { displayFrequency: "SESSION" })}
                                                     className={`py-2 px-3 rounded-lg text-[10px] font-bold uppercase tracking-tight transition-all border ${popup.displayFrequency === 'SESSION' ? 'bg-primary/10 border-primary/40 text-primary' : 'bg-white/5 border-white/10 text-white/40 hover:text-white/60'}`}
                                                 >
                                                     Una vez por sesión
                                                 </button>
                                                 <button
-                                                    onClick={() => handleSavePopup(loc, popup.imageUrl, popup.isActive, "ALWAYS")}
+                                                    onClick={() => handleLocalPopupUpdate(loc, { displayFrequency: "ALWAYS" })}
                                                     className={`py-2 px-3 rounded-lg text-[10px] font-bold uppercase tracking-tight transition-all border ${popup.displayFrequency === 'ALWAYS' ? 'bg-primary/10 border-primary/40 text-primary' : 'bg-white/5 border-white/10 text-white/40 hover:text-white/60'}`}
                                                 >
                                                     Siempre que ingresen
@@ -1454,12 +1364,24 @@ export default function MarketingPage() {
                                     </div>
 
                                     <button
-                                        disabled={isSavingPopup === loc}
-                                        onClick={() => handleSavePopup(loc, popup.imageUrl, popup.isActive, popup.displayFrequency)}
-                                        className="w-full py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-[12px] font-bold uppercase tracking-widest text-white transition-all flex items-center justify-center gap-3"
+                                        disabled={isSavingPopup === loc || (!hasChanges && !isSaved)}
+                                        onClick={() => handleSavePopup(loc)}
+                                        className={`w-full py-4 rounded-xl text-[12px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-3 shadow-xl active:scale-[0.97] active:brightness-110 disabled:opacity-50 ${
+                                            isSavingPopup === loc 
+                                                ? 'bg-primary/20 text-primary border border-primary/20' 
+                                                : isSaved
+                                                    ? 'bg-green-500/10 text-green-400 border border-green-500/20'
+                                                    : hasChanges
+                                                        ? 'bg-primary hover:bg-primary-dark border border-primary text-white shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)]'
+                                                        : 'bg-white/5 border border-white/10 text-white/20'
+                                        }`}
                                     >
-                                        {isSavingPopup === loc ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4 text-primary" />}
-                                        Actualizar Pop-up
+                                        {isSavingPopup === loc ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                                        {!isSavingPopup && !isSaved && !hasChanges && <CheckCircle2 className="h-4 w-4 opacity-40" />}
+                                        {!isSavingPopup && isSaved && <CheckCircle2 className="h-4 w-4" />}
+                                        {!isSavingPopup && hasChanges && <Save className="h-4 w-4" />}
+                                        
+                                        {isSavingPopup === loc ? 'Actualizando...' : isSaved ? '¡Actualizado! ✨' : hasChanges ? 'Actualizar Pop-up' : 'Actualizado'}
                                     </button>
                                 </div>
                             );

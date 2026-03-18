@@ -124,6 +124,29 @@ export default function CheckoutPage() {
     const [saveAddress, setSaveAddress] = useState(true);
     const [isProcessing, setIsProcessing] = useState(false);
     const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+    const [bankTransferInfo, setBankTransferInfo] = useState<{ cbu: string; alias: string; discount: number }>({ cbu: "", alias: "", discount: 15 });
+
+    const fetchBankInfo = () => {
+        fetch("/api/settings")
+            .then(r => r.json())
+            .then(d => {
+                if (d && !d.error) {
+                    setBankTransferInfo({
+                        cbu: d.bankTransferCbu || "",
+                        alias: d.bankTransferAlias || "",
+                        discount: d.bankTransferDiscount ?? 15
+                    });
+                }
+            })
+            .catch(() => {});
+    };
+
+    useEffect(() => {
+        fetchBankInfo();
+        const handleSettingsUpdate = () => fetchBankInfo();
+        window.addEventListener("settings-updated", handleSettingsUpdate);
+        return () => window.removeEventListener("settings-updated", handleSettingsUpdate);
+    }, []);
 
     // Coupon State
     const [couponCodeInput, setCouponCodeInput] = useState("");
@@ -314,9 +337,9 @@ export default function CheckoutPage() {
         }
     }
 
-    // 2. Apply 15% discount if transfer is selected (applied to subtotal after coupon maybe, or just subtotal. Let's do subtotal)
+    // 2. Apply dynamic discount if transfer is selected
     if (selectedPayment === 'transferencia') {
-        totalDiscount += subtotal * 0.15;
+        totalDiscount += subtotal * (bankTransferInfo.discount / 100);
     }
 
     // Shipping cost only counts if not null
@@ -850,7 +873,9 @@ export default function CheckoutPage() {
 
                                         <div className="space-y-4">
                                             <label className={`block border ${selectedPayment === 'transferencia' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-gray-200 bg-white hover:border-gray-300'} rounded-2xl p-5 cursor-pointer transition-all relative overflow-hidden`}>
-                                                <div className="absolute top-0 right-0 bg-primary text-white text-[9px] uppercase tracking-widest font-bold px-3 py-1 rounded-bl-xl">15% OFF</div>
+                                                {bankTransferInfo.discount > 0 && (
+                                                    <div className="absolute top-0 right-0 bg-primary text-white text-[9px] uppercase tracking-widest font-bold px-3 py-1 rounded-bl-xl">{bankTransferInfo.discount}% OFF</div>
+                                                )}
                                                 <div className="flex items-center justify-between">
                                                     <div className="flex items-center gap-4">
                                                         <input type="radio" name="payment" value="transferencia" checked={selectedPayment === 'transferencia'} onChange={() => setSelectedPayment('transferencia')} className="w-5 h-5 text-primary border-gray-300 focus:ring-primary" />
@@ -870,6 +895,39 @@ export default function CheckoutPage() {
                                                             exit={{ height: 0, opacity: 0 }}
                                                             className="mt-6 pt-6 border-t border-gray-100 overflow-hidden"
                                                         >
+                                                            {/* CBU / Alias */}
+                                                            {(bankTransferInfo.cbu || bankTransferInfo.alias) && (
+                                                                <div className="mb-5 p-4 bg-emerald-50 border border-emerald-100 rounded-2xl space-y-3">
+                                                                    <p className="text-[10px] text-emerald-700 uppercase tracking-widest font-bold">Datos para transferir</p>
+                                                                    {bankTransferInfo.cbu && (
+                                                                        <div className="flex items-center justify-between">
+                                                                            <span className="text-xs text-gray-500 font-medium">CBU</span>
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => navigator.clipboard.writeText(bankTransferInfo.cbu)}
+                                                                                className="text-xs font-mono font-bold text-gray-800 hover:text-primary transition-colors tracking-wide"
+                                                                                title="Copiar CBU"
+                                                                            >
+                                                                                {bankTransferInfo.cbu}
+                                                                            </button>
+                                                                        </div>
+                                                                    )}
+                                                                    {bankTransferInfo.alias && (
+                                                                        <div className="flex items-center justify-between">
+                                                                            <span className="text-xs text-gray-500 font-medium">Alias</span>
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => navigator.clipboard.writeText(bankTransferInfo.alias)}
+                                                                                className="text-sm font-bold text-gray-800 hover:text-primary transition-colors tracking-wide"
+                                                                                title="Copiar Alias"
+                                                                            >
+                                                                                {bankTransferInfo.alias}
+                                                                            </button>
+                                                                        </div>
+                                                                    )}
+                                                                    <p className="text-[10px] text-emerald-600 italic">Hacé clic en el número para copiarlo.</p>
+                                                                </div>
+                                                            )}
                                                             <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-4">Adjuntar Comprobante (Opcional)</p>
                                                             <div className="flex items-center gap-4">
                                                                 <label className="flex-1">
@@ -1077,7 +1135,7 @@ export default function CheckoutPage() {
                                         <span className="font-medium">Descuentos Aplicados</span>
                                         <span className="text-[10px]">
                                             {[
-                                                selectedPayment === 'transferencia' ? 'Transferencia (15%)' : null,
+                                                selectedPayment === 'transferencia' ? `Transferencia (${bankTransferInfo.discount}%)` : null,
                                                 appliedCoupon ? `Cupón ${appliedCoupon.code}` : null
                                             ].filter(Boolean).join(' + ')}
                                         </span>
