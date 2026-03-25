@@ -20,10 +20,12 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useAdminUtils } from "@/components/admin/AdminUtilsProvider";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function AdminPedidosPage() {
+    const { confirm, showToast } = useAdminUtils();
     const [orders, setOrders] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const { user } = useAuthStore();
@@ -35,7 +37,14 @@ export default function AdminPedidosPage() {
     const ITEMS_PER_PAGE = 20;
 
     const handleDeleteOrder = async (orderId: string) => {
-        if (!confirm("¿Estás seguro de que deseas eliminar este pedido? Esta acción no se puede deshacer.")) return;
+        const ok = await confirm({
+            title: "¿Eliminar pedido?",
+            message: "¿Estás seguro de que deseas eliminar este pedido? Esta acción no se puede deshacer.",
+            confirmText: "Eliminar",
+            type: "danger"
+        });
+
+        if (!ok) return;
         
         setIsDeleting(true);
         try {
@@ -44,16 +53,17 @@ export default function AdminPedidosPage() {
             });
 
             if (res.ok) {
+                showToast("Pedido eliminado");
                 setOrders(prev => prev.filter(o => o.id !== orderId));
                 setSelectedOrder(null);
                 // Notify sidebar to refresh badges
                 window.dispatchEvent(new CustomEvent('refreshAdminStats'));
             } else {
                 const data = await res.json();
-                alert(data.error || "Error al eliminar pedido");
+                showToast(data.error || "Error al eliminar pedido", "error");
             }
         } catch (error) {
-            alert("Error de conexión");
+            showToast("Error de conexión", "error");
         } finally {
             setIsDeleting(false);
         }

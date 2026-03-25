@@ -11,8 +11,10 @@ import {
     X
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useAdminUtils } from "@/components/admin/AdminUtilsProvider";
 
 export default function AtributosPage() {
+    const { confirm, showToast } = useAdminUtils();
     const [atributos, setAtributos] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -58,15 +60,16 @@ export default function AtributosPage() {
             });
 
             if (res.ok) {
+                showToast(editingId ? "Atributo actualizado" : "Atributo creado");
                 setFormData({ name: "", slug: "", terms: "", isAddon: false });
                 setEditingId(null);
                 fetchAtributos();
             } else {
                 const err = await res.json();
-                alert(err.error || `Error al ${editingId ? 'actualizar' : 'crear'} atributo`);
+                showToast(err.error || `Error al ${editingId ? 'actualizar' : 'crear'} atributo`, "error");
             }
         } catch (error) {
-            alert("Ocurrió un error inesperado");
+            showToast("Ocurrió un error inesperado", "error");
         } finally {
             setIsSubmitting(false);
         }
@@ -89,7 +92,14 @@ export default function AtributosPage() {
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm("¿Estás seguro de que deseas eliminar este atributo?")) return;
+        const ok = await confirm({
+            title: "¿Eliminar atributo?",
+            message: "¿Estás seguro de que deseas eliminar este atributo? Se quitará de todos los productos que lo utilicen.",
+            confirmText: "Eliminar",
+            type: "danger"
+        });
+
+        if (!ok) return;
 
         try {
             const res = await fetch(`/api/attributes?id=${id}`, {
@@ -97,13 +107,14 @@ export default function AtributosPage() {
             });
 
             if (res.ok) {
+                showToast("Atributo eliminado");
                 fetchAtributos();
             } else {
                 const err = await res.json();
-                alert(err.error || "Error al eliminar atributo");
+                showToast(err.error || "Error al eliminar atributo", "error");
             }
         } catch (error) {
-            alert("Error de conexión al eliminar");
+            showToast("Error de conexión al eliminar", "error");
         }
     };
 

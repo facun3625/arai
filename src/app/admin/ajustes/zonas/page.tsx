@@ -15,6 +15,7 @@ import {
     Save,
     MapPinOff
 } from "lucide-react";
+import { useAdminUtils } from "@/components/admin/AdminUtilsProvider";
 
 type RestrictionType = 'BLOCK_SALE' | 'BLOCK_SHIPPING';
 
@@ -40,12 +41,7 @@ export default function ZonasRestringidasPage() {
     const [newAddress, setNewAddress] = useState("");
     const [newPhone, setNewPhone] = useState("");
 
-    const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
-
-    const showToast = (message: string, type: "success" | "error" = "success") => {
-        setToast({ message, type });
-        setTimeout(() => setToast(null), 3500);
-    };
+    const { confirm, showToast } = useAdminUtils();
 
     const fetchRestrictions = async () => {
         try {
@@ -102,7 +98,14 @@ export default function ZonasRestringidasPage() {
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm("¿Eliminar esta restricción?")) return;
+        const ok = await confirm({
+            title: "¿Eliminar restricción?",
+            message: "Esta acción eliminará el bloqueo de venta o envío para este código postal. ¿Estás seguro?",
+            confirmText: "Eliminar",
+            type: "danger"
+        });
+
+        if (!ok) return;
         
         try {
             const res = await fetch(`/api/settings/restrictions?id=${id}`, {
@@ -308,14 +311,6 @@ export default function ZonasRestringidasPage() {
                     </div>
                 </div>
             </div>
-
-            {/* Toast */}
-            {toast && (
-                <div className={`fixed bottom-8 right-8 px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 z-50 animate-in slide-in-from-right-10 duration-500 ${toast.type === "success" ? "bg-primary text-white" : "bg-red-500 text-white"}`}>
-                    {toast.type === "success" ? <Save className="h-5 w-5" /> : <AlertCircle className="h-5 w-5" />}
-                    <span className="text-xs font-bold uppercase tracking-widest">{toast.message}</span>
-                </div>
-            )}
         </div>
     );
 }

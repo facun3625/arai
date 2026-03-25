@@ -14,8 +14,10 @@ import {
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useAdminUtils } from "@/components/admin/AdminUtilsProvider";
 
 export default function ProductosPage() {
+    const { confirm, showToast } = useAdminUtils();
     const [productos, setProductos] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -38,7 +40,14 @@ export default function ProductosPage() {
     }, []);
 
     const handleDelete = async (id: string) => {
-        if (!confirm("¿Estás seguro de que deseas eliminar este producto?")) return;
+        const ok = await confirm({
+            title: "¿Eliminar producto?",
+            message: "¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.",
+            confirmText: "Eliminar",
+            type: "danger"
+        });
+
+        if (!ok) return;
 
         try {
             const res = await fetch(`/api/products?id=${id}`, {
@@ -46,13 +55,14 @@ export default function ProductosPage() {
             });
 
             if (res.ok) {
+                showToast("Producto eliminado");
                 fetchProductos();
             } else {
                 const err = await res.json();
-                alert(err.error || "Error al eliminar producto");
+                showToast(err.error || "Error al eliminar producto", "error");
             }
         } catch (error) {
-            alert("Error de conexión al eliminar");
+            showToast("Error de conexión al eliminar", "error");
         }
     };
 

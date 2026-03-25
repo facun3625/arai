@@ -19,8 +19,10 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { useAdminUtils } from "@/components/admin/AdminUtilsProvider";
 
 export default function EditarProductoPage() {
+    const { confirm, showToast } = useAdminUtils();
     const router = useRouter();
     const params = useParams();
     const productId = params.id as string;
@@ -171,10 +173,10 @@ export default function EditarProductoPage() {
             if (data.url) {
                 setFormData(prev => ({ ...prev, images: [...prev.images, data.url] }));
             } else {
-                alert(data.error || "Error al subir la imagen");
+                showToast(data.error || "Error al subir la imagen", "error");
             }
         } catch (error) {
-            alert("Error de conexión al subir el archivo");
+            showToast("Error de conexión al subir el archivo", "error");
         } finally {
             setIsUploading(false);
             if (fileInputRef.current) fileInputRef.current.value = "";
@@ -203,10 +205,10 @@ export default function EditarProductoPage() {
                 updated[vIdx] = { ...updated[vIdx], images: [...updated[vIdx].images, data.url] };
                 setVariants(updated);
             } else {
-                alert(data.error || "Error al subir la imagen");
+                showToast(data.error || "Error al subir la imagen", "error");
             }
         } catch (error) {
-            alert("Error de conexión");
+            showToast("Error de conexión", "error");
         }
     };
 
@@ -232,7 +234,7 @@ export default function EditarProductoPage() {
 
         const missingTerms = attrs.some(attr => !selectedTerms[attr.id] || selectedTerms[attr.id].length === 0);
         if (missingTerms) {
-            alert("Selecciona al menos un término para cada atributo");
+            showToast("Selecciona al menos un término para cada atributo", "error");
             return;
         }
 
@@ -273,7 +275,7 @@ export default function EditarProductoPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (formData.categories.length === 0) {
-            alert("Selecciona al menos una categoría");
+            showToast("Selecciona al menos una categoría", "error");
             return;
         }
 
@@ -292,13 +294,14 @@ export default function EditarProductoPage() {
             });
 
             if (res.ok) {
+                showToast("Producto actualizado correctly");
                 router.push("/admin/productos");
             } else {
                 const err = await res.json();
-                alert(err.error || "Error al actualizar producto");
+                showToast(err.error || "Error al actualizar producto", "error");
             }
         } catch (error) {
-            alert("Error de conexión");
+            showToast("Error de conexión", "error");
         } finally {
             setIsSubmitting(false);
         }

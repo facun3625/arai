@@ -19,13 +19,14 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { useAdminUtils } from "@/components/admin/AdminUtilsProvider";
 
 export default function AbandonedCartsPage() {
+    const { confirm, showToast } = useAdminUtils();
     const [carts, setCarts] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [filterType, setFilterType] = useState("all"); // all, registered, guest, anonymous
     const [minTotal, setMinTotal] = useState("");
-    const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
     const fetchCarts = async () => {
         setIsLoading(true);
@@ -55,25 +56,32 @@ export default function AbandonedCartsPage() {
             .join(", ");
 
         if (!emails) {
-            setNotification({ message: "No hay correos para copiar", type: 'error' });
+            showToast("No hay correos para copiar", "error");
             return;
         }
 
         navigator.clipboard.writeText(emails);
-        setNotification({ message: "Correos copiados al portapapeles", type: 'success' });
+        showToast("Correos copiados al portapapeles");
     };
 
     const deleteCart = async (id: string) => {
-        if (!confirm("¿Estás seguro de eliminar este registro?")) return;
+        const ok = await confirm({
+            title: "¿Eliminar carrito?",
+            message: "¿Estás seguro de que deseas eliminar este registro de carrito abandonado?",
+            confirmText: "Eliminar",
+            type: "danger"
+        });
+
+        if (!ok) return;
 
         try {
             const res = await fetch(`/api/admin/abandoned-carts?id=${id}`, { method: 'DELETE' });
             if (res.ok) {
                 setCarts(carts.filter(c => c.id !== id));
-                setNotification({ message: "Registro eliminado", type: 'success' });
+                showToast("Registro eliminado");
             }
         } catch (error) {
-            setNotification({ message: "Error al eliminar", type: 'error' });
+            showToast("Error al eliminar", "error");
         }
     };
 
@@ -82,13 +90,6 @@ export default function AbandonedCartsPage() {
         if (cart.email) return { label: "Invitado", class: "bg-purple-400/10 text-purple-400" };
         return { label: "Anónimo", class: "bg-white/5 text-white/40" };
     };
-
-    useEffect(() => {
-        if (notification) {
-            const timer = setTimeout(() => setNotification(null), 3000);
-            return () => clearTimeout(timer);
-        }
-    }, [notification]);
 
     return (
         <>
@@ -241,13 +242,7 @@ export default function AbandonedCartsPage() {
                     </div>
                 </div>
 
-                {/* Notificación (Toast) */}
-                {notification && (
-                    <div className={`fixed bottom-8 right-8 ${notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 animate-in slide-in-from-right duration-300 z-[100]`}>
-                        {notification.type === 'success' ? <CheckCircle2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
-                        <span className="text-[11px] font-bold uppercase tracking-wider">{notification.message}</span>
-                    </div>
-                )}
+                {/* Los toasts de notificación ahora se gestionan globalmente */}
             </div>
         </>
     );

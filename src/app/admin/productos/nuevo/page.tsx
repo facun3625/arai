@@ -19,8 +19,10 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { useAdminUtils } from "@/components/admin/AdminUtilsProvider";
 
 export default function NuevoProductoPage() {
+    const { confirm, showToast } = useAdminUtils();
     const router = useRouter();
     const [categories, setCategories] = useState<any[]>([]);
     const [allAttributes, setAllAttributes] = useState<any[]>([]);
@@ -103,10 +105,10 @@ export default function NuevoProductoPage() {
             if (data.url) {
                 setFormData(prev => ({ ...prev, images: [...prev.images, data.url] }));
             } else {
-                alert(data.error || "Error al subir la imagen");
+                showToast(data.error || "Error al subir la imagen", "error");
             }
         } catch (error) {
-            alert("Error de conexión al subir el archivo");
+            showToast("Error de conexión al subir el archivo", "error");
         } finally {
             setIsUploading(false);
             if (fileInputRef.current) fileInputRef.current.value = "";
@@ -135,10 +137,10 @@ export default function NuevoProductoPage() {
                 updated[vIdx] = { ...updated[vIdx], images: [...updated[vIdx].images, data.url] };
                 setVariants(updated);
             } else {
-                alert(data.error || "Error al subir la imagen");
+                showToast(data.error || "Error al subir la imagen", "error");
             }
         } catch (error) {
-            alert("Error de conexión");
+            showToast("Error de conexión", "error");
         }
     };
 
@@ -165,7 +167,7 @@ export default function NuevoProductoPage() {
         // Check if all selected attributes have at least one term selected
         const missingTerms = attrs.some(attr => !selectedTerms[attr.id] || selectedTerms[attr.id].length === 0);
         if (missingTerms) {
-            alert("Selecciona al menos un término para cada atributo");
+            showToast("Selecciona al menos un término para cada atributo", "error");
             return;
         }
 
@@ -206,7 +208,7 @@ export default function NuevoProductoPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (formData.categories.length === 0) {
-            alert("Selecciona al menos una categoría");
+            showToast("Selecciona al menos una categoría", "error");
             return;
         }
 
@@ -224,13 +226,14 @@ export default function NuevoProductoPage() {
             });
 
             if (res.ok) {
+                showToast("Producto creado correctamente");
                 router.push("/admin/productos");
             } else {
                 const err = await res.json();
-                alert(err.error || "Error al crear producto");
+                showToast(err.error || "Error al crear producto", "error");
             }
         } catch (error) {
-            alert("Error de conexión");
+            showToast("Error de conexión", "error");
         } finally {
             setIsSubmitting(false);
         }

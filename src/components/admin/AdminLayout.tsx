@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AdminSidebar } from "./AdminSidebar";
 import { Loader2, ArrowLeft } from "lucide-react";
+import { AdminUtilsProvider } from "./AdminUtilsProvider";
 
 export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     const { user, isAuthenticated } = useAuthStore();
@@ -45,24 +46,26 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     }
 
     return (
-        <div className="flex min-h-screen bg-[#050806]">
-            <AdminSidebar />
-            <main className="flex-1 overflow-y-auto min-h-screen">
-                <div className="p-8 md:p-12 max-w-7xl mx-auto">
-                    {pathname !== "/admin/dashboard" && (
-                        <button
-                            onClick={handleBack}
-                            className="flex items-center gap-2 text-white/40 hover:text-white text-[11px] uppercase tracking-widest mb-8 transition-colors group"
-                        >
-                            <div className="bg-white/5 p-1.5 rounded-full group-hover:bg-white/10 transition-colors">
-                                <ArrowLeft className="h-3 w-3" />
-                            </div>
-                            volver
-                        </button>
-                    )}
-                    {children}
-                </div>
-            </main>
-        </div>
+        <AdminUtilsProvider>
+            <div className="flex min-h-screen bg-[#050806]">
+                <AdminSidebar />
+                <main className="flex-1 overflow-y-auto min-h-screen">
+                    <div className="p-8 md:p-12 max-w-7xl mx-auto">
+                        {pathname !== "/admin/dashboard" && (
+                            <button
+                                onClick={handleBack}
+                                className="flex items-center gap-2 text-white/40 hover:text-white text-[11px] uppercase tracking-widest mb-8 transition-colors group"
+                            >
+                                <div className="bg-white/5 p-1.5 rounded-full group-hover:bg-white/10 transition-colors">
+                                    <ArrowLeft className="h-3 w-3" />
+                                </div>
+                                volver
+                            </button>
+                        )}
+                        {children}
+                    </div>
+                </main>
+            </div>
+        </AdminUtilsProvider>
     );
-};
+}

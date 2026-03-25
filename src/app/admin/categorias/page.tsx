@@ -14,8 +14,10 @@ import {
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import { useAdminUtils } from "@/components/admin/AdminUtilsProvider";
 
 export default function CategoriasPage() {
+    const { confirm, showToast } = useAdminUtils();
     const [categorias, setCategorias] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -67,10 +69,10 @@ export default function CategoriasPage() {
             if (data.url) {
                 setFormData(prev => ({ ...prev, image: data.url }));
             } else {
-                alert(data.error || "Error al subir la imagen");
+                showToast(data.error || "Error al subir la imagen", "error");
             }
         } catch (error) {
-            alert("Error de conexión al subir el archivo");
+            showToast("Error de conexión al subir el archivo", "error");
         } finally {
             setIsUploading(false);
             if (fileInputRef.current) fileInputRef.current.value = "";
@@ -91,15 +93,16 @@ export default function CategoriasPage() {
             });
 
             if (res.ok) {
+                showToast(editingId ? "Categoría actualizada" : "Categoría creada");
                 setFormData({ name: "", slug: "", description: "", image: "" });
                 setEditingId(null);
                 fetchCategorias();
             } else {
                 const err = await res.json();
-                alert(err.error || `Error al ${editingId ? 'actualizar' : 'crear'} categoría`);
+                showToast(err.error || `Error al ${editingId ? 'actualizar' : 'crear'} categoría`, "error");
             }
         } catch (error) {
-            alert("Ocurrió un error inesperado");
+            showToast("Ocurrió un error inesperado", "error");
         } finally {
             setIsSubmitting(false);
         }
@@ -123,11 +126,18 @@ export default function CategoriasPage() {
 
     const handleDelete = async (id: string, slug: string) => {
         if (slug === "sin-categoria") {
-            alert("No se puede eliminar la categoría por defecto");
+            showToast("No se puede eliminar la categoría por defecto", "warning");
             return;
         }
 
-        if (!confirm("¿Estás seguro de que deseas eliminar esta categoría?")) return;
+        const ok = await confirm({
+            title: "¿Eliminar categoría?",
+            message: "¿Estás seguro de que deseas eliminar esta categoría? Los productos asociados pasarán a 'Sin Categoría'.",
+            confirmText: "Eliminar",
+            type: "danger"
+        });
+
+        if (!ok) return;
 
         try {
             const res = await fetch(`/api/categories?id=${id}`, {
@@ -135,13 +145,14 @@ export default function CategoriasPage() {
             });
 
             if (res.ok) {
+                showToast("Categoría eliminada");
                 fetchCategorias();
             } else {
                 const err = await res.json();
-                alert(err.error || "Error al eliminar categoría");
+                showToast(err.error || "Error al eliminar categoría", "error");
             }
         } catch (error) {
-            alert("Error de conexión al eliminar");
+            showToast("Error de conexión al eliminar", "error");
         }
     };
 
@@ -168,11 +179,11 @@ export default function CategoriasPage() {
             if (data.url) {
                 setFormData({ ...formData, image: data.url });
             } else {
-                alert("Error al subir imagen");
+                showToast("Error al subir imagen", "error");
             }
         } catch (error) {
             console.error("Upload error:", error);
-            alert("Error de conexión al subir imagen");
+            showToast("Error de conexión al subir imagen", "error");
         }
     };
 
