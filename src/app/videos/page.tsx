@@ -37,7 +37,7 @@ export default function VideosPage() {
                             <Play className="h-3 w-3" />
                             <span>Tradición en Movimiento</span>
                         </div>
-                        <h1 className="text-[40px] md:text-[64px] font-light text-gray-900 tracking-tight leading-[1.1] mb-8">
+                        <h1 className="text-[28px] md:text-[64px] font-light text-gray-900 tracking-tight leading-[1.1] mb-8">
                             Nuestra alma <br />
                             <span className="font-semibold text-primary">en video</span>
                         </h1>
@@ -50,7 +50,7 @@ export default function VideosPage() {
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 1.2, ease: "easeOut" }}
-                        className="relative h-[250px] md:h-[400px] rounded-[40px] overflow-hidden shadow-2xl bg-black/5"
+                        className="relative h-[180px] md:h-[400px] rounded-[30px] md:rounded-[40px] overflow-hidden shadow-2xl bg-black/5"
                     >
                         <iframe
                             className="absolute inset-0 w-full h-full"
@@ -88,7 +88,7 @@ export default function VideosPage() {
                                     />
 
                                     {/* Background Number Pattern (Matches Proceso style) */}
-                                    <span className="text-[120px] md:text-[180px] font-black text-primary/10 leading-none absolute -bottom-10 -right-6 select-none pointer-events-none group-hover:text-primary/15 transition-colors z-[-1]">
+                                    <span className="text-[70px] md:text-[180px] font-black text-primary/10 leading-none absolute -bottom-6 -right-4 select-none pointer-events-none group-hover:text-primary/15 transition-colors z-[-1]">
                                         0{index + 1}
                                     </span>
                                 </div>
@@ -115,7 +115,7 @@ export default function VideosPage() {
                     initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="mt-12 p-12 md:p-24 rounded-[60px] bg-primary/5 border border-primary/10 relative overflow-hidden text-center"
+                    className="mt-12 p-8 md:p-24 rounded-[40px] md:rounded-[60px] bg-primary/5 border border-primary/10 relative overflow-hidden text-center"
                 >
                     <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
                     <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-[120px] translate-y-1/2 -translate-x-1/2" />

@@ -4,11 +4,13 @@ services:
     container_name: arai-db
     restart: always
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-arai_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-arai_password}
-      POSTGRES_DB: ${POSTGRES_DB:-arai_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-arai2026}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
     volumes:
       - arai-db-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
     networks:
       - arai-network
 

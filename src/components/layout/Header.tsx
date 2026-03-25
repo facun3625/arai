@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ShoppingBag, User, Facebook, Instagram, Twitter, Menu, ChevronDown, LogOut, LayoutDashboard, X, Youtube } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
 import { useCartStore } from "@/store/useCartStore";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -81,6 +82,15 @@ export const Header = () => {
         };
     }, []);
 
+    // Block scroll when menu is open
+    useEffect(() => {
+        if (isMenuOpen) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "unset";
+        }
+    }, [isMenuOpen]);
+
     return (
         <>
             <AuthModal
@@ -99,7 +109,7 @@ export const Header = () => {
                         </Link>
                     </div>
 
-                    <div className="hidden md:block text-[9px] font-bold text-white/90">
+                    <div className="hidden lg:block text-[9px] font-bold text-white/90">
                         {bankDiscount !== null && bankDiscount > 0 ? (
                             <>
                                 <span className="text-primary font-black">{bankDiscount}%</span> POR TRANSF. BANCARIA
@@ -172,13 +182,11 @@ export const Header = () => {
                             </Link>
                         </div>
 
-                        {/* Center: Main Nav */}
-                        <nav className="hidden lg:flex items-center gap-4 xl:gap-8 overflow-visible">
+                        <div className="hidden lg:flex items-center gap-4 xl:gap-8 overflow-visible">
                             {[
                                 { name: 'Inicio', href: '/' },
                                 { name: 'Proceso Productivo', href: '/proceso' },
                                 { name: 'Videos', href: '/videos' },
-                                { name: 'Cómo Comprar', href: '/como-comprar' },
                                 { name: 'Tienda', href: '/tienda', isButton: true },
                             ].map((item) => (
                                 <Link
@@ -194,7 +202,7 @@ export const Header = () => {
                                     <span>{item.name}</span>
                                 </Link>
                             ))}
-                        </nav>
+                        </div>
 
                         {/* Right: Actions */}
                         <div className="flex items-center gap-3 md:gap-5">
@@ -304,13 +312,112 @@ export const Header = () => {
                 </div>
             </header>
 
-            {/* Mobile Menu Backdrop */}
-            {isMenuOpen && (
-                <div
-                    className="fixed inset-0 bg-black/50 z-[100] transition-opacity duration-300 lg:hidden"
-                    onClick={() => setIsMenuOpen(false)}
-                />
-            )}
+            {/* Mobile Menu Backdrop & Drawer */}
+            <AnimatePresence>
+                {isMenuOpen && (
+                    <>
+                        {/* Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsMenuOpen(false)}
+                            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] lg:hidden"
+                        />
+                        {/* Drawer */}
+                        <motion.div
+                            initial={{ x: "-100%" }}
+                            animate={{ x: 0 }}
+                            exit={{ x: "-100%" }}
+                            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                            className="fixed top-0 left-0 bottom-0 w-[85%] max-w-xs bg-white z-[101] lg:hidden shadow-2xl flex flex-col"
+                        >
+                            {/* Header Drawer */}
+                            <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-primary">
+                                <Link href="/" onClick={() => setIsMenuOpen(false)}>
+                                    <Image src="/arai_logo.png" alt="Araí" width={80} height={20} className="brightness-0 invert" />
+                                </Link>
+                                <button
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="p-2 bg-white/10 rounded-full text-white"
+                                >
+                                    <X className="h-5 w-5" />
+                                </button>
+                            </div>
+
+                            {/* Nav Links */}
+                            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                                <nav className="space-y-4">
+                                    {[
+                                        { name: 'Inicio', href: '/' },
+                                        { name: 'Proceso Productivo', href: '/proceso' },
+                                        { name: 'Videos', href: '/videos' },
+                                        { name: 'Tienda', href: '/tienda' },
+                                    ].map((item) => (
+                                        <Link
+                                            key={item.name}
+                                            href={item.href}
+                                            className="block text-sm font-medium text-gray-900 border-b border-gray-50 pb-4 hover:text-primary transition-colors"
+                                            onClick={() => setIsMenuOpen(false)}
+                                        >
+                                            {item.name}
+                                        </Link>
+                                    ))}
+                                </nav>
+
+                                {/* External Links */}
+                                <div className="space-y-3 pt-4">
+                                    <Link
+                                        href="/franquicias"
+                                        className="block text-[10px] font-bold uppercase tracking-widest text-primary/60 hover:text-primary"
+                                        onClick={() => setIsMenuOpen(false)}
+                                    >
+                                        Franquicias
+                                    </Link>
+                                    <Link
+                                        href="/mayoristas"
+                                        className="block text-[10px] font-bold uppercase tracking-widest text-primary/60 hover:text-primary"
+                                        onClick={() => setIsMenuOpen(false)}
+                                    >
+                                        Mayoristas
+                                    </Link>
+                                </div>
+
+                                {/* Language Selector */}
+                                <div className="pt-6 border-t border-gray-100">
+                                    <p className="text-[10px] uppercase font-bold text-gray-400 tracking-tighter mb-4">Idioma</p>
+                                    <div className="flex gap-4">
+                                        <button className="text-xs font-bold text-primary">Español</button>
+                                        <button className="text-xs font-medium text-gray-400">English</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Footer Drawer */}
+                            <div className="p-6 border-t border-gray-100 bg-gray-50">
+                                <p className="text-[10px] uppercase font-bold text-gray-400 tracking-tighter mb-4">Seguinos</p>
+                                <div className="flex gap-5">
+                                    {socialLinks.instagramUrl && (
+                                        <a href={socialLinks.instagramUrl} target="_blank" rel="noopener noreferrer">
+                                            <Instagram className="h-5 w-5 text-gray-400 hover:text-primary transition-colors" />
+                                        </a>
+                                    )}
+                                    {socialLinks.facebookUrl && (
+                                        <a href={socialLinks.facebookUrl} target="_blank" rel="noopener noreferrer">
+                                            <Facebook className="h-5 w-5 text-gray-400 hover:text-primary transition-colors" />
+                                        </a>
+                                    )}
+                                    {socialLinks.tiktokUrl && (
+                                        <a href={socialLinks.tiktokUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-primary transition-colors">
+                                            <TikTokIcon className="h-5 w-5" />
+                                        </a>
+                                    )}
+                                </div>
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
         </>
     );
 };

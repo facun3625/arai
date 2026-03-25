@@ -76,7 +76,7 @@ export default function ProcesoPage() {
     return (
         <div className="bg-white min-h-screen pt-12 font-montserrat overflow-hidden">
             {/* Hero Section */}
-            <header className="max-w-6xl mx-auto px-4 md:px-8 mb-32">
+            <header className="max-w-6xl mx-auto px-4 md:px-8 mb-12 md:mb-32">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
                     <motion.div
                         initial={{ opacity: 0, x: -30 }}
@@ -88,7 +88,7 @@ export default function ProcesoPage() {
                             <Leaf className="h-3 w-3" />
                             <span>Tradición y Calidad</span>
                         </div>
-                        <h1 className="text-[40px] md:text-[64px] font-light text-gray-900 tracking-tight leading-[1.1] mb-8">
+                        <h1 className="text-[32px] md:text-[64px] font-light text-gray-900 tracking-tight leading-[1.1] mb-8">
                             El viaje de la <br />
                             <span className="font-semibold text-primary">Yerba Mate</span>
                         </h1>
@@ -116,7 +116,7 @@ export default function ProcesoPage() {
             </header>
 
             {/* Steps Timeline / Grid */}
-            <main className="max-w-6xl mx-auto px-4 md:px-8 space-y-24">
+            <main className="max-w-6xl mx-auto px-4 md:px-8 space-y-12 md:space-y-24">
                 {steps.map((step, index) => (
                     <motion.section
                         key={step.number}
@@ -131,7 +131,7 @@ export default function ProcesoPage() {
 
                             {/* Visual Side (Numbers Only as requested) */}
                             <div className="flex-1 flex justify-center relative">
-                                <span className="text-[150px] md:text-[250px] font-black text-primary/15 leading-none select-none">
+                                <span className="text-[80px] md:text-[250px] font-black text-primary/15 leading-none select-none">
                                     {step.number}
                                 </span>
 

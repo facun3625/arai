@@ -73,45 +73,48 @@ export default function TiendaPage() {
     return (
         <div className="max-w-7xl mx-auto px-4 lg:px-8 pt-6 pb-16 font-montserrat">
             <div className="flex flex-col md:flex-row gap-12">
-                {/* Sidebar Filtros */}
+                {/* Sidebar Filtros / Categories Toggle */}
                 <aside className="w-full md:w-64 flex-shrink-0">
-                    <div className="pb-6 mb-8 border-b border-gray-100 flex items-center gap-2">
+                    <div className="md:pb-6 md:mb-8 md:border-b md:border-gray-100 flex items-center gap-2 mb-4">
                         <SlidersHorizontal className="h-4 w-4 text-primary" />
                         <h2 className="text-sm font-bold text-gray-800 capitalize">Categorías</h2>
                     </div>
 
-                    <ul className="space-y-0.5 font-montserrat">
-                        <li>
-                            <button
-                                onClick={() => setSelectedCategory("todas")}
-                                className={`w-full text-left px-4 py-1.5 rounded-lg transition-all text-xs capitalize flex justify-between items-center group ${selectedCategory === "todas"
-                                    ? "text-primary font-medium"
-                                    : "text-gray-400 hover:text-gray-600 hover:bg-gray-50/50"
-                                    }`}
-                            >
-                                <span>todas las categorías</span>
-                                <span className={`text-[10px] ${selectedCategory === "todas" ? "text-primary/60" : "text-gray-300"}`}>
-                                    {totalCount}
-                                </span>
-                            </button>
-                        </li>
-                        {categories.map((cat) => (
-                            <li key={cat.id}>
+                    {/* Horizontal scroll on mobile, vertical list on desktop */}
+                    <div className="overflow-x-auto pb-4 -mx-4 px-4 md:px-0 md:pb-0 scrollbar-hide">
+                        <ul className="flex flex-row md:flex-col gap-2 md:gap-0.5 min-w-max md:min-w-0 font-montserrat">
+                            <li>
                                 <button
-                                    onClick={() => setSelectedCategory(cat.slug)}
-                                    className={`w-full text-left px-4 py-1.5 rounded-lg transition-all text-xs capitalize flex justify-between items-center group ${selectedCategory === cat.slug
-                                        ? "text-primary font-medium"
-                                        : "text-gray-400 hover:text-gray-600 hover:bg-gray-50/50"
+                                    onClick={() => setSelectedCategory("todas")}
+                                    className={`whitespace-nowrap px-4 py-2 md:py-1.5 rounded-full md:rounded-lg transition-all text-[11px] md:text-xs capitalize flex justify-between items-center gap-2 md:w-full ${selectedCategory === "todas"
+                                        ? "bg-primary text-white md:bg-transparent md:text-primary md:font-medium"
+                                        : "bg-gray-50 text-gray-400 md:bg-transparent md:hover:text-gray-600 md:hover:bg-gray-50/50"
                                         }`}
                                 >
-                                    <span className="flex-1">{cat.name}</span>
-                                    <span className={`text-[10px] ${selectedCategory === cat.slug ? "text-primary/60" : "text-gray-300"}`}>
-                                        {cat._count?.products || 0}
+                                    <span>todas</span>
+                                    <span className={`text-[9px] md:text-[10px] ${selectedCategory === "todas" ? "text-white/60 md:text-primary/60" : "text-gray-300"}`}>
+                                        {totalCount}
                                     </span>
                                 </button>
                             </li>
-                        ))}
-                    </ul>
+                            {categories.map((cat) => (
+                                <li key={cat.id}>
+                                    <button
+                                        onClick={() => setSelectedCategory(cat.slug)}
+                                        className={`whitespace-nowrap px-4 py-2 md:py-1.5 rounded-full md:rounded-lg transition-all text-[11px] md:text-xs capitalize flex justify-between items-center gap-2 md:w-full ${selectedCategory === cat.slug
+                                            ? "bg-primary text-white md:bg-transparent md:text-primary md:font-medium"
+                                            : "bg-gray-50 text-gray-400 md:bg-transparent md:hover:text-gray-600 md:hover:bg-gray-50/50"
+                                            }`}
+                                    >
+                                        <span className="flex-1">{cat.name}</span>
+                                        <span className={`text-[9px] md:text-[10px] ${selectedCategory === cat.slug ? "text-white/60 md:text-primary/60" : "text-gray-300"}`}>
+                                            {cat._count?.products || 0}
+                                        </span>
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
                 </aside>
 
                 {/* Grid de Productos */}
@@ -130,7 +133,7 @@ export default function TiendaPage() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-8">
+                    <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-3 md:gap-x-6 gap-y-6 md:gap-y-8">
                         {filteredProducts.map((product) => {
                             const mainImage = product.featuredImage || product.images?.[0] || "/placeholder-product.png";
                             const hasVariations = product.type === "VARIABLE" && product.variants?.length > 0;
