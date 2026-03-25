@@ -1,6 +1,6 @@
 "use client";
 
-import { AdminLayout } from "@/components/admin/AdminLayout";
+
 import {
     Plus,
     Package,
@@ -57,7 +57,7 @@ export default function ProductosPage() {
     };
 
     return (
-        <AdminLayout>
+        <>
             <div className="space-y-8 animate-in fade-in duration-700">
                 {/* Header */}
                 <div className="flex items-center justify-between">
@@ -214,6 +214,6 @@ export default function ProductosPage() {
                     </div>
                 </div>
             </div>
-        </AdminLayout>
+        </>
     );
 }

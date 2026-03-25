@@ -1,6 +1,6 @@
 "use client";
 
-import { AdminLayout } from "@/components/admin/AdminLayout";
+
 import {
     Plus,
     MoreVertical,
@@ -177,7 +177,7 @@ export default function CategoriasPage() {
     };
 
     return (
-        <AdminLayout>
+        <>
             <div className="space-y-8 animate-in fade-in duration-700">
                 {/* Header */}
                 <div className="flex items-center justify-between">
@@ -352,6 +352,6 @@ export default function CategoriasPage() {
                     </div>
                 </div>
             </div>
-        </AdminLayout>
+        </>
     );
 }

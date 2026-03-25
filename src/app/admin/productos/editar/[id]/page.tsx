@@ -1,6 +1,6 @@
 "use client";
 
-import { AdminLayout } from "@/components/admin/AdminLayout";
+
 import {
     Plus,
     X,
@@ -307,7 +307,7 @@ export default function EditarProductoPage() {
     if (isLoading) return <div className="p-8 text-white/20 uppercase tracking-widest text-center">Cargando...</div>;
 
     return (
-        <AdminLayout>
+        <>
             <form onSubmit={handleSubmit} className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 {/* Header Contextual */}
                 <div className="flex items-center justify-between">
@@ -908,6 +908,6 @@ export default function EditarProductoPage() {
                     </div>
                 </div>
             </form>
-        </AdminLayout>
+        </>
     );
 }

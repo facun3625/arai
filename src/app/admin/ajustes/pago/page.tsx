@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { AdminLayout } from "@/components/admin/AdminLayout";
+
 import { useAuthStore } from "@/store/useAuthStore";
 import { 
     CreditCard, 
@@ -125,7 +125,7 @@ export default function PagoPage() {
     );
 
     return (
-        <AdminLayout>
+        <>
             <form onSubmit={handleSave}>
                 <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-700">
 
@@ -329,6 +329,6 @@ export default function PagoPage() {
                     </div>
                 </div>
             )}
-        </AdminLayout>
+        </>
     );
 }

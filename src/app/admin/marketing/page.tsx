@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { AdminLayout } from "@/components/admin/AdminLayout";
+
 import { useAuthStore } from "@/store/useAuthStore";
 import { Plus, Trash2, Edit2, CheckCircle2, XCircle, Save, Percent, DollarSign, Tag, Monitor, Image as ImageIcon, Loader2, Coins, Gift, Settings2, Sparkles, Truck, Instagram, Facebook, Twitter, Mail, Send, ExternalLink, Users } from "lucide-react";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
@@ -388,7 +388,7 @@ export default function MarketingPage() {
     };
 
     return (
-        <AdminLayout>
+        <>
             <div className="space-y-8 animate-in fade-in duration-700">
                 {/* Header */}
                 <div className="flex items-center justify-between">
@@ -1450,6 +1450,6 @@ export default function MarketingPage() {
                     </div>
                 </div>
             )}
-        </AdminLayout>
+        </>
     );
 }

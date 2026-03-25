@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { AdminLayout } from "@/components/admin/AdminLayout";
+
 import { useAuthStore } from "@/store/useAuthStore";
 import { 
     Truck, 
@@ -100,7 +100,7 @@ export default function EnvioPage() {
     const pendingBadge = "mb-8 p-4 bg-yellow-500/5 border border-yellow-500/10 rounded-2xl flex items-center gap-3";
 
     return (
-        <AdminLayout>
+        <>
             <form onSubmit={handleSave}>
                 <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-700">
 
@@ -234,6 +234,6 @@ export default function EnvioPage() {
                     </div>
                 </div>
             )}
-        </AdminLayout>
+        </>
     );
 }

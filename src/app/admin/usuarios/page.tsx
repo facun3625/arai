@@ -1,6 +1,6 @@
 "use client";
 
-import { AdminLayout } from "@/components/admin/AdminLayout";
+
 import {
     Users,
     Search,
@@ -126,7 +126,7 @@ export default function AdminUsuariosPage() {
     };
 
     return (
-        <AdminLayout>
+        <>
             <div className="space-y-8 animate-in fade-in duration-700">
                 {/* Delete Confirmation Modal */}
                 {isDeleteModalOpen && userToDelete && (
@@ -389,6 +389,6 @@ export default function AdminUsuariosPage() {
                     </div>
                 </div>
             </div>
-        </AdminLayout>
+        </>
     );
 }

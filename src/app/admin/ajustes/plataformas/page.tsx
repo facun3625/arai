@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { AdminLayout } from "@/components/admin/AdminLayout";
+
 import { useAuthStore } from "@/store/useAuthStore";
 import { 
     Instagram, 
@@ -80,7 +80,6 @@ export default function PlataformasPage() {
     };
 
     return (
-        <AdminLayout>
             <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-700">
                 <div className="bg-[#0a0a0a] border border-white/5 rounded-[32px] p-10 md:p-12 shadow-2xl">
                     <div className="space-y-2 mb-10">
@@ -201,6 +200,5 @@ export default function PlataformasPage() {
                     </div>
                 )}
             </div>
-        </AdminLayout>
     );
 }

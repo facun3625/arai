@@ -1,6 +1,6 @@
 "use client";
 
-import { AdminLayout } from "@/components/admin/AdminLayout";
+
 import {
     ShoppingCart,
     Search,
@@ -211,7 +211,7 @@ export default function AdminPedidosPage() {
     };
 
     return (
-        <AdminLayout>
+        <>
             <div className="space-y-8 animate-in fade-in duration-700 pb-20">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -651,6 +651,6 @@ export default function AdminPedidosPage() {
                     )}
                 </AnimatePresence>
             </div>
-        </AdminLayout>
+        </>
     );
 }

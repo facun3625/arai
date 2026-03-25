@@ -126,9 +126,9 @@ export default function ZonasRestringidasPage() {
     const labelCls = "text-white/40 text-[10px] uppercase tracking-widest font-bold mb-2 block";
 
     return (
-        <div className="min-h-screen bg-[#060907] p-8 font-montserrat">
+        <div className="space-y-8 animate-in fade-in duration-700">
             {/* Header */}
-            <div className="max-w-6xl mx-auto space-y-8">
+            <div className="space-y-8">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-3xl font-light text-white tracking-tight flex items-center gap-3">

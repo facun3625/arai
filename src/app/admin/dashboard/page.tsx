@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { AdminLayout } from "@/components/admin/AdminLayout";
 import {
     Users,
     Package,
@@ -49,14 +48,12 @@ export default function DashboardPage() {
 
     if (isLoading) {
         return (
-            <AdminLayout>
-                <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="flex flex-col items-center gap-4">
-                        <Loader2 className="h-8 w-8 text-primary animate-spin" />
-                        <p className="text-white/40 text-[11px] uppercase tracking-widest font-medium">cargando estadísticas...</p>
-                    </div>
+            <div className="flex items-center justify-center min-h-[60vh]">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="h-8 w-8 text-primary animate-spin" />
+                    <p className="text-white/40 text-[11px] uppercase tracking-widest font-medium">cargando estadísticas...</p>
                 </div>
-            </AdminLayout>
+            </div>
         );
     }
 
@@ -96,7 +93,7 @@ export default function DashboardPage() {
     ];
 
     return (
-        <AdminLayout>
+        <>
             <div className="space-y-10 animate-in fade-in duration-700">
                 {/* Header */}
                 <div className="flex flex-col gap-1">
@@ -236,6 +233,6 @@ export default function DashboardPage() {
                     </div>
                 </div>
             </div>
-        </AdminLayout>
+        </>
     );
 }

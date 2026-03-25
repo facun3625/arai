@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { AdminLayout } from "@/components/admin/AdminLayout";
+
 import {
     BarChart3,
     Calendar,
@@ -136,7 +136,7 @@ export default function EstadisticasPage() {
     };
 
     return (
-        <AdminLayout>
+        <>
             <div className="space-y-10 animate-in fade-in duration-700">
                 {/* Header with Date Filter */}
                 <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 bg-[#0f0f0f] border border-white/5 p-6 md:p-8 rounded-[40px] relative">
@@ -331,6 +331,6 @@ export default function EstadisticasPage() {
                     </>
                 )}
             </div>
-        </AdminLayout>
+        </>
     );
 }
