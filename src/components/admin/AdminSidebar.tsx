@@ -19,7 +19,9 @@ import {
     Folder,
     Monitor,
     DollarSign,
-    Truck
+    Truck,
+    BookOpen,
+    LineChart
 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import Image from "next/image";
@@ -59,11 +61,13 @@ const menuItems: MenuNode[] = [
             { name: "plataformas de pago", href: "/admin/ajustes/pago", icon: DollarSign },
             { name: "plataformas de envío", href: "/admin/ajustes/envio", icon: Truck },
             { name: "zonas restringidas", href: "/admin/ajustes/zonas", icon: Layers },
+            { name: "analytics & tracking", href: "/admin/ajustes/analytics", icon: LineChart },
         ]
     },
     { name: "pedidos", href: "/admin/pedidos", icon: ShoppingCart },
     { name: "usuarios", href: "/admin/usuarios", icon: User },
     { name: "estadísticas", href: "/admin/estadisticas", icon: BarChart3 },
+    { name: "base de conocimiento", href: "/admin/knowledge", icon: BookOpen },
 ];
 
 export const AdminSidebar = () => {
@@ -125,7 +129,7 @@ export const AdminSidebar = () => {
     return (
         <aside className="w-64 bg-[#0c120e] text-white/90 flex flex-col h-screen sticky top-0 border-r border-white/5 font-montserrat">
             {/* Navigation */}
-            <nav className="flex-1 p-4 space-y-1 mt-8">
+            <nav className="flex-1 p-4 space-y-1 mt-8 overflow-y-auto">
                 {menuItems.map((node, i) => {
                     if ('type' in node && node.type === 'group') {
                         const isOpen = openGroups[node.title];

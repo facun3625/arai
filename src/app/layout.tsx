@@ -3,7 +3,8 @@ import { Montserrat } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { WhatsAppButton } from "@/components/common/WhatsAppButton";
+import { AIChatButton } from "@/components/chat/AIChatButton";
+import { AnalyticsScripts } from "@/components/analytics/AnalyticsScripts";
 import { Providers } from "@/app/providers";
 import { SessionSync } from "@/components/auth/SessionSync";
 import { SideCart } from "@/components/cart/SideCart";
@@ -27,6 +28,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
+      <head>
+        <AnalyticsScripts />
+      </head>
       <body className={montserrat.className}>
         <Providers>
           <MaintenanceGuard>
@@ -37,7 +41,7 @@ export default function RootLayout({
               {children}
             </main>
             <Footer />
-            <WhatsAppButton />
+            <AIChatButton />
           </MaintenanceGuard>
         </Providers>
       </body>

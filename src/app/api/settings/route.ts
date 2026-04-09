@@ -99,6 +99,8 @@ export async function POST(request: Request) {
             ...(body.ocaOriginZipCode !== undefined && { ocaOriginZipCode: parseStr(body.ocaOriginZipCode) }),
             ...(body.ocaEnabled !== undefined && { ocaEnabled: !!body.ocaEnabled }),
             ...(body.maintenanceMode !== undefined && { maintenanceMode: !!body.maintenanceMode }),
+            ...(body.metaPixelId !== undefined && { metaPixelId: parseStr(body.metaPixelId) }),
+            ...(body.ga4MeasurementId !== undefined && { ga4MeasurementId: parseStr(body.ga4MeasurementId) }),
         };
 
         // Remove undefined keys to avoid Prisma errors
