@@ -74,10 +74,10 @@ export default function TiendaPage() {
         <div className="max-w-7xl mx-auto px-4 lg:px-8 pt-6 pb-16 font-montserrat">
             <div className="flex flex-col md:flex-row gap-12">
                 {/* Sidebar Filtros / Categories Toggle */}
-                <aside className="w-full md:w-64 flex-shrink-0">
-                    <div className="md:pb-6 md:mb-8 md:border-b md:border-gray-100 flex items-center gap-2 mb-4">
-                        <SlidersHorizontal className="h-4 w-4 text-primary" />
-                        <h2 className="text-sm font-bold text-gray-800 capitalize">Categorías</h2>
+                <aside className="w-full md:w-52 flex-shrink-0 md:sticky md:top-24 md:self-start">
+                    <div className="hidden md:flex items-center gap-2 mb-5">
+                        <SlidersHorizontal className="h-3.5 w-3.5 text-primary/60" />
+                        <h2 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Categorías</h2>
                     </div>
 
                     {/* Horizontal scroll on mobile, vertical list on desktop */}
@@ -86,13 +86,13 @@ export default function TiendaPage() {
                             <li>
                                 <button
                                     onClick={() => setSelectedCategory("todas")}
-                                    className={`whitespace-nowrap px-4 py-2 md:py-1.5 rounded-full md:rounded-lg transition-all text-[11px] md:text-xs capitalize flex justify-between items-center gap-2 md:w-full ${selectedCategory === "todas"
-                                        ? "bg-primary text-white md:bg-transparent md:text-primary md:font-medium"
-                                        : "bg-gray-50 text-gray-400 md:bg-transparent md:hover:text-gray-600 md:hover:bg-gray-50/50"
+                                    className={`whitespace-nowrap px-4 py-2 md:py-2 md:px-3 rounded-full md:rounded-xl transition-all text-[11px] capitalize flex justify-between items-center gap-3 md:w-full ${selectedCategory === "todas"
+                                        ? "bg-primary text-white md:bg-primary/8 md:text-primary md:font-semibold"
+                                        : "bg-gray-50 text-gray-400 md:bg-transparent md:text-gray-400 md:hover:text-gray-700 md:hover:bg-gray-50"
                                         }`}
                                 >
                                     <span>todas</span>
-                                    <span className={`text-[9px] md:text-[10px] ${selectedCategory === "todas" ? "text-white/60 md:text-primary/60" : "text-gray-300"}`}>
+                                    <span className={`text-[10px] font-medium ${selectedCategory === "todas" ? "text-white/70 md:text-primary/50" : "text-gray-300"}`}>
                                         {totalCount}
                                     </span>
                                 </button>
@@ -101,13 +101,13 @@ export default function TiendaPage() {
                                 <li key={cat.id}>
                                     <button
                                         onClick={() => setSelectedCategory(cat.slug)}
-                                        className={`whitespace-nowrap px-4 py-2 md:py-1.5 rounded-full md:rounded-lg transition-all text-[11px] md:text-xs capitalize flex justify-between items-center gap-2 md:w-full ${selectedCategory === cat.slug
-                                            ? "bg-primary text-white md:bg-transparent md:text-primary md:font-medium"
-                                            : "bg-gray-50 text-gray-400 md:bg-transparent md:hover:text-gray-600 md:hover:bg-gray-50/50"
+                                        className={`whitespace-nowrap px-4 py-2 md:py-2 md:px-3 rounded-full md:rounded-xl transition-all text-[11px] capitalize flex justify-between items-center gap-3 md:w-full ${selectedCategory === cat.slug
+                                            ? "bg-primary text-white md:bg-primary/8 md:text-primary md:font-semibold"
+                                            : "bg-gray-50 text-gray-400 md:bg-transparent md:text-gray-400 md:hover:text-gray-700 md:hover:bg-gray-50"
                                             }`}
                                     >
-                                        <span className="flex-1">{cat.name}</span>
-                                        <span className={`text-[9px] md:text-[10px] ${selectedCategory === cat.slug ? "text-white/60 md:text-primary/60" : "text-gray-300"}`}>
+                                        <span className="flex-1 text-left">{cat.name}</span>
+                                        <span className={`text-[10px] font-medium ${selectedCategory === cat.slug ? "text-white/70 md:text-primary/50" : "text-gray-300"}`}>
                                             {cat._count?.products || 0}
                                         </span>
                                     </button>
@@ -192,12 +192,12 @@ export default function TiendaPage() {
                                             </span>
                                         </div>
                                         <Link href={`/producto/${product.slug}`}>
-                                            <h3 className="text-[14px] font-medium text-gray-800 line-clamp-2 min-h-[42px] leading-tight capitalize group-hover:text-primary transition-colors duration-300">
+                                            <h3 className="text-[14px] font-medium text-gray-800 line-clamp-2 min-h-[42px] leading-tight capitalize group-hover:text-primary transition-colors duration-300 overflow-hidden">
                                                 {product.name}
                                             </h3>
                                         </Link>
 
-                                        <div className="mt-8 flex items-center justify-between">
+                                        <div className="mt-auto pt-4 flex items-center justify-between">
                                             <div className="flex flex-col">
                                                 {mounted ? (
                                                     <div className="flex flex-col -space-y-1">
