@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session || (session.user as { role?: string })?.role !== "ADMIN") {
+async function verifyAdmin(adminId: string | null) {
+  if (!adminId) return false;
+  const user = await prisma.user.findUnique({ where: { id: adminId } });
+  return user?.role === "ADMIN";
+}
+
+export async function GET(req: NextRequest) {
+  const adminId = req.nextUrl.searchParams.get("adminId");
+  if (!await verifyAdmin(adminId)) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
@@ -16,48 +20,44 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session || (session.user as { role?: string })?.role !== "ADMIN") {
+  const { adminId, title, content } = await req.json();
+  if (!await verifyAdmin(adminId)) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
-
-  const { title, content } = await req.json();
   if (!title || !content) {
     return NextResponse.json({ error: "title y content requeridos" }, { status: 400 });
   }
 
-  const doc = await prisma.knowledgeDocument.create({
-    data: { title, content },
-  });
+  const doc = await prisma.knowledgeDocument.create({ data: { title, content } });
   return NextResponse.json(doc, { status: 201 });
 }
 
 export async function PUT(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session || (session.user as { role?: string })?.role !== "ADMIN") {
+  const { adminId, id, title, content, isActive } = await req.json();
+  if (!await verifyAdmin(adminId)) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
-
-  const { id, title, content, isActive } = await req.json();
   if (!id) {
     return NextResponse.json({ error: "id requerido" }, { status: 400 });
   }
 
   const doc = await prisma.knowledgeDocument.update({
     where: { id },
-    data: { ...(title && { title }), ...(content && { content }), ...(isActive !== undefined && { isActive }) },
+    data: {
+      ...(title && { title }),
+      ...(content && { content }),
+      ...(isActive !== undefined && { isActive }),
+    },
   });
   return NextResponse.json(doc);
 }
 
 export async function DELETE(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session || (session.user as { role?: string })?.role !== "ADMIN") {
+  const adminId = req.nextUrl.searchParams.get("adminId");
+  const id = req.nextUrl.searchParams.get("id");
+  if (!await verifyAdmin(adminId)) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
-
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
   if (!id) {
     return NextResponse.json({ error: "id requerido" }, { status: 400 });
   }

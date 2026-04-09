@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Plus, Trash2, Edit2, BookOpen, Loader2, Eye, EyeOff } from "lucide-react";
 import { useAdminUtils } from "@/components/admin/AdminUtilsProvider";
+import { useAuthStore } from "@/store/useAuthStore";
 
 interface KnowledgeDoc {
   id: string;
@@ -15,6 +16,7 @@ interface KnowledgeDoc {
 
 export default function KnowledgePage() {
   const { confirm, showToast } = useAdminUtils();
+  const { user } = useAuthStore();
   const [docs, setDocs] = useState<KnowledgeDoc[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -23,7 +25,7 @@ export default function KnowledgePage() {
 
   const fetchDocs = async () => {
     try {
-      const res = await fetch("/api/admin/knowledge");
+      const res = await fetch(`/api/admin/knowledge?adminId=${user?.id}`);
       const data = await res.json();
       if (Array.isArray(data)) setDocs(data);
     } catch {
@@ -42,7 +44,7 @@ export default function KnowledgePage() {
     setIsSubmitting(true);
     try {
       const method = editingId ? "PUT" : "POST";
-      const body = editingId ? { ...formData, id: editingId } : formData;
+      const body = editingId ? { ...formData, id: editingId, adminId: user?.id } : { ...formData, adminId: user?.id };
       const res = await fetch("/api/admin/knowledge", {
         method,
         headers: { "Content-Type": "application/json" },
@@ -81,7 +83,7 @@ export default function KnowledgePage() {
       const res = await fetch("/api/admin/knowledge", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: doc.id, isActive: !doc.isActive }),
+        body: JSON.stringify({ id: doc.id, isActive: !doc.isActive, adminId: user?.id }),
       });
       if (res.ok) {
         showToast(doc.isActive ? "Documento desactivado" : "Documento activado");
@@ -102,7 +104,7 @@ export default function KnowledgePage() {
     if (!ok) return;
 
     try {
-      const res = await fetch(`/api/admin/knowledge?id=${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/admin/knowledge?id=${id}&adminId=${user?.id}`, { method: "DELETE" });
       if (res.ok) {
         showToast("Documento eliminado");
         fetchDocs();
