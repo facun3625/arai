@@ -128,8 +128,35 @@ export default function CheckoutPage() {
     const [isProcessing, setIsProcessing] = useState(false);
     const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
     const [bankTransferInfo, setBankTransferInfo] = useState<{ cbu: string; alias: string; discount: number }>({ cbu: "", alias: "", discount: 15 });
+    const [naveEnabled, setNaveEnabled] = useState(false);
+    const [modoEnabled, setModoEnabled] = useState(false);
+    const [paypalEnabled, setPaypalEnabled] = useState(false);
+    const [modoMode, setModoMode] = useState<"preprod" | "prod">("preprod");
     const [restrictions, setRestrictions] = useState<any[]>([]);
     const [activeRestriction, setActiveRestriction] = useState<any | null>(null);
+
+    // Modo SDK se carga solo cuando se necesita (en handleFinalPurchase)
+    const loadModoSDK = (): Promise<void> => {
+        return new Promise((resolve, reject) => {
+            const scriptUrl = modoMode === "prod"
+                ? "https://ecommerce-modal.modo.com.ar/bundle.js"
+                : "https://ecommerce-modal.preprod.modo.com.ar/bundle.js";
+            if ((window as any).ModoSDK) { resolve(); return; }
+            if (document.querySelector(`script[src="${scriptUrl}"]`)) {
+                const check = setInterval(() => {
+                    if ((window as any).ModoSDK) { clearInterval(check); resolve(); }
+                }, 100);
+                setTimeout(() => { clearInterval(check); reject(new Error("Modo SDK timeout")); }, 10000);
+                return;
+            }
+            const script = document.createElement("script");
+            script.src = scriptUrl;
+            script.async = true;
+            script.onload = () => resolve();
+            script.onerror = () => reject(new Error("Error cargando Modo SDK"));
+            document.body.appendChild(script);
+        });
+    };
 
     const fetchBankInfo = () => {
         fetch("/api/settings")
@@ -141,6 +168,10 @@ export default function CheckoutPage() {
                         alias: d.bankTransferAlias || "",
                         discount: d.bankTransferDiscount ?? 15
                     });
+                    setNaveEnabled(!!d.naveEnabled);
+                    setModoEnabled(!!d.modoEnabled);
+                    setPaypalEnabled(!!d.paypalEnabled);
+                    setModoMode(d.modoMode === "production" ? "prod" : "preprod");
                 }
             })
             .catch(() => { });
@@ -448,7 +479,111 @@ export default function CheckoutPage() {
                 });
             }
 
-            // 3. Handle Mercado Pago Redirection if selected
+            // 3. Handle Nave de Galicia Redirection if selected
+            if (selectedPayment === 'nave') {
+                const naveRes = await fetch('/api/payments/nave/create-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        orderId: order.id,
+                        amount: total,
+                        description: `Pedido Araí #${order.id.slice(-8).toUpperCase()}`,
+                        buyer: {
+                            name: `${contactInfo.firstName} ${contactInfo.lastName}`.trim(),
+                            user_email: contactInfo.email,
+                            phone: contactInfo.phone,
+                            doc_type: "DNI",
+                            doc_number: contactInfo.dni,
+                        },
+                    })
+                });
+
+                if (naveRes.ok) {
+                    const { checkout_url } = await naveRes.json();
+                    if (checkout_url) {
+                        clearCart();
+                        window.location.href = checkout_url;
+                        return;
+                    }
+                }
+
+                setNotification({
+                    message: "Pedido creado, pero hubo un problema al conectar con Nave. Por favor, contáctanos.",
+                    type: 'error'
+                });
+                setIsProcessing(false);
+                return;
+            }
+
+            // Handle PayPal
+            if (selectedPayment === 'paypal') {
+                const paypalRes = await fetch('/api/payments/paypal/create-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orderId: order.id, amount: total })
+                });
+                if (paypalRes.ok) {
+                    const { approval_url } = await paypalRes.json();
+                    if (approval_url) {
+                        clearCart();
+                        window.location.href = approval_url;
+                        return;
+                    }
+                }
+                setNotification({ message: "Pedido creado, pero hubo un problema al conectar con PayPal. Por favor, contáctanos.", type: 'error' });
+                setIsProcessing(false);
+                return;
+            }
+
+            // Handle Modo — usa SDK modal con QR, no redirect
+            if (selectedPayment === 'modo') {
+                const modoRes = await fetch('/api/payments/modo/create-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orderId: order.id, amount: total })
+                });
+                if (modoRes.ok) {
+                    const { id, qr, deeplink } = await modoRes.json();
+                    // Solo cargar SDK si el API respondió OK (evita inyección de CSS en caso de error)
+                    await loadModoSDK();
+                    if (id && (window as any).ModoSDK) {
+                        setIsProcessing(false);
+                        clearCart();
+                        (window as any).ModoSDK.modoInitPayment({
+                            version: '2',
+                            qrString: qr,
+                            checkoutId: id,
+                            deeplink: {
+                                url: deeplink,
+                                callbackURL: `${window.location.origin}/checkout`,
+                                callbackURLSuccess: `${window.location.origin}/checkout/success?orderId=${order.id}`,
+                            },
+                            callbackURL: `${window.location.origin}/checkout/success?orderId=${order.id}`,
+                            refreshData: async () => {
+                                const r = await fetch('/api/payments/modo/create-payment', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ orderId: order.id, amount: total })
+                                });
+                                const d = await r.json();
+                                return { checkoutId: d.id, qrString: d.qr, deeplink: { url: d.deeplink } };
+                            },
+                            onSuccess: () => { router.push(`/checkout/success?orderId=${order.id}`); },
+                            onFailure: () => {},
+                            onCancel: () => {},
+                            onClose: () => {},
+                        });
+                        return;
+                    }
+                }
+                const modoErrData = await modoRes.json().catch(() => ({}));
+                const modoErrMsg = modoErrData?.error || "Error al conectar con Modo";
+                setNotification({ message: `Pedido creado. Error Modo: ${modoErrMsg}`, type: 'error' });
+                setIsProcessing(false);
+                return;
+            }
+
+            // Handle Mercado Pago Redirection if selected
             if (selectedPayment === 'mercadopago') {
                 const prefRes = await fetch('/api/payments/mercadopago/preference', {
                     method: 'POST',
@@ -522,7 +657,7 @@ export default function CheckoutPage() {
     }
 
     return (
-        <div className="min-h-screen bg-white font-montserrat flex justify-center w-full overflow-hidden">
+        <div className="min-h-screen bg-white font-montserrat flex justify-center w-full overflow-x-hidden pb-20">
             <div className="w-full max-w-7xl px-4 lg:px-8 flex flex-col md:flex-row relative">
                 {/* LEFT COLUMN: Checkout Form */}
                 <div className="w-full md:w-1/2 lg:w-[55%] flex flex-col border-r border-gray-100/80 bg-white z-10">
@@ -1090,6 +1225,40 @@ export default function CheckoutPage() {
                                                     </div>
                                                 </div>
                                             </label>
+
+                                            {naveEnabled && (
+                                                <label className={`block border ${selectedPayment === 'nave' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-gray-200 bg-white hover:border-gray-300'} rounded-2xl p-5 cursor-pointer transition-all`}>
+                                                    <div className="flex items-center gap-4">
+                                                        <input type="radio" name="payment" value="nave" onChange={() => setSelectedPayment('nave')} className="w-5 h-5 text-primary border-gray-300 focus:ring-primary" />
+                                                        <div>
+                                                            <p className="font-medium text-gray-900 text-sm">Nave de Galicia</p>
+                                                            <p className="text-xs text-gray-500 mt-1">Pagá con tu cuenta bancaria del Banco Galicia.</p>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            )}
+                                            {modoEnabled && (
+                                                <label className={`block border ${selectedPayment === 'modo' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-gray-200 bg-white hover:border-gray-300'} rounded-2xl p-5 cursor-pointer transition-all`}>
+                                                    <div className="flex items-center gap-4">
+                                                        <input type="radio" name="payment" value="modo" onChange={() => setSelectedPayment('modo')} className="w-5 h-5 text-primary border-gray-300 focus:ring-primary" />
+                                                        <div>
+                                                            <p className="font-medium text-gray-900 text-sm">Modo</p>
+                                                            <p className="text-xs text-gray-500 mt-1">Wallet digital. Pagá con tu billetera Modo.</p>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            )}
+                                            {paypalEnabled && (
+                                                <label className={`block border ${selectedPayment === 'paypal' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-gray-200 bg-white hover:border-gray-300'} rounded-2xl p-5 cursor-pointer transition-all`}>
+                                                    <div className="flex items-center gap-4">
+                                                        <input type="radio" name="payment" value="paypal" onChange={() => setSelectedPayment('paypal')} className="w-5 h-5 text-primary border-gray-300 focus:ring-primary" />
+                                                        <div>
+                                                            <p className="font-medium text-gray-900 text-sm">PayPal</p>
+                                                            <p className="text-xs text-gray-500 mt-1">Pagá en USD con tu cuenta PayPal o tarjeta internacional.</p>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            )}
                                         </div>
                                     </section>
 
@@ -1190,8 +1359,21 @@ export default function CheckoutPage() {
                                 return (
                                     <div key={item.id} className="flex gap-4 items-center">
                                         <div className="w-16 h-16 rounded-xl bg-white border border-gray-100 overflow-hidden relative shadow-sm shrink-0">
-                                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                                            <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                            {item.image && !item.image.includes('placeholder') && item.image !== 'null' ? (
+                                                // eslint-disable-next-line @next/next/no-img-element
+                                                <img 
+                                                    src={item.image} 
+                                                    alt={item.name} 
+                                                    className="w-full h-full object-cover" 
+                                                    onError={(e) => {
+                                                        (e.target as HTMLImageElement).style.display = 'none';
+                                                    }}
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center bg-gray-50 text-gray-200">
+                                                    <Store className="h-6 w-6" />
+                                                </div>
+                                            )}
                                             <span className="absolute -top-2 -right-2 bg-gray-500 text-white text-[9px] font-bold w-5 h-5 rounded-full flex items-center justify-center z-10 border-2 border-white">
                                                 {item.quantity}
                                             </span>
@@ -1263,7 +1445,7 @@ export default function CheckoutPage() {
 
                         <div className="h-px bg-gray-200 mb-6"></div>
 
-                        <div className="flex justify-between items-end mb-8">
+                        <div className="flex justify-between items-end mb-8 mt-2">
                             <span className="text-gray-500 text-lg">Total</span>
                             <div className="text-right">
                                 <span className="text-gray-400 text-xs mr-2 uppercase tracking-widest">AR$</span>

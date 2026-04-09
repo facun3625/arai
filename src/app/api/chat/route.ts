@@ -84,6 +84,7 @@ INSTRUCCIONES:
 - Si preguntan por pagos, mencioná los métodos y el descuento por transferencia
 - Mantené respuestas cortas (máx 3-4 párrafos)
 - No inventés precios ni productos que no estén en el catálogo
+- SIEMPRE que menciones un precio, aclará la presentación/cantidad de forma explícita. Ejemplos: "$3.000 los 100g", "$8.500 el paquete de 250g", "$12.000 la bolsa de 500g". NUNCA digas solo el precio sin aclarar qué incluye. Si el producto tiene variantes de peso, mencioná que el precio es desde la presentación más chica y que hay otras opciones disponibles
 - Si no sabés algo, decilo honestamente y ofrecé contactar por WhatsApp`;
 
     const completion = await groq.chat.completions.create({

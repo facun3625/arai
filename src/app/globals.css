@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/forms";
+@source "../";
 
 @theme {
   --color-primary: var(--primary);
@@ -19,9 +21,8 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: var(--font-montserrat);
-  text-transform: none !important;
 }
 
 * {
-  text-transform: none !important;
+  box-sizing: border-box;
 }

@@ -4,7 +4,30 @@
       "Bash(npx prisma:*)",
       "Bash(npm install:*)",
       "Bash(node -e \"const {PrismaClient} = require\\(''@prisma/client''\\); const p = new PrismaClient\\(\\); p.storeSettings.findUnique\\({where:{id:''global''}}\\).then\\(s => console.log\\(''whatsapp:'', s?.whatsappNumber\\)\\).finally\\(\\(\\) => p.$disconnect\\(\\)\\)\")",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "WebSearch",
+      "Bash(curl -s \"https://www.nave.com.ar\" -L --max-time 10 -o /dev/null -w \"%{url_effective} %{http_code}\")",
+      "Bash(curl -s \"https://developers.nave.com.ar\" -L --max-time 10 -o /dev/null -w \"%{url_effective} %{http_code}\")",
+      "Bash(curl -s \"https://nave.galicia.com.ar\" -L --max-time 10 -o /dev/null -w \"%{url_effective} %{http_code}\")",
+      "WebFetch(domain:navenegocios.ar)",
+      "WebFetch(domain:centralweb.info)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:help.billowshop.com)",
+      "WebFetch(domain:ayuda.tiendastic.com)",
+      "WebFetch(domain:shop.wanderlust-webdesign.com)",
+      "WebFetch(domain:www.navenegocios.com)",
+      "WebFetch(domain:es.scribd.com)",
+      "Bash(curl -s https://navenegocios.ar/home/developers.model.json -L --max-time 10 -A Mozilla/5.0)",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -s https://navenegocios.ar/home/developers.model.json -L --max-time 15 -A Mozilla/5.0)",
+      "WebFetch(domain:developer-portal-doc-mfe-website-mfe.ranty.io)",
+      "Bash(PGPASSWORD=postgres psql -h localhost -p 5433 -U postgres -d postgres -c \"\\\\d \"\"StoreSettings\"\"\")",
+      "Bash(PGPASSWORD=postgres psql -h localhost -p 5433 -U postgres -d postgres -c \"SELECT column_name FROM information_schema.columns WHERE table_name=''StoreSettings'' AND column_name LIKE ''nave%'';\")",
+      "Bash(curl -s -X POST http://localhost:3000/api/settings -H \"Content-Type: application/json\" -d '{\"\"\"\"mercadopagoEnabled\"\"\"\": true}')",
+      "Bash(npx pm2:*)",
+      "Read(//Users/facundoarteagasola/.pm2/logs/**)",
+      "WebFetch(domain:merchants.modo.com.ar)",
+      "Bash(npx tsc:*)"
     ]
   }
 }

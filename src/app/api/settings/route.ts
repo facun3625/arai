@@ -85,6 +85,7 @@ export async function POST(request: Request) {
             ...(body.modoPublicKey !== undefined && { modoPublicKey: parseStr(body.modoPublicKey) }),
             ...(body.modoPrivateKey !== undefined && { modoPrivateKey: parseStr(body.modoPrivateKey) }),
             ...(body.modoMerchantId !== undefined && { modoMerchantId: parseStr(body.modoMerchantId) }),
+            ...(body.modoMode !== undefined && { modoMode: parseStr(body.modoMode) }),
             ...(body.modoEnabled !== undefined && { modoEnabled: !!body.modoEnabled }),
             ...(body.paypalClientId !== undefined && { paypalClientId: parseStr(body.paypalClientId) }),
             ...(body.paypalSecret !== undefined && { paypalSecret: parseStr(body.paypalSecret) }),
@@ -101,6 +102,12 @@ export async function POST(request: Request) {
             ...(body.maintenanceMode !== undefined && { maintenanceMode: !!body.maintenanceMode }),
             ...(body.metaPixelId !== undefined && { metaPixelId: parseStr(body.metaPixelId) }),
             ...(body.ga4MeasurementId !== undefined && { ga4MeasurementId: parseStr(body.ga4MeasurementId) }),
+            ...(body.naveClientId !== undefined && { naveClientId: parseStr(body.naveClientId) }),
+            ...(body.naveClientSecret !== undefined && { naveClientSecret: parseStr(body.naveClientSecret) }),
+            ...(body.naveAudience !== undefined && { naveAudience: parseStr(body.naveAudience) }),
+            ...(body.navePosId !== undefined && { navePosId: parseStr(body.navePosId) }),
+            ...(body.naveMode !== undefined && { naveMode: parseStr(body.naveMode) }),
+            ...(body.naveEnabled !== undefined && { naveEnabled: !!body.naveEnabled }),
         };
 
         // Remove undefined keys to avoid Prisma errors

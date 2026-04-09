@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 export default function PagoPage() {
-    const { user } = useAuthStore();
+    useAuthStore();
     const [isSaving, setIsSaving] = useState(false);
     const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
@@ -30,10 +30,17 @@ export default function PagoPage() {
         modoPublicKey: "",
         modoPrivateKey: "",
         modoMerchantId: "",
+        modoMode: "preprod",
         modoEnabled: false,
         paypalClientId: "",
         paypalSecret: "",
-        paypalEnabled: false
+        paypalEnabled: false,
+        naveClientId: "",
+        naveClientSecret: "",
+        naveAudience: "",
+        navePosId: "",
+        naveMode: "sandbox",
+        naveEnabled: false
     });
     const [initialSettings, setInitialSettings] = useState<any>(null);
     const [lastSaved, setLastSaved] = useState(false);
@@ -58,10 +65,17 @@ export default function PagoPage() {
                     modoPublicKey: data.modoPublicKey || "",
                     modoPrivateKey: data.modoPrivateKey || "",
                     modoMerchantId: data.modoMerchantId || "",
+                    modoMode: data.modoMode || "preprod",
                     modoEnabled: data.modoEnabled ?? false,
                     paypalClientId: data.paypalClientId || "",
                     paypalSecret: data.paypalSecret || "",
-                    paypalEnabled: data.paypalEnabled ?? false
+                    paypalEnabled: data.paypalEnabled ?? false,
+                    naveClientId: data.naveClientId || "",
+                    naveClientSecret: data.naveClientSecret || "",
+                    naveAudience: data.naveAudience || "",
+                    navePosId: data.navePosId || "",
+                    naveMode: data.naveMode || "sandbox",
+                    naveEnabled: data.naveEnabled ?? false
                 };
                 setSettings(s);
                 setInitialSettings(s);
@@ -75,7 +89,7 @@ export default function PagoPage() {
         fetchSettings();
     }, []);
 
-    const handleSave = async (e: React.FormEvent) => {
+    const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsSaving(true);
         try {
@@ -106,23 +120,6 @@ export default function PagoPage() {
     const labelCls = "text-white/80 text-sm font-medium flex items-center gap-2.5";
     const hintCls = "text-[11px] text-white/20 italic mt-2 ml-1";
     const pendingBadge = "mb-8 p-4 bg-yellow-500/5 border border-yellow-500/10 rounded-2xl flex items-center gap-3";
-
-    const PlatformToggle = ({ enabled, color, onToggle }: { enabled: boolean; color: string; onToggle: () => void }) => (
-        <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5">
-            <span className={`text-[10px] font-bold uppercase tracking-widest ${enabled ? color : 'text-white/20'}`}>
-                {enabled ? 'Plataforma Activa' : 'Plataforma Inactiva'}
-            </span>
-            <button
-                type="button"
-                onClick={onToggle}
-                className={`relative w-14 h-7 rounded-full transition-all duration-300 ${enabled ? 'bg-current' : 'bg-white/10'}`}
-                style={enabled ? { backgroundColor: 'currentColor' } : {}}
-            >
-                <div style={enabled ? { backgroundColor: 'white', boxShadow: '0 0 10px rgba(255,255,255,0.5)' } : { backgroundColor: 'white' }}
-                    className={`absolute top-1 left-1 w-5 h-5 rounded-full transition-all duration-300 ${enabled ? 'translate-x-7' : 'translate-x-0'}`} />
-            </button>
-        </div>
-    );
 
     return (
         <>
@@ -237,22 +234,32 @@ export default function PagoPage() {
                         )}
                         <div className={`grid grid-cols-1 gap-y-8 transition-all duration-500 ${!settings.modoEnabled ? 'opacity-30 pointer-events-none grayscale' : ''}`}>
                             <div className="space-y-3">
-                                <label className={labelCls}><Key className="h-4 w-4 text-white/60" /> Public Key</label>
-                                <input type="text" placeholder="modo_pk_..." value={settings.modoPublicKey}
-                                    onChange={(e) => setSettings({ ...settings, modoPublicKey: e.target.value })} className={inputCls} />
-                                <p className={hintCls}>Clave pública provista por Modo para el frontend.</p>
+                                <label className={labelCls}><Globe className="h-4 w-4 text-white/60" /> Entorno</label>
+                                <select value={settings.modoMode}
+                                    onChange={(e) => setSettings({ ...settings, modoMode: e.target.value })}
+                                    className={inputCls}>
+                                    <option value="preprod">Preproducción (pruebas)</option>
+                                    <option value="production">Producción</option>
+                                </select>
+                                <p className={hintCls}>Usá preproducción para testear antes de activar en producción.</p>
                             </div>
                             <div className="space-y-3">
-                                <label className={labelCls}><Lock className="h-4 w-4 text-white/60" /> Private Key / Secret</label>
-                                <input type="password" placeholder="modo_sk_..." value={settings.modoPrivateKey}
+                                <label className={labelCls}><Key className="h-4 w-4 text-white/60" /> Usuario (username)</label>
+                                <input type="text" placeholder="araiyerbamate" value={settings.modoPublicKey}
+                                    onChange={(e) => setSettings({ ...settings, modoPublicKey: e.target.value })} className={inputCls} />
+                                <p className={hintCls}>Usuario provisto por Modo para autenticar tu comercio.</p>
+                            </div>
+                            <div className="space-y-3">
+                                <label className={labelCls}><Lock className="h-4 w-4 text-white/60" /> Contraseña (password)</label>
+                                <input type="password" placeholder="••••••••" value={settings.modoPrivateKey}
                                     onChange={(e) => setSettings({ ...settings, modoPrivateKey: e.target.value })} className={inputCls} />
-                                <p className={hintCls}>Clave privada para procesar pagos de forma segura.</p>
+                                <p className={hintCls}>Contraseña para autenticarte con la API de Modo.</p>
                             </div>
                             <div className="space-y-3">
                                 <label className={labelCls}><Hash className="h-4 w-4 text-white/60" /> Merchant ID</label>
-                                <input type="text" placeholder="merchant_12345" value={settings.modoMerchantId}
+                                <input type="text" placeholder="9308f80e-9998-..." value={settings.modoMerchantId}
                                     onChange={(e) => setSettings({ ...settings, modoMerchantId: e.target.value })} className={inputCls} />
-                                <p className={hintCls}>Identificador único del comercio en la red de Modo.</p>
+                                <p className={hintCls}>Identificador único del comercio en Modo (opcional según gateway).</p>
                             </div>
                         </div>
                     </div>
@@ -296,6 +303,75 @@ export default function PagoPage() {
                                 <input type="password" placeholder="EGa..." value={settings.paypalSecret}
                                     onChange={(e) => setSettings({ ...settings, paypalSecret: e.target.value })} className={inputCls} />
                                 <p className={hintCls}>Clave privada para procesar pagos de forma segura.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ── Nave de Galicia ── */}
+                    <div className="bg-[#0a0a0a] border border-white/5 rounded-[32px] p-10 md:p-12 shadow-2xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-violet-500/5 blur-[120px] -z-10" />
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <div className="p-2 bg-violet-500/10 rounded-xl"><CreditCard className="h-6 w-6 text-violet-400" /></div>
+                                    <h2 className="text-white text-3xl font-bold tracking-tight">Nave de Galicia</h2>
+                                </div>
+                                <p className="text-white/40 text-sm tracking-wide">Billetera digital del Banco Galicia. Configurá con las credenciales de tu integración.</p>
+                            </div>
+                            <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5">
+                                <span className={`text-[10px] font-bold uppercase tracking-widest ${settings.naveEnabled ? 'text-violet-400' : 'text-white/20'}`}>
+                                    {settings.naveEnabled ? 'Plataforma Activa' : 'Plataforma Inactiva'}
+                                </span>
+                                <button type="button" onClick={() => setSettings({ ...settings, naveEnabled: !settings.naveEnabled })}
+                                    className={`relative w-14 h-7 rounded-full transition-all duration-300 ${settings.naveEnabled ? 'bg-violet-500' : 'bg-white/10'}`}>
+                                    <div className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-all duration-300 ${settings.naveEnabled ? 'translate-x-7 shadow-[0_0_10px_rgba(255,255,255,0.5)]' : 'translate-x-0'}`} />
+                                </button>
+                            </div>
+                        </div>
+                        {!settings.naveClientId && !settings.naveClientSecret && (
+                            <div className={pendingBadge}>
+                                <div className="w-2 h-2 rounded-full bg-yellow-400/60 animate-pulse flex-shrink-0" />
+                                <p className="text-[12px] text-yellow-400/60 font-medium">En espera de credenciales de Nave de Galicia.</p>
+                            </div>
+                        )}
+                        <div className={`grid grid-cols-1 gap-y-8 transition-all duration-500 ${!settings.naveEnabled ? 'opacity-30 pointer-events-none grayscale' : ''}`}>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="space-y-3">
+                                    <label className={labelCls}><Key className="h-4 w-4 text-white/60" /> Client ID</label>
+                                    <input type="text" placeholder="nave_client_..." value={settings.naveClientId}
+                                        onChange={(e) => setSettings({ ...settings, naveClientId: e.target.value })} className={inputCls} />
+                                    <p className={hintCls}>Identificador público de tu integración con Nave.</p>
+                                </div>
+                                <div className="space-y-3">
+                                    <label className={labelCls}><Lock className="h-4 w-4 text-white/60" /> Client Secret</label>
+                                    <input type="password" placeholder="nave_secret_..." value={settings.naveClientSecret}
+                                        onChange={(e) => setSettings({ ...settings, naveClientSecret: e.target.value })} className={inputCls} />
+                                    <p className={hintCls}>Clave privada para autenticar pagos de forma segura.</p>
+                                </div>
+                            </div>
+                            <div className="space-y-3">
+                                <label className={labelCls}><Globe className="h-4 w-4 text-white/60" /> Audience</label>
+                                <input type="text" placeholder="https://naranja.com/ranty/merchants/api" value={settings.naveAudience}
+                                    onChange={(e) => setSettings({ ...settings, naveAudience: e.target.value })} className={inputCls} />
+                                <p className={hintCls}>URL de audience provista por Nave para generar el token de acceso.</p>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="space-y-3">
+                                    <label className={labelCls}><Hash className="h-4 w-4 text-white/60" /> POS ID</label>
+                                    <input type="text" placeholder="106cce5e-243f-4f72-..." value={settings.navePosId}
+                                        onChange={(e) => setSettings({ ...settings, navePosId: e.target.value })} className={inputCls} />
+                                    <p className={hintCls}>ID del punto de venta. Lo encontrás en Nave → Integraciones → Sistema de gestión.</p>
+                                </div>
+                                <div className="space-y-3">
+                                    <label className={labelCls}><Globe className="h-4 w-4 text-white/60" /> Entorno</label>
+                                    <select value={settings.naveMode}
+                                        onChange={(e) => setSettings({ ...settings, naveMode: e.target.value })}
+                                        className={inputCls}>
+                                        <option value="sandbox">Sandbox (pruebas)</option>
+                                        <option value="production">Producción</option>
+                                    </select>
+                                    <p className={hintCls}>Usá sandbox para probar antes de activar en producción.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
