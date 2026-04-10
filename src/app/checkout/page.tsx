@@ -591,7 +591,7 @@ export default function CheckoutPage() {
                     body: JSON.stringify({
                         orderId: order.id,
                         items: items,
-                        customerEmail: contactInfo.email,
+                        customer: { email: contactInfo.email },
                         subtotal,
                         shippingCost: effectiveShippingCost,
                         discount: totalDiscount
