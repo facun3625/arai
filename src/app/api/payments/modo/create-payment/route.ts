@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import dns from "dns";
+
+// Forzar IPv4 para evitar bloqueos de Cloudflare vía IPv6
+dns.setDefaultResultOrder("ipv4first");
 
 const BASE_URLS: Record<string, string> = {
   preprod: "https://merchants.preprod.playdigital.com.ar",
@@ -28,7 +32,7 @@ async function getModoToken(baseUrl: string, username: string, password: string)
   if (!res.ok) {
     const err = await res.text();
     console.error("Modo auth error:", err);
-    throw new Error("Error al autenticar con Modo");
+    throw new Error(`Auth Modo ${res.status}: ${err.substring(0, 200)}`);
   }
 
   const data = await res.json();
