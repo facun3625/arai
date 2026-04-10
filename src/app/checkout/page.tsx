@@ -501,7 +501,6 @@ export default function CheckoutPage() {
                 if (naveRes.ok) {
                     const { checkout_url } = await naveRes.json();
                     if (checkout_url) {
-                        clearCart();
                         window.location.href = checkout_url;
                         return;
                     }
@@ -525,7 +524,6 @@ export default function CheckoutPage() {
                 if (paypalRes.ok) {
                     const { approval_url } = await paypalRes.json();
                     if (approval_url) {
-                        clearCart();
                         window.location.href = approval_url;
                         return;
                     }
@@ -542,19 +540,19 @@ export default function CheckoutPage() {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ orderId: order.id, amount: total })
                 });
-                if (modoRes.ok) {
-                    const { id, qr, deeplink } = await modoRes.json();
+                // Read body once and reuse (Response body can only be consumed once)
+                const modoData = await modoRes.json().catch(() => ({}));
+                if (modoRes.ok && modoData.id) {
                     // Solo cargar SDK si el API respondió OK (evita inyección de CSS en caso de error)
                     await loadModoSDK();
-                    if (id && (window as any).ModoSDK) {
+                    if ((window as any).ModoSDK) {
                         setIsProcessing(false);
-                        clearCart();
                         (window as any).ModoSDK.modoInitPayment({
                             version: '2',
-                            qrString: qr,
-                            checkoutId: id,
+                            qrString: modoData.qr,
+                            checkoutId: modoData.id,
                             deeplink: {
-                                url: deeplink,
+                                url: modoData.deeplink,
                                 callbackURL: `${window.location.origin}/checkout`,
                                 callbackURLSuccess: `${window.location.origin}/checkout/success?orderId=${order.id}`,
                             },
@@ -568,7 +566,7 @@ export default function CheckoutPage() {
                                 const d = await r.json();
                                 return { checkoutId: d.id, qrString: d.qr, deeplink: { url: d.deeplink } };
                             },
-                            onSuccess: () => { router.push(`/checkout/success?orderId=${order.id}`); },
+                            onSuccess: () => { clearCart(); router.push(`/checkout/success?orderId=${order.id}`); },
                             onFailure: () => {},
                             onCancel: () => {},
                             onClose: () => {},
@@ -576,8 +574,7 @@ export default function CheckoutPage() {
                         return;
                     }
                 }
-                const modoErrData = await modoRes.json().catch(() => ({}));
-                const modoErrMsg = modoErrData?.error || "Error al conectar con Modo";
+                const modoErrMsg = modoData?.error || "Error al conectar con Modo";
                 setNotification({ message: `Pedido creado. Error Modo: ${modoErrMsg}`, type: 'error' });
                 setIsProcessing(false);
                 return;
@@ -601,8 +598,7 @@ export default function CheckoutPage() {
                 if (prefRes.ok) {
                     const { init_point } = await prefRes.json();
                     if (init_point) {
-                        // Clear Cart ONLY if preference was successful
-                        clearCart();
+                        // Clear cart in success page, not here (avoids flash of empty cart before redirect)
                         window.location.href = init_point;
                         return;
                     }

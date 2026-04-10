@@ -89,25 +89,22 @@ export async function POST(request: Request) {
             return newOrder;
         });
 
-        // 3. Send Confirmation Email (Async, don't block response)
-        try {
-            if (order.contactEmail) {
-                await resend.emails.send({
-                    from: EMAIL_FROM,
-                    to: order.contactEmail,
-                    subject: `¡Confirmación de tu pedido #${order.id.slice(-6).toUpperCase()}! - Araí Yerba Mate`,
-                    react: OrderTemplate({
-                        customerName: order.contactName,
-                        orderId: order.id,
-                        items: order.items,
-                        total: order.total,
-                        shippingAddress: JSON.parse(order.shippingAddress)
-                    })
-                });
-            }
-        } catch (emailError) {
-            console.error('Error sending order confirmation email:', emailError);
-            // We don't throw here as the order was already created successfully
+        // 3. Send Confirmation Email (fire-and-forget, don't block response)
+        if (order.contactEmail) {
+            resend.emails.send({
+                from: EMAIL_FROM,
+                to: order.contactEmail,
+                subject: `¡Confirmación de tu pedido #${order.id.slice(-6).toUpperCase()}! - Araí Yerba Mate`,
+                react: OrderTemplate({
+                    customerName: order.contactName,
+                    orderId: order.id,
+                    items: order.items,
+                    total: order.total,
+                    shippingAddress: JSON.parse(order.shippingAddress)
+                })
+            }).catch((emailError: any) => {
+                console.error('Error sending order confirmation email:', emailError);
+            });
         }
 
         return NextResponse.json({
