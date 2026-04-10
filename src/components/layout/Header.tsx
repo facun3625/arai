@@ -16,6 +16,16 @@ export const Header = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [bankDiscount, setBankDiscount] = useState<number | null>(null);
+    const [currentLang, setCurrentLang] = useState<'es' | 'en'>('es');
+
+    const switchLanguage = (lang: 'es' | 'en') => {
+        const select = document.querySelector('.goog-te-combo') as HTMLSelectElement | null;
+        if (select) {
+            select.value = lang === 'en' ? 'en' : 'es';
+            select.dispatchEvent(new Event('change'));
+            setCurrentLang(lang);
+        }
+    };
     const [socialLinks, setSocialLinks] = useState({
         instagramUrl: "",
         facebookUrl: "",
@@ -133,13 +143,18 @@ export const Header = () => {
                         )}
                         <div className="flex items-center gap-2 text-[9px] font-bold text-white/70">
                             <button
-                                onClick={() => window.open(`https://translate.google.com/translate?sl=es&tl=en&u=${encodeURIComponent(window.location.href)}`, '_blank')}
-                                className="flex items-center gap-1 cursor-pointer hover:text-white uppercase text-[9px]"
+                                onClick={() => switchLanguage('en')}
+                                className={`flex items-center gap-1 cursor-pointer uppercase text-[9px] transition-colors ${currentLang === 'en' ? 'text-white' : 'hover:text-white'}`}
                             >
                                 English
                             </button>
                             <span className="text-white/20">|</span>
-                            <span className="flex items-center gap-1 cursor-pointer hover:text-white text-white uppercase text-[9px]">Español</span>
+                            <button
+                                onClick={() => switchLanguage('es')}
+                                className={`flex items-center gap-1 cursor-pointer uppercase text-[9px] transition-colors ${currentLang === 'es' ? 'text-white' : 'hover:text-white'}`}
+                            >
+                                Español
+                            </button>
                         </div>
                         <div className="flex items-center gap-2 border-l border-white/10 pl-4">
                             {socialLinks.facebookUrl && (
@@ -405,10 +420,15 @@ export const Header = () => {
                                 <div className="pt-6 border-t border-gray-100">
                                     <p className="text-[10px] uppercase font-bold text-gray-400 tracking-tighter mb-4">Idioma</p>
                                     <div className="flex gap-4">
-                                        <button className="text-xs font-bold text-primary">Español</button>
                                         <button
-                                            onClick={() => window.open(`https://translate.google.com/translate?sl=es&tl=en&u=${encodeURIComponent(window.location.href)}`, '_blank')}
-                                            className="text-xs font-medium text-gray-400 hover:text-primary"
+                                            onClick={() => switchLanguage('es')}
+                                            className={`text-xs font-medium ${currentLang === 'es' ? 'font-bold text-primary' : 'text-gray-400 hover:text-primary'}`}
+                                        >
+                                            Español
+                                        </button>
+                                        <button
+                                            onClick={() => switchLanguage('en')}
+                                            className={`text-xs font-medium ${currentLang === 'en' ? 'font-bold text-primary' : 'text-gray-400 hover:text-primary'}`}
                                         >
                                             English
                                         </button>

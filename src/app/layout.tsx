@@ -30,8 +30,26 @@ export default function RootLayout({
     <html lang="es">
       <head>
         <AnalyticsScripts />
+        {/* Google Translate Widget - hidden, triggered by buttons in Header */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+              pageLanguage: 'es',
+              includedLanguages: 'en,es',
+              autoDisplay: false
+            }, 'google_translate_element');
+          }
+        `}} />
+        <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async />
+        <style dangerouslySetInnerHTML={{ __html: `
+          #google_translate_element { display: none; }
+          .goog-te-banner-frame { display: none !important; }
+          body { top: 0 !important; }
+          .skiptranslate { display: none !important; }
+        `}} />
       </head>
       <body className={montserrat.className}>
+        <div id="google_translate_element" />
         <Providers>
           <MaintenanceGuard>
             <SessionSync />
