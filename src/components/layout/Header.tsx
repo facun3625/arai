@@ -132,7 +132,12 @@ export const Header = () => {
                             </a>
                         )}
                         <div className="flex items-center gap-2 text-[9px] font-bold text-white/70">
-                            <span className="flex items-center gap-1 cursor-pointer hover:text-white uppercase text-[9px]">English</span>
+                            <button
+                                onClick={() => window.open(`https://translate.google.com/translate?sl=es&tl=en&u=${encodeURIComponent(window.location.href)}`, '_blank')}
+                                className="flex items-center gap-1 cursor-pointer hover:text-white uppercase text-[9px]"
+                            >
+                                English
+                            </button>
                             <span className="text-white/20">|</span>
                             <span className="flex items-center gap-1 cursor-pointer hover:text-white text-white uppercase text-[9px]">Español</span>
                         </div>
@@ -401,7 +406,12 @@ export const Header = () => {
                                     <p className="text-[10px] uppercase font-bold text-gray-400 tracking-tighter mb-4">Idioma</p>
                                     <div className="flex gap-4">
                                         <button className="text-xs font-bold text-primary">Español</button>
-                                        <button className="text-xs font-medium text-gray-400">English</button>
+                                        <button
+                                            onClick={() => window.open(`https://translate.google.com/translate?sl=es&tl=en&u=${encodeURIComponent(window.location.href)}`, '_blank')}
+                                            className="text-xs font-medium text-gray-400 hover:text-primary"
+                                        >
+                                            English
+                                        </button>
                                     </div>
                                 </div>
                             </div>
