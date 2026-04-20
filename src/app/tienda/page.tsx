@@ -5,15 +5,16 @@ import { ChevronDown, ShoppingBag, SlidersHorizontal, Loader2, CheckCircle2 } fr
 import { useCartStore } from "@/store/useCartStore";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { PopupOverlay } from "@/components/ui/PopupOverlay";
 
 export default function TiendaPage() {
     const [mounted, setMounted] = useState(false);
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [products, setProducts] = useState<any[]>([]);
     const [categories, setCategories] = useState<any[]>([]);
-    const [selectedCategory, setSelectedCategory] = useState("todas");
+    const [selectedCategory, setSelectedCategory] = useState(() => searchParams.get("categoria") || "todas");
     const [isLoading, setIsLoading] = useState(true);
     const addItem = useCartStore((state) => state.addItem);
     const cartItems = useCartStore((state) => state.items);
@@ -46,6 +47,12 @@ export default function TiendaPage() {
         };
         fetchData();
     }, []);
+
+    // Sync category from URL param
+    useEffect(() => {
+        const cat = searchParams.get("categoria");
+        if (cat) setSelectedCategory(cat);
+    }, [searchParams]);
 
     // Scroll to top on category change
     useEffect(() => {

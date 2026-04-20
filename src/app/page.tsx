@@ -241,7 +241,7 @@ export default function Home() {
             </div>
             <div className="space-y-1">
               <h4 className="text-[14px] font-bold text-gray-900 uppercase tracking-wider">Envío Nacional</h4>
-              <p className="text-[12px] text-gray-500 leading-relaxed">Llegamos a todo el país con logística propia y seguimiento en tiempo real.</p>
+              <p className="text-[12px] text-gray-500 leading-relaxed">Llegamos a todo el país.</p>
             </div>
           </div>
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6 group">
