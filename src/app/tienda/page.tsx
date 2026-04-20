@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { ChevronDown, ShoppingBag, SlidersHorizontal, Loader2, CheckCircle2 } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
 import { AnimatePresence, motion } from "framer-motion";
@@ -9,6 +9,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { PopupOverlay } from "@/components/ui/PopupOverlay";
 
 export default function TiendaPage() {
+    return (
+        <Suspense>
+            <TiendaContent />
+        </Suspense>
+    );
+}
+
+function TiendaContent() {
     const [mounted, setMounted] = useState(false);
     const router = useRouter();
     const searchParams = useSearchParams();
