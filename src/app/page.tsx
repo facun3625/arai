@@ -149,7 +149,7 @@ export default function Home() {
                 <h2 className="text-[20px] md:text-[28px] font-bold text-white leading-tight uppercase tracking-[0.2em] mb-8">
                   YERBA <br /> MATE
                 </h2>
-                <Link href="/tienda?categoria=yerba-mate" className="px-8 py-3 bg-white text-black text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-white/90 transition-all rounded-full shadow-lg">
+                <Link href="/tienda?categoria=yerba" className="px-8 py-3 bg-white text-black text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-white/90 transition-all rounded-full shadow-lg">
                   Comprar
                 </Link>
               </div>
