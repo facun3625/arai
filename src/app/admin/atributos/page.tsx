@@ -25,7 +25,9 @@ export default function AtributosPage() {
         name: "",
         slug: "",
         terms: "",
-        isAddon: false
+        isAddon: false,
+        maxSelections: "" as string | number,
+        blocksAttributeId: "",
     });
 
     const fetchAtributos = async () => {
@@ -61,7 +63,7 @@ export default function AtributosPage() {
 
             if (res.ok) {
                 showToast(editingId ? "Atributo actualizado" : "Atributo creado");
-                setFormData({ name: "", slug: "", terms: "", isAddon: false });
+                setFormData({ name: "", slug: "", terms: "", isAddon: false, maxSelections: "", blocksAttributeId: "" });
                 setEditingId(null);
                 fetchAtributos();
             } else {
@@ -81,14 +83,16 @@ export default function AtributosPage() {
             name: attr.name,
             slug: attr.slug,
             terms: attr.terms || "",
-            isAddon: attr.isAddon || false
+            isAddon: attr.isAddon || false,
+            maxSelections: attr.maxSelections ?? "",
+            blocksAttributeId: attr.blocksAttributeId || "",
         });
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const handleCancelEdit = () => {
         setEditingId(null);
-        setFormData({ name: "", slug: "", terms: "", isAddon: false });
+        setFormData({ name: "", slug: "", terms: "", isAddon: false, maxSelections: "", blocksAttributeId: "" });
     };
 
     const handleDelete = async (id: string) => {
@@ -191,6 +195,38 @@ export default function AtributosPage() {
                                     <span className="text-[9px] text-white/40 italic">Para blends, hierbas y agregados multi-selección.</span>
                                 </div>
                             </div>
+
+                            {formData.isAddon && (
+                                <>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Máximo de selecciones</label>
+                                        <input
+                                            type="number"
+                                            min={1}
+                                            value={formData.maxSelections}
+                                            onChange={(e) => setFormData({ ...formData, maxSelections: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                            placeholder="Sin límite"
+                                        />
+                                        <p className="text-[9px] text-white/20 ml-1 italic">Dejá vacío para sin límite.</p>
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Bloquea al complemento</label>
+                                        <select
+                                            value={formData.blocksAttributeId}
+                                            onChange={(e) => setFormData({ ...formData, blocksAttributeId: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                        >
+                                            <option value="">— Ninguno —</option>
+                                            {atributos.filter(a => a.isAddon && a.id !== editingId).map(a => (
+                                                <option key={a.id} value={a.id} className="text-black">{a.name}</option>
+                                            ))}
+                                        </select>
+                                        <p className="text-[9px] text-white/20 ml-1 italic">Si el cliente elige algo aquí, ese complemento se deshabilita.</p>
+                                    </div>
+                                </>
+                            )}
 
                             <div className="flex flex-col gap-2 pt-2">
                                 <button

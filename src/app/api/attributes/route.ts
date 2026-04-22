@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { name, slug, terms, isAddon } = body;
+        const { name, slug, terms, isAddon, maxSelections, blocksAttributeId } = body;
 
         if (!name || !slug) {
             return NextResponse.json({ error: "Nombre y slug requeridos" }, { status: 400 });
@@ -15,7 +15,9 @@ export async function POST(req: Request) {
                 name,
                 slug,
                 terms: terms || "",
-                isAddon: Boolean(isAddon)
+                isAddon: Boolean(isAddon),
+                maxSelections: maxSelections ? Number(maxSelections) : null,
+                blocksAttributeId: blocksAttributeId || null,
             }
         });
 
@@ -45,7 +47,7 @@ export async function GET() {
 export async function PUT(req: Request) {
     try {
         const body = await req.json();
-        const { id, name, slug, terms, isAddon } = body;
+        const { id, name, slug, terms, isAddon, maxSelections, blocksAttributeId } = body;
 
         if (!id || !name || !slug) {
             return NextResponse.json({ error: "ID, nombre y slug requeridos" }, { status: 400 });
@@ -57,7 +59,9 @@ export async function PUT(req: Request) {
                 name,
                 slug,
                 terms: terms || "",
-                isAddon: Boolean(isAddon)
+                isAddon: Boolean(isAddon),
+                maxSelections: maxSelections ? Number(maxSelections) : null,
+                blocksAttributeId: blocksAttributeId || null,
             }
         });
 

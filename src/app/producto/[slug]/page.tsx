@@ -35,6 +35,7 @@ export default function ProductoDetallePage() {
     const [quantity, setQuantity] = useState(1);
     const [activeImage, setActiveImage] = useState("");
     const [selectedAddons, setSelectedAddons] = useState<Record<string, string[]>>({});
+    const [addonMeta, setAddonMeta] = useState<Record<string, { maxSelections?: number; blocksAttributeId?: string }>>({});
     const addItem = useCartStore((state) => state.addItem);
     const cartItems = useCartStore((state) => state.items);
 
@@ -56,6 +57,19 @@ export default function ProductoDetallePage() {
                     }
 
                     setActiveImage(data.featuredImage || pImages[0] || "");
+
+                    // Load addon restrictions
+                    try {
+                        const attrRes = await fetch("/api/attributes");
+                        if (attrRes.ok) {
+                            const attrs = await attrRes.json();
+                            const meta: Record<string, { maxSelections?: number; blocksAttributeId?: string }> = {};
+                            attrs.forEach((a: any) => {
+                                meta[a.id] = { maxSelections: a.maxSelections, blocksAttributeId: a.blocksAttributeId };
+                            });
+                            setAddonMeta(meta);
+                        }
+                    } catch { /* ignore */ }
 
                     // Initial attribute selection if variable
                     if (data.type === "VARIABLE" && data.variants?.length > 0) {
@@ -365,41 +379,73 @@ export default function ProductoDetallePage() {
 
                             if (!addonsList || addonsList.length === 0) return null;
 
+                            // Build a map of which addon groups are blocked
+                            const blockedGroups = new Set<string>();
+                            addonsList.forEach((addon: any) => {
+                                const meta = addonMeta[addon.attributeId];
+                                const hasSelection = (selectedAddons[addon.name] || []).length > 0;
+                                if (hasSelection && meta?.blocksAttributeId) {
+                                    const blocked = addonsList.find((a: any) => a.attributeId === meta.blocksAttributeId);
+                                    if (blocked) blockedGroups.add(blocked.name);
+                                }
+                            });
+
                             return (
                                 <div className="space-y-10 py-2 border-t border-gray-50 pt-8 mt-4">
-                                    {addonsList.map((addon: any) => (
-                                        <div key={addon.attributeId} className="space-y-5">
-                                            <p className="text-[14px] font-medium text-gray-900 capitalize">
-                                                {addon.name} <span className="text-[11px] opacity-40 ml-2 font-normal">(opcional)</span>
-                                            </p>
-                                            <div className="flex flex-wrap gap-3">
-                                                {addon.terms.map((term: string) => {
-                                                    const isSelected = selectedAddons[addon.name]?.includes(term);
-                                                    return (
-                                                        <button
-                                                            key={term}
-                                                            onClick={() => {
-                                                                const current = selectedAddons[addon.name] || [];
-                                                                const updated = current.includes(term)
-                                                                    ? current.filter(t => t !== term)
-                                                                    : [...current, term];
-                                                                setSelectedAddons({ ...selectedAddons, [addon.name]: updated });
-                                                            }}
-                                                            className={`px-5 py-2.5 rounded-xl text-[11px] font-normal transition-all border tracking-wide flex items-center gap-3 ${isSelected
-                                                                ? 'bg-[#23553d] border-[#23553d] text-white'
-                                                                : 'bg-white border-gray-100 text-gray-500 hover:border-primary/30 hover:text-primary shadow-sm'
+                                    {addonsList.map((addon: any) => {
+                                        const meta = addonMeta[addon.attributeId];
+                                        const isBlocked = blockedGroups.has(addon.name);
+                                        const currentSelected = selectedAddons[addon.name] || [];
+                                        const maxReached = meta?.maxSelections ? currentSelected.length >= meta.maxSelections : false;
+
+                                        return (
+                                            <div key={addon.attributeId} className={`space-y-5 transition-opacity ${isBlocked ? 'opacity-30 pointer-events-none' : ''}`}>
+                                                <p className="text-[14px] font-medium text-gray-900 capitalize flex items-center gap-2">
+                                                    {addon.name}
+                                                    <span className="text-[11px] opacity-40 font-normal">(opcional)</span>
+                                                    {meta?.maxSelections && (
+                                                        <span className="text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
+                                                            máx. {meta.maxSelections}
+                                                        </span>
+                                                    )}
+                                                    {isBlocked && (
+                                                        <span className="text-[10px] text-red-400">bloqueado</span>
+                                                    )}
+                                                </p>
+                                                <div className="flex flex-wrap gap-3">
+                                                    {addon.terms.map((term: string) => {
+                                                        const isSelected = currentSelected.includes(term);
+                                                        const isDisabled = isBlocked || (!isSelected && maxReached);
+                                                        return (
+                                                            <button
+                                                                key={term}
+                                                                disabled={isDisabled}
+                                                                onClick={() => {
+                                                                    if (isDisabled) return;
+                                                                    const updated = isSelected
+                                                                        ? currentSelected.filter(t => t !== term)
+                                                                        : [...currentSelected, term];
+                                                                    setSelectedAddons({ ...selectedAddons, [addon.name]: updated });
+                                                                }}
+                                                                className={`px-5 py-2.5 rounded-xl text-[11px] font-normal transition-all border tracking-wide flex items-center gap-3 ${
+                                                                    isSelected
+                                                                        ? 'bg-[#23553d] border-[#23553d] text-white'
+                                                                        : isDisabled
+                                                                            ? 'bg-gray-50 border-gray-100 text-gray-300 cursor-not-allowed'
+                                                                            : 'bg-white border-gray-100 text-gray-500 hover:border-primary/30 hover:text-primary shadow-sm'
                                                                 }`}
-                                                        >
-                                                            <div className={`w-3.5 h-3.5 rounded-sm border flex items-center justify-center transition-colors ${isSelected ? 'bg-white border-white' : 'bg-gray-50 border-gray-200'}`}>
-                                                                {isSelected && <CheckCircle2 className="h-2.5 w-2.5 text-[#23553d]" />}
-                                                            </div>
-                                                            {term}
-                                                        </button>
-                                                    );
-                                                })}
+                                                            >
+                                                                <div className={`w-3.5 h-3.5 rounded-sm border flex items-center justify-center transition-colors ${isSelected ? 'bg-white border-white' : 'bg-gray-50 border-gray-200'}`}>
+                                                                    {isSelected && <CheckCircle2 className="h-2.5 w-2.5 text-[#23553d]" />}
+                                                                </div>
+                                                                {term}
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             );
                         })()}

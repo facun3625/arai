@@ -25,19 +25,18 @@ export async function POST(req: Request) {
         const settings = await prisma.storeSettings.findUnique({ where: { id: "global" } });
         const clientId = settings?.naveClientId || process.env.NAVE_CLIENT_ID;
         const clientSecret = settings?.naveClientSecret || process.env.NAVE_CLIENT_SECRET;
-        const audience = settings?.naveAudience || process.env.NAVE_AUDIENCE;
         const mode = (settings?.naveMode || process.env.NAVE_MODE || "sandbox") as string;
 
         const AUTH_URLS: Record<string, string> = {
-          sandbox: "https://homeservices.apinaranja.com/security-ms/api/security/authB/b2b/m2msPrivate",
-          production: "https://services.apinaranja.com/security-ms/api/security/authB/b2b/m2msPrivate",
+          sandbox: "https://homoservices.apinaranja.com/security-ms/api/security/auth0/b2b/m2msPrivate",
+          production: "https://services.apinaranja.com/security-ms/api/security/auth0/b2b/m2msPrivate",
         };
 
-        if (clientId && clientSecret && audience) {
+        if (clientId && clientSecret) {
           const tokenRes = await fetch(AUTH_URLS[mode] || AUTH_URLS.sandbox, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ client_id: clientId, client_secret: clientSecret, audience }),
+            body: JSON.stringify({ client_id: clientId, client_secret: clientSecret, audience: "https://naranja.com/ranty/merchants/api" }),
           });
 
           if (tokenRes.ok) {

@@ -21,7 +21,8 @@ import {
     DollarSign,
     Truck,
     BookOpen,
-    LineChart
+    LineChart,
+    ImageIcon
 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import Image from "next/image";
@@ -62,6 +63,7 @@ const menuItems: MenuNode[] = [
             { name: "plataformas de envío", href: "/admin/ajustes/envio", icon: Truck },
             { name: "zonas restringidas", href: "/admin/ajustes/zonas", icon: Layers },
             { name: "analytics & tracking", href: "/admin/ajustes/analytics", icon: LineChart },
+            { name: "imágenes del hero", href: "/admin/ajustes/hero", icon: ImageIcon },
         ]
     },
     { name: "pedidos", href: "/admin/pedidos", icon: ShoppingCart },

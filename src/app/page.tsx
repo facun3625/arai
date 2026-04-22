@@ -24,6 +24,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [heroImages, setHeroImages] = useState({ h1: "", h2: "", h3: "", h4: "" });
 
   // Newsletter states
   const [newsletterEmail, setNewsletterEmail] = useState("");
@@ -34,12 +35,22 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [catsRes, prodsRes] = await Promise.all([
+        const [catsRes, prodsRes, settingsRes] = await Promise.all([
           fetch("/api/categories"),
-          fetch("/api/products")
+          fetch("/api/products"),
+          fetch("/api/settings"),
         ]);
         const catsData = await catsRes.json();
         const prodsData = await prodsRes.json();
+        const settingsData = await settingsRes.json();
+        if (settingsData && !settingsData.error) {
+          setHeroImages({
+            h1: settingsData.heroImage1 || "",
+            h2: settingsData.heroImage2 || "",
+            h3: settingsData.heroImage3 || "",
+            h4: settingsData.heroImage4 || "",
+          });
+        }
 
         // Filter categories that have at least one product
         if (Array.isArray(catsData)) {
@@ -118,7 +129,7 @@ export default function Home() {
             {/* Column 1: Vos Elegis / Arma tu propio blend */}
             <div className="relative group overflow-hidden border-r border-white/5 h-[400px] md:h-full">
               <Image
-                src="/images/proceso/1.webp"
+                src={heroImages.h1 || "/images/proceso/1.webp"}
                 alt="Arma tu propio blend"
                 fill
                 className="object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
@@ -130,7 +141,7 @@ export default function Home() {
                   ARMA TU <br /> PROPIO <br /> BLEND
                 </h2>
                 <span className="text-[9px] md:text-[10px] text-white/50 mb-6 tracking-[0.3em] uppercase font-bold">Visita nuestra Tienda</span>
-                <Link href="/tienda" className="px-8 py-3 bg-white text-black text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-white/90 transition-all rounded-full shadow-lg">
+                <Link href="/tienda?categoria=blends" className="px-8 py-3 bg-white text-black text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-white/90 transition-all rounded-full shadow-lg">
                   Comprar
                 </Link>
               </div>
@@ -139,7 +150,7 @@ export default function Home() {
             {/* Column 2: Yerba Mate */}
             <div className="relative group overflow-hidden border-r border-white/5 h-[400px] md:h-full">
               <Image
-                src="/images/proceso/2.jpg"
+                src={heroImages.h2 || "/images/proceso/2.jpg"}
                 alt="Yerba Mate"
                 fill
                 className="object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
@@ -155,46 +166,27 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Column 3: Hierbas & Familias Araí */}
-            <div className="flex flex-col h-[800px] md:h-full">
-              <div className="relative flex-1 group overflow-hidden border-b border-white/5">
-                <Image
-                  src="/images/proceso/3.jpg"
-                  alt="Hierbas"
-                  fill
-                  className="object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black/50 group-hover:bg-black/30 transition-all duration-700" />
-                <div className="absolute inset-0 p-4 md:p-6 flex flex-col justify-center items-center text-center">
-                  <h2 className="text-[18px] md:text-[24px] font-bold text-white uppercase tracking-[0.2em] mb-4">HIERBAS</h2>
-                  <Link href="/tienda?categoria=hierbas" className="px-7 py-2.5 bg-white text-black text-[9px] font-bold uppercase tracking-[0.3em] hover:bg-white/90 transition-all rounded-full shadow-lg">
-                    Comprar
-                  </Link>
-                </div>
-              </div>
-              <div className="relative flex-1 group overflow-hidden">
-                <Image
-                  src="/images/proceso/4.webp"
-                  alt="Las distintas familias Araí"
-                  fill
-                  className="object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-all duration-700" />
-                <div className="absolute inset-0 p-4 md:p-6 flex flex-col justify-center items-center text-center">
-                  <h2 className="text-[14px] md:text-[18px] font-bold text-white uppercase tracking-[0.1em] mb-4 leading-relaxed">
-                    LAS DISTINTAS <br /> FAMILIAS <br /> ARAÍ
-                  </h2>
-                  <Link href="/tienda" className="px-7 py-2.5 bg-white text-black text-[9px] font-bold uppercase tracking-[0.3em] hover:bg-white/90 transition-all rounded-full shadow-lg">
-                    Comprar
-                  </Link>
-                </div>
+            {/* Column 3: Hierbas */}
+            <div className="relative group overflow-hidden border-r border-white/5 h-[400px] md:h-full">
+              <Image
+                src={heroImages.h3 || "/images/proceso/3.jpg"}
+                alt="Hierbas"
+                fill
+                className="object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-black/50 group-hover:bg-black/30 transition-all duration-700" />
+              <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-center items-center text-center">
+                <h2 className="text-[20px] md:text-[28px] font-bold text-white leading-tight uppercase tracking-[0.2em] mb-8">HIERBAS</h2>
+                <Link href="/tienda?categoria=hierbas" className="px-8 py-3 bg-white text-black text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-white/90 transition-all rounded-full shadow-lg">
+                  Comprar
+                </Link>
               </div>
             </div>
 
             {/* Column 4: Accesorios */}
             <div className="relative group overflow-hidden h-[400px] md:h-full">
               <Image
-                src="/images/proceso/5.jpeg"
+                src={heroImages.h4 || "/images/proceso/5.jpeg"}
                 alt="Accesorios"
                 fill
                 className="object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
@@ -223,7 +215,7 @@ export default function Home() {
           className="w-full relative"
         >
           <img
-            src="/images/proceso/banner.png"
+            src="/home_banner.jpeg"
             alt="Yerba Mate Araí Experience"
             className="w-full h-auto block"
           />

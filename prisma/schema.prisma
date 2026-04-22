@@ -95,13 +95,15 @@ model Variant {
 }
 
 model Attribute {
-  id        String   @id @default(cuid())
-  name      String
-  slug      String   @unique
-  terms     String
-  isAddon   Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                String   @id @default(cuid())
+  name              String
+  slug              String   @unique
+  terms             String
+  isAddon           Boolean  @default(false)
+  maxSelections     Int?
+  blocksAttributeId String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 model StoreSettings {
@@ -161,6 +163,12 @@ model StoreSettings {
   navePosId             String?
   naveMode              String   @default("sandbox")
   naveEnabled           Boolean  @default(false)
+
+  // Hero Images
+  heroImage1            String?
+  heroImage2            String?
+  heroImage3            String?
+  heroImage4            String?
 }
 
 model Coupon {
