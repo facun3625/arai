@@ -108,6 +108,10 @@ export async function POST(request: Request) {
             ...(body.navePosId !== undefined && { navePosId: parseStr(body.navePosId) }),
             ...(body.naveMode !== undefined && { naveMode: parseStr(body.naveMode) }),
             ...(body.naveEnabled !== undefined && { naveEnabled: !!body.naveEnabled }),
+            ...(body.heroImage1 !== undefined && { heroImage1: parseStr(body.heroImage1) }),
+            ...(body.heroImage2 !== undefined && { heroImage2: parseStr(body.heroImage2) }),
+            ...(body.heroImage3 !== undefined && { heroImage3: parseStr(body.heroImage3) }),
+            ...(body.heroImage4 !== undefined && { heroImage4: parseStr(body.heroImage4) }),
         };
 
         // Remove undefined keys to avoid Prisma errors
