@@ -32,7 +32,9 @@ export const Header = () => {
         xUrl: "",
         youtubeUrl: "",
         tiktokUrl: "",
-        whatsappNumber: ""
+        whatsappNumber: "",
+        franquiciasUrl: "",
+        mayoristasUrl: ""
     });
 
     const { user, isAuthenticated, logout } = useAuthStore();
@@ -69,7 +71,9 @@ export const Header = () => {
                         xUrl: data.xUrl || "",
                         youtubeUrl: data.youtubeUrl || "",
                         tiktokUrl: data.tiktokUrl || "",
-                        whatsappNumber: data.whatsappNumber || ""
+                        whatsappNumber: data.whatsappNumber || "",
+                        franquiciasUrl: data.franquiciasUrl || "",
+                        mayoristasUrl: data.mayoristasUrl || ""
                     });
                 }
             } catch (error) {
@@ -111,12 +115,16 @@ export const Header = () => {
             <div className="bg-[#1a1a1a] text-white py-2 font-montserrat relative z-[60]">
                 <div className="max-w-7xl mx-auto px-4 lg:px-8 flex items-center justify-between">
                     <div className="flex gap-2">
-                        <Link href="/franquicias" className="bg-[#23553D]/40 hover:bg-[#23553D] text-[9px] font-bold px-4 py-1.5 rounded-full border border-white/10 transition-all uppercase">
-                            Franquicias
-                        </Link>
-                        <Link href="/mayoristas" className="bg-[#23553D]/40 hover:bg-[#23553D] text-[9px] font-bold px-4 py-1.5 rounded-full border border-white/10 transition-all uppercase">
-                            Mayoristas
-                        </Link>
+                        {socialLinks.franquiciasUrl && (
+                            <a href={socialLinks.franquiciasUrl} target="_blank" rel="noopener noreferrer" className="bg-[#23553D]/40 hover:bg-[#23553D] text-[9px] font-bold px-4 py-1.5 rounded-full border border-white/10 transition-all uppercase">
+                                Franquicias
+                            </a>
+                        )}
+                        {socialLinks.mayoristasUrl && (
+                            <a href={socialLinks.mayoristasUrl} target="_blank" rel="noopener noreferrer" className="bg-[#23553D]/40 hover:bg-[#23553D] text-[9px] font-bold px-4 py-1.5 rounded-full border border-white/10 transition-all uppercase">
+                                Mayoristas
+                            </a>
+                        )}
                     </div>
 
                     <div className="hidden lg:block text-[9px] font-bold text-white/90">
@@ -399,22 +407,32 @@ export const Header = () => {
                                 </nav>
 
                                 {/* External Links */}
-                                <div className="space-y-3 pt-4">
-                                    <Link
-                                        href="/franquicias"
-                                        className="block text-[10px] font-bold uppercase tracking-widest text-primary/60 hover:text-primary"
-                                        onClick={() => setIsMenuOpen(false)}
-                                    >
-                                        Franquicias
-                                    </Link>
-                                    <Link
-                                        href="/mayoristas"
-                                        className="block text-[10px] font-bold uppercase tracking-widest text-primary/60 hover:text-primary"
-                                        onClick={() => setIsMenuOpen(false)}
-                                    >
-                                        Mayoristas
-                                    </Link>
-                                </div>
+                                {(socialLinks.franquiciasUrl || socialLinks.mayoristasUrl) && (
+                                    <div className="space-y-3 pt-4">
+                                        {socialLinks.franquiciasUrl && (
+                                            <a
+                                                href={socialLinks.franquiciasUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="block text-[10px] font-bold uppercase tracking-widest text-primary/60 hover:text-primary"
+                                                onClick={() => setIsMenuOpen(false)}
+                                            >
+                                                Franquicias
+                                            </a>
+                                        )}
+                                        {socialLinks.mayoristasUrl && (
+                                            <a
+                                                href={socialLinks.mayoristasUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="block text-[10px] font-bold uppercase tracking-widest text-primary/60 hover:text-primary"
+                                                onClick={() => setIsMenuOpen(false)}
+                                            >
+                                                Mayoristas
+                                            </a>
+                                        )}
+                                    </div>
+                                )}
 
                                 {/* Language Selector */}
                                 <div className="pt-6 border-t border-gray-100">
