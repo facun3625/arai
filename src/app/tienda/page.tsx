@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
-import { ChevronDown, ShoppingBag, SlidersHorizontal, Loader2, CheckCircle2 } from "lucide-react";
+import { ShoppingBag, SlidersHorizontal, Loader2, CheckCircle2, ChevronRight } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
@@ -40,13 +40,12 @@ function TiendaContent() {
 
                 const parsedProducts = prodData.map((p: any) => ({
                     ...p,
-                    images: typeof p.images === 'string' ? JSON.parse(p.images) : p.images,
+                    images: typeof p.images === "string" ? JSON.parse(p.images) : p.images,
                 }));
 
                 setProducts(parsedProducts);
-                // Filter categories that have at least one product
-                const activeCategories = catData.filter((cat: any) => (cat._count?.products || 0) > 0);
-                setCategories(activeCategories);
+                // Keep all categories (needed for child slug resolution)
+                setCategories(Array.isArray(catData) ? catData : []);
             } catch (error) {
                 console.error("Error fetching store data:", error);
             } finally {
@@ -56,25 +55,61 @@ function TiendaContent() {
         fetchData();
     }, []);
 
-    // Sync category from URL param
     useEffect(() => {
         const cat = searchParams.get("categoria");
         if (cat) setSelectedCategory(cat);
     }, [searchParams]);
 
-    // Scroll to top on category change
     useEffect(() => {
-        if (mounted) {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        if (mounted) window.scrollTo({ top: 0, behavior: "smooth" });
     }, [selectedCategory, mounted]);
+
+    // Top-level categories (only roots)
+    const topLevelCategories = categories.filter((c: any) => !c.parentId);
+
+    // Get all relevant slugs when a category is selected (includes children)
+    const getRelevantSlugs = (slug: string): string[] => {
+        const cat = categories.find((c: any) => c.slug === slug);
+        if (!cat) return [slug];
+        return [slug, ...(cat.children || []).map((c: any) => c.slug)];
+    };
 
     const filteredProducts = selectedCategory === "todas"
         ? products
-        : products.filter(p => p.categories.some((c: any) => c.slug === selectedCategory));
+        : products.filter(p => {
+            const slugs = getRelevantSlugs(selectedCategory);
+            return p.categories.some((c: any) => slugs.includes(c.slug));
+        });
 
-    // Calculate counts based on current products
+    // Count for a category including its children
+    const getCategoryCount = (cat: any): number => {
+        const childSlugs = (cat.children || []).map((c: any) => c.slug);
+        const allSlugs = [cat.slug, ...childSlugs];
+        return products.filter(p => p.categories.some((c: any) => allSlugs.includes(c.slug))).length;
+    };
+
+    // Flat ordered list for mobile: parent, then children, then next parent
+    const flatMobileCategories: Array<any & { _isChild?: boolean }> = [];
+    for (const cat of topLevelCategories) {
+        const count = getCategoryCount(cat);
+        if (count === 0) continue;
+        flatMobileCategories.push(cat);
+        for (const child of (cat.children || [])) {
+            if ((child._count?.products || 0) > 0)
+                flatMobileCategories.push({ ...child, _isChild: true });
+        }
+    }
+
     const totalCount = products.length;
+
+    const categoryButtonClass = (slug: string, isChild = false) =>
+        `whitespace-nowrap transition-all text-[11px] capitalize flex justify-between items-center gap-3 md:w-full ${isChild ? "pl-5 md:pl-6" : ""} ${selectedCategory === slug
+            ? "bg-primary text-white md:bg-primary/8 md:text-primary md:font-semibold px-4 py-2 md:py-2 md:px-3 rounded-full md:rounded-xl"
+            : "bg-gray-50 text-gray-400 md:bg-transparent md:text-gray-400 md:hover:text-gray-700 md:hover:bg-gray-50 px-4 py-2 md:py-2 md:px-3 rounded-full md:rounded-xl"
+        }`;
+
+    const countClass = (slug: string) =>
+        `text-[10px] font-medium ${selectedCategory === slug ? "text-white/70 md:text-primary/50" : "text-gray-300"}`;
 
     if (isLoading) {
         return (
@@ -88,48 +123,74 @@ function TiendaContent() {
     return (
         <div className="max-w-7xl mx-auto px-4 lg:px-8 pt-6 pb-16 font-montserrat">
             <div className="flex flex-col md:flex-row gap-12">
-                {/* Sidebar Filtros / Categories Toggle */}
+                {/* Sidebar */}
                 <aside className="w-full md:w-52 flex-shrink-0 md:sticky md:top-24 md:self-start">
                     <div className="hidden md:flex items-center gap-2 mb-5">
                         <SlidersHorizontal className="h-3.5 w-3.5 text-primary/60" />
                         <h2 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Categorías</h2>
                     </div>
 
-                    {/* Horizontal scroll on mobile, vertical list on desktop */}
-                    <div className="overflow-x-auto pb-4 -mx-4 px-4 md:px-0 md:pb-0 scrollbar-hide">
-                        <ul className="flex flex-row md:flex-col gap-2 md:gap-0.5 min-w-max md:min-w-0 font-montserrat">
+                    {/* Mobile: horizontal scroll (flat) */}
+                    <div className="overflow-x-auto pb-4 -mx-4 px-4 md:hidden scrollbar-hide">
+                        <ul className="flex flex-row gap-2 min-w-max">
                             <li>
-                                <button
-                                    onClick={() => setSelectedCategory("todas")}
-                                    className={`whitespace-nowrap px-4 py-2 md:py-2 md:px-3 rounded-full md:rounded-xl transition-all text-[11px] capitalize flex justify-between items-center gap-3 md:w-full ${selectedCategory === "todas"
-                                        ? "bg-primary text-white md:bg-primary/8 md:text-primary md:font-semibold"
-                                        : "bg-gray-50 text-gray-400 md:bg-transparent md:text-gray-400 md:hover:text-gray-700 md:hover:bg-gray-50"
-                                        }`}
-                                >
+                                <button onClick={() => setSelectedCategory("todas")} className={categoryButtonClass("todas")}>
                                     <span>todas</span>
-                                    <span className={`text-[10px] font-medium ${selectedCategory === "todas" ? "text-white/70 md:text-primary/50" : "text-gray-300"}`}>
-                                        {totalCount}
-                                    </span>
+                                    <span className={countClass("todas")}>{totalCount}</span>
                                 </button>
                             </li>
-                            {categories.map((cat) => (
+                            {flatMobileCategories.map((cat) => (
                                 <li key={cat.id}>
-                                    <button
-                                        onClick={() => setSelectedCategory(cat.slug)}
-                                        className={`whitespace-nowrap px-4 py-2 md:py-2 md:px-3 rounded-full md:rounded-xl transition-all text-[11px] capitalize flex justify-between items-center gap-3 md:w-full ${selectedCategory === cat.slug
-                                            ? "bg-primary text-white md:bg-primary/8 md:text-primary md:font-semibold"
-                                            : "bg-gray-50 text-gray-400 md:bg-transparent md:text-gray-400 md:hover:text-gray-700 md:hover:bg-gray-50"
-                                            }`}
-                                    >
-                                        <span className="flex-1 text-left">{cat.name}</span>
-                                        <span className={`text-[10px] font-medium ${selectedCategory === cat.slug ? "text-white/70 md:text-primary/50" : "text-gray-300"}`}>
-                                            {cat._count?.products || 0}
-                                        </span>
+                                    <button onClick={() => setSelectedCategory(cat.slug)} className={categoryButtonClass(cat.slug, cat._isChild)}>
+                                        {cat._isChild && <ChevronRight className="h-3 w-3 opacity-40 flex-shrink-0" />}
+                                        <span>{cat.name}</span>
+                                        <span className={countClass(cat.slug)}>{cat._count?.products || 0}</span>
                                     </button>
                                 </li>
                             ))}
                         </ul>
                     </div>
+
+                    {/* Desktop: nested vertical list */}
+                    <ul className="hidden md:flex flex-col gap-0.5">
+                        <li>
+                            <button onClick={() => setSelectedCategory("todas")} className={categoryButtonClass("todas")}>
+                                <span>todas</span>
+                                <span className={countClass("todas")}>{totalCount}</span>
+                            </button>
+                        </li>
+                        {topLevelCategories.map((cat) => {
+                            const count = getCategoryCount(cat);
+                            if (count === 0) return null;
+                            const hasChildren = (cat.children || []).filter((c: any) => (c._count?.products || 0) > 0).length > 0;
+                            return (
+                                <li key={cat.id}>
+                                    <button onClick={() => setSelectedCategory(cat.slug)} className={categoryButtonClass(cat.slug)}>
+                                        <span className="flex-1 text-left">{cat.name}</span>
+                                        <span className={countClass(cat.slug)}>{count}</span>
+                                    </button>
+                                    {/* Subcategories */}
+                                    {hasChildren && (
+                                        <ul className="mt-0.5 space-y-0.5">
+                                            {(cat.children || [])
+                                                .filter((c: any) => (c._count?.products || 0) > 0)
+                                                .map((child: any) => (
+                                                    <li key={child.id}>
+                                                        <button onClick={() => setSelectedCategory(child.slug)} className={`${categoryButtonClass(child.slug)} pl-5`}>
+                                                            <span className="flex items-center gap-1.5">
+                                                                <ChevronRight className="h-3 w-3 opacity-30 flex-shrink-0" />
+                                                                {child.name}
+                                                            </span>
+                                                            <span className={countClass(child.slug)}>{child._count?.products || 0}</span>
+                                                        </button>
+                                                    </li>
+                                                ))}
+                                        </ul>
+                                    )}
+                                </li>
+                            );
+                        })}
+                    </ul>
                 </aside>
 
                 {/* Grid de Productos */}
@@ -159,7 +220,6 @@ function TiendaContent() {
 
                             return (
                                 <div key={product.id} className="group bg-white rounded-[24px] border border-gray-100 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_60px_-10px_rgba(35,85,61,0.08)] hover:-translate-y-1.5 transition-all duration-700 overflow-hidden flex flex-col">
-                                    {/* Product Image Container */}
                                     <div className="p-4">
                                         <Link href={`/producto/${product.slug}`} className="aspect-[4/5] bg-gray-50/40 relative overflow-hidden rounded-[20px] block">
                                             {product.compareAtPrice && product.compareAtPrice > displayPrice && (
@@ -167,14 +227,11 @@ function TiendaContent() {
                                                     -{Math.round(((product.compareAtPrice - displayPrice) / product.compareAtPrice) * 100)}%
                                                 </div>
                                             )}
-
                                             <img
                                                 src={mainImage}
                                                 alt={product.name}
                                                 className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                                             />
-
-                                            {/* Quick Add Overlay */}
                                             <div className="absolute inset-0 bg-primary/2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-4">
                                                 <button
                                                     onClick={(e) => {
@@ -197,8 +254,6 @@ function TiendaContent() {
                                             </div>
                                         </Link>
                                     </div>
-
-                                    {/* Product Info */}
                                     <div className="px-6 pb-6 pt-2 flex flex-col flex-1">
                                         <div className="flex items-center gap-2 mb-2">
                                             <span className="h-px w-4 bg-primary/20"></span>
@@ -211,19 +266,18 @@ function TiendaContent() {
                                                 {product.name}
                                             </h3>
                                         </Link>
-
                                         <div className="mt-auto pt-4 flex items-center justify-between">
                                             <div className="flex flex-col">
                                                 {mounted ? (
                                                     <div className="flex flex-col -space-y-1">
                                                         {product.compareAtPrice && product.compareAtPrice > displayPrice && (
                                                             <span className="text-xs text-gray-300 line-through font-medium">
-                                                                $ {product.compareAtPrice.toLocaleString('es-AR')}
+                                                                $ {product.compareAtPrice.toLocaleString("es-AR")}
                                                             </span>
                                                         )}
                                                         <span className="text-[17px] font-bold text-primary">
                                                             {hasVariations && <span className="text-[9px] mr-1 font-medium opacity-40">desde</span>}
-                                                            $ {Number(displayPrice).toLocaleString('es-AR')}
+                                                            $ {Number(displayPrice).toLocaleString("es-AR")}
                                                         </span>
                                                     </div>
                                                 ) : (

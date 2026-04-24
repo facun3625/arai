@@ -25,6 +25,7 @@ export default function Home() {
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [heroImages, setHeroImages] = useState({ h1: "", h2: "", h3: "", h4: "" });
+  const [ctaLinks, setCtaLinks] = useState({ franquicias: "", mayoristas: "" });
 
   // Newsletter states
   const [newsletterEmail, setNewsletterEmail] = useState("");
@@ -49,6 +50,10 @@ export default function Home() {
             h2: settingsData.heroImage2 || "",
             h3: settingsData.heroImage3 || "",
             h4: settingsData.heroImage4 || "",
+          });
+          setCtaLinks({
+            franquicias: settingsData.franquiciasUrl || "",
+            mayoristas: settingsData.mayoristasUrl || "",
           });
         }
 
@@ -205,22 +210,20 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* Transition Banner Section - Respecting natural image height */}
-      <section className="relative w-full overflow-hidden bg-white">
+      {/* Transition Banner Section */}
+      <section className="relative w-full bg-white py-8 px-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full relative"
+          className="max-w-5xl mx-auto"
         >
           <img
             src="/home_banner.jpeg"
             alt="Yerba Mate Araí Experience"
-            className="w-full h-auto block"
+            className="w-full h-auto block mx-auto"
           />
-          {/* Subtle overlay to blend if needed, but keeping it clean as per user request for padding */}
-          {/* <div className="absolute inset-0 bg-black/5" /> */}
         </motion.div>
       </section>
 
@@ -254,6 +257,73 @@ export default function Home() {
               <p className="text-[12px] text-gray-500 leading-relaxed">Yerba estacionada naturalmente sin aditivos ni conservantes.</p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Franquicias & Mayoristas */}
+      <section className="bg-white py-12 px-6 md:px-12">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Franquicias */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="relative overflow-hidden rounded-[32px] bg-[#0c120e] p-10 flex flex-col justify-between min-h-[220px] group"
+          >
+            <div className="absolute top-0 right-0 w-40 h-40 bg-primary/20 blur-[60px] group-hover:scale-150 transition-transform duration-700" />
+            <div className="space-y-3 z-10 relative">
+              <span className="text-[10px] font-bold text-primary/60 uppercase tracking-[0.3em]">Crecé con araí</span>
+              <h3 className="text-[28px] font-bold text-white leading-tight">Franquicias</h3>
+              <p className="text-white/40 text-[13px] leading-relaxed max-w-xs">Sumá tu local a la red araí y ofrecé la mejor yerba mate a tus clientes.</p>
+            </div>
+            {ctaLinks.franquicias ? (
+              <a
+                href={ctaLinks.franquicias}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-8 z-10 relative self-start flex items-center gap-2 px-8 py-3 bg-primary text-white text-[11px] font-bold uppercase tracking-[0.25em] rounded-full hover:bg-primary/80 transition-all duration-300 group/btn"
+              >
+                Quiero ser franquiciado
+                <ArrowRight className="h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+              </a>
+            ) : (
+              <span className="mt-8 z-10 relative self-start flex items-center gap-2 px-8 py-3 bg-white/10 text-white/30 text-[11px] font-bold uppercase tracking-[0.25em] rounded-full cursor-default">
+                Link no configurado
+              </span>
+            )}
+          </motion.div>
+
+          {/* Mayoristas */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="relative overflow-hidden rounded-[32px] bg-gray-50 border border-gray-100 p-10 flex flex-col justify-between min-h-[220px] group"
+          >
+            <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 blur-[60px] group-hover:scale-150 transition-transform duration-700" />
+            <div className="space-y-3 z-10 relative">
+              <span className="text-[10px] font-bold text-primary/60 uppercase tracking-[0.3em]">Precios especiales</span>
+              <h3 className="text-[28px] font-bold text-gray-900 leading-tight">Mayoristas</h3>
+              <p className="text-gray-400 text-[13px] leading-relaxed max-w-xs">Accedé a precios mayoristas y condiciones exclusivas para revendedores.</p>
+            </div>
+            {ctaLinks.mayoristas ? (
+              <a
+                href={ctaLinks.mayoristas}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-8 z-10 relative self-start flex items-center gap-2 px-8 py-3 bg-[#0c120e] text-white text-[11px] font-bold uppercase tracking-[0.25em] rounded-full hover:bg-primary transition-all duration-300 group/btn"
+              >
+                Quiero ser mayorista
+                <ArrowRight className="h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+              </a>
+            ) : (
+              <span className="mt-8 z-10 relative self-start flex items-center gap-2 px-8 py-3 bg-gray-200 text-gray-400 text-[11px] font-bold uppercase tracking-[0.25em] rounded-full cursor-default">
+                Link no configurado
+              </span>
+            )}
+          </motion.div>
         </div>
       </section>
 

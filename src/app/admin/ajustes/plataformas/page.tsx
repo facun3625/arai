@@ -27,7 +27,9 @@ export default function PlataformasPage() {
         xUrl: "",
         youtubeUrl: "",
         tiktokUrl: "",
-        whatsappNumber: ""
+        whatsappNumber: "",
+        franquiciasUrl: "",
+        mayoristasUrl: ""
     });
 
     const showToast = (message: string, type: "success" | "error" = "success") => {
@@ -47,7 +49,9 @@ export default function PlataformasPage() {
                         xUrl: data.xUrl || "",
                         youtubeUrl: data.youtubeUrl || "",
                         tiktokUrl: data.tiktokUrl || "",
-                        whatsappNumber: data.whatsappNumber || ""
+                        whatsappNumber: data.whatsappNumber || "",
+                        franquiciasUrl: data.franquiciasUrl || "",
+                        mayoristasUrl: data.mayoristasUrl || ""
                     });
                 }
             } catch (error) {
@@ -67,7 +71,7 @@ export default function PlataformasPage() {
                 body: JSON.stringify(settings)
             });
             if (res.ok) {
-                showToast("Configuraciones guardadas ✨", "success");
+                showToast("Los cambios ya están publicados en el sitio.", "success");
                 window.dispatchEvent(new Event("settings-updated"));
             } else {
                 showToast("Error al guardar configuraciones", "error");
@@ -175,6 +179,33 @@ export default function PlataformasPage() {
                             </div>
                         </div>
 
+                        {/* Franquicias & Mayoristas */}
+                        <div className="border-t border-white/5 pt-8 space-y-2">
+                            <h3 className="text-white/80 text-sm font-semibold mb-6">Botones del Home</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+                                <div className="space-y-3">
+                                    <label className="text-white/80 text-sm font-medium">Franquicias — URL del botón</label>
+                                    <input
+                                        type="text"
+                                        placeholder="https://..."
+                                        value={settings.franquiciasUrl}
+                                        onChange={(e) => setSettings({ ...settings, franquiciasUrl: e.target.value })}
+                                        className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10"
+                                    />
+                                </div>
+                                <div className="space-y-3">
+                                    <label className="text-white/80 text-sm font-medium">Mayoristas — URL del botón</label>
+                                    <input
+                                        type="text"
+                                        placeholder="https://..."
+                                        value={settings.mayoristasUrl}
+                                        onChange={(e) => setSettings({ ...settings, mayoristasUrl: e.target.value })}
+                                        className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
                         <div className="pt-6">
                             <button
                                 type="submit"
@@ -190,12 +221,30 @@ export default function PlataformasPage() {
 
                 {/* TOAST */}
                 {toast && (
-                    <div className={`fixed bottom-8 right-8 px-6 py-4 rounded-2xl shadow-2xl border animate-in slide-in-from-right-8 duration-500 z-50 ${
-                        toast.type === 'success' ? 'bg-[#0c120e] border-primary/20 text-primary' : 'bg-red-500/10 border-red-500/20 text-red-500'
+                    <div className={`fixed bottom-8 right-8 z-50 animate-in slide-in-from-bottom-4 duration-500 ${
+                        toast.type === 'success'
+                            ? 'text-white'
+                            : 'text-white'
                     }`}>
-                        <div className="flex items-center gap-3">
-                            {toast.type === 'success' ? <CheckCircle2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
-                            <p className="text-sm font-medium">{toast.message}</p>
+                        <div className={`flex items-start gap-4 px-6 py-5 rounded-2xl shadow-[0_20px_60px_-10px_rgba(0,0,0,0.6)] border min-w-[280px] ${
+                            toast.type === 'success'
+                                ? 'bg-[#0c1a10] border-primary/30'
+                                : 'bg-[#1a0c0c] border-red-500/30'
+                        }`}>
+                            <div className={`mt-0.5 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                                toast.type === 'success' ? 'bg-primary/20' : 'bg-red-500/20'
+                            }`}>
+                                {toast.type === 'success'
+                                    ? <CheckCircle2 className="h-4 w-4 text-primary" />
+                                    : <XCircle className="h-4 w-4 text-red-400" />
+                                }
+                            </div>
+                            <div>
+                                <p className={`text-[13px] font-semibold ${toast.type === 'success' ? 'text-white' : 'text-red-300'}`}>
+                                    {toast.type === 'success' ? '¡Guardado!' : 'Error'}
+                                </p>
+                                <p className="text-[12px] text-white/40 mt-0.5">{toast.message}</p>
+                            </div>
                         </div>
                     </div>
                 )}

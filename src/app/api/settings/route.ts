@@ -112,6 +112,8 @@ export async function POST(request: Request) {
             ...(body.heroImage2 !== undefined && { heroImage2: parseStr(body.heroImage2) }),
             ...(body.heroImage3 !== undefined && { heroImage3: parseStr(body.heroImage3) }),
             ...(body.heroImage4 !== undefined && { heroImage4: parseStr(body.heroImage4) }),
+            ...(body.franquiciasUrl !== undefined && { franquiciasUrl: parseStr(body.franquiciasUrl) }),
+            ...(body.mayoristasUrl !== undefined && { mayoristasUrl: parseStr(body.mayoristasUrl) }),
         };
 
         // Remove undefined keys to avoid Prisma errors
