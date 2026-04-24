@@ -39,7 +39,10 @@ export default function MarketingPage() {
         discountType: "PERCENTAGE",
         discountValue: "",
         minPurchaseAmount: "",
-        isActive: true
+        isActive: true,
+        expiresAt: "",
+        usageLimit: "",
+        usageLimitPerUser: ""
     });
 
     // Pop-ups
@@ -300,7 +303,7 @@ export default function MarketingPage() {
             const data = await res.json();
 
             if (res.ok) {
-                setCouponForm({ code: "", discountType: "PERCENTAGE", discountValue: "", minPurchaseAmount: "", isActive: true });
+                setCouponForm({ code: "", discountType: "PERCENTAGE", discountValue: "", minPurchaseAmount: "", isActive: true, expiresAt: "", usageLimit: "", usageLimitPerUser: "" });
                 showToast("¡Cupón mágico creado! ✨", "success");
                 fetchCoupons();
             } else {
@@ -1010,6 +1013,45 @@ export default function MarketingPage() {
                                         </div>
                                     </div>
 
+                                    <div className="border-t border-white/5 pt-4 space-y-3">
+                                        <p className="text-[10px] uppercase tracking-widest text-white/20 ml-1">Restricciones opcionales</p>
+
+                                        <div className="space-y-1.5">
+                                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Fecha de expiración</label>
+                                            <input
+                                                type="date"
+                                                value={couponForm.expiresAt}
+                                                onChange={(e) => setCouponForm({ ...couponForm, expiresAt: e.target.value })}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                            />
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="space-y-1.5">
+                                                <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1 leading-tight">Usos totales</label>
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    value={couponForm.usageLimit}
+                                                    onChange={(e) => setCouponForm({ ...couponForm, usageLimit: e.target.value })}
+                                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                                    placeholder="∞"
+                                                />
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1 leading-tight">Por usuario</label>
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    value={couponForm.usageLimitPerUser}
+                                                    onChange={(e) => setCouponForm({ ...couponForm, usageLimitPerUser: e.target.value })}
+                                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                                    placeholder="∞"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <button
                                         type="submit"
                                         disabled={isSubmittingCoupon}
@@ -1048,19 +1090,21 @@ export default function MarketingPage() {
                                                     <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Código</th>
                                                     <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Descuento</th>
                                                     <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Condiciones</th>
+                                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Usos</th>
+                                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Expira</th>
                                                     <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium text-right">Acciones</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/5">
                                                 {isLoadingCoupons ? (
                                                     <tr>
-                                                        <td colSpan={4} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
+                                                        <td colSpan={6} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
                                                             Cargando cupones...
                                                         </td>
                                                     </tr>
                                                 ) : coupons.filter(c => !c.userId).length === 0 ? (
                                                     <tr>
-                                                        <td colSpan={4} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
+                                                        <td colSpan={6} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
                                                             No hay cupones de campaña.
                                                         </td>
                                                     </tr>
@@ -1075,8 +1119,22 @@ export default function MarketingPage() {
                                                         <td className="px-6 py-4 text-[13px] text-white">
                                                             {c.discountType === 'PERCENTAGE' ? `${c.discountValue}% OFF` : `$${c.discountValue.toLocaleString('es-AR')} OFF`}
                                                         </td>
+                                                        <td className="px-6 py-4 text-[11px] text-white/60 space-y-0.5">
+                                                            {c.minPurchaseAmount ? <div>Mín. ${c.minPurchaseAmount.toLocaleString('es-AR')}</div> : null}
+                                                            {c.usageLimitPerUser ? <div>Máx. {c.usageLimitPerUser} por usuario</div> : null}
+                                                            {!c.minPurchaseAmount && !c.usageLimitPerUser && <span className="text-white/20">—</span>}
+                                                        </td>
                                                         <td className="px-6 py-4 text-[11px] text-white/60">
-                                                            {c.minPurchaseAmount ? `Compra mín. $${c.minPurchaseAmount.toLocaleString('es-AR')}` : 'Sin restricciones'}
+                                                            <span className={c.usageLimit && c.usageCount >= c.usageLimit ? "text-red-400" : ""}>
+                                                                {c.usageCount}{c.usageLimit ? `/${c.usageLimit}` : ""}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-[11px]">
+                                                            {c.expiresAt ? (
+                                                                <span className={new Date(c.expiresAt) < new Date() ? "text-red-400" : "text-white/60"}>
+                                                                    {new Date(c.expiresAt).toLocaleDateString('es-AR')}
+                                                                </span>
+                                                            ) : <span className="text-white/20">—</span>}
                                                         </td>
                                                         <td className="px-6 py-4">
                                                             <div className="flex items-center justify-end gap-3 transition-opacity">

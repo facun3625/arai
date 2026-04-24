@@ -4,14 +4,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
     try {
         const coupons = await prisma.coupon.findMany({
-            include: {
-                user: {
-                    select: {
-                        name: true,
-                        email: true
-                    }
-                }
-            },
+            include: { user: { select: { name: true, email: true } } },
             orderBy: { createdAt: 'desc' }
         });
         return NextResponse.json(coupons);
@@ -24,14 +17,12 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { code, discountType, discountValue, minPurchaseAmount, isActive } = body;
+        const { code, discountType, discountValue, minPurchaseAmount, isActive, expiresAt, usageLimit, usageLimitPerUser } = body;
 
-        // Basic validation
         if (!code || !discountType || discountValue === undefined) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
-        // Check if code already exists
         const existing = await prisma.coupon.findUnique({ where: { code: code.toUpperCase() } });
         if (existing) {
             return NextResponse.json({ error: "El cupón ya existe" }, { status: 400 });
@@ -43,7 +34,10 @@ export async function POST(request: Request) {
                 discountType,
                 discountValue: Number(discountValue),
                 minPurchaseAmount: minPurchaseAmount ? Number(minPurchaseAmount) : null,
-                isActive: isActive ?? true
+                isActive: isActive ?? true,
+                expiresAt: expiresAt ? new Date(expiresAt) : null,
+                usageLimit: usageLimit ? Number(usageLimit) : null,
+                usageLimitPerUser: usageLimitPerUser ? Number(usageLimitPerUser) : null,
             }
         });
 

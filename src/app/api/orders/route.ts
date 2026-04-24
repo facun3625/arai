@@ -72,16 +72,22 @@ export async function POST(request: Request) {
                 }
             });
 
-            // If a redemption coupon was used, deactivate it (if it exists)
-            if (couponCode && couponCode.toUpperCase().startsWith('CANJE-')) {
+            // Handle coupon usage tracking
+            if (couponCode) {
                 const coupon = await tx.coupon.findUnique({
                     where: { code: couponCode.toUpperCase() }
                 });
-
                 if (coupon) {
+                    const updateData: any = { usageCount: { increment: 1 } };
+                    // Deactivate redemption coupons (CANJE-) after use
+                    if (coupon.code.startsWith('CANJE-')) updateData.isActive = false;
+                    // Auto-deactivate if usage limit reached
+                    if (coupon.usageLimit !== null && coupon.usageCount + 1 >= coupon.usageLimit) {
+                        updateData.isActive = false;
+                    }
                     await tx.coupon.update({
                         where: { code: couponCode.toUpperCase() },
-                        data: { isActive: false }
+                        data: updateData
                     });
                 }
             }
