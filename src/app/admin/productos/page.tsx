@@ -19,15 +19,21 @@ import { useAdminUtils } from "@/components/admin/AdminUtilsProvider";
 export default function ProductosPage() {
     const { confirm, showToast } = useAdminUtils();
     const [productos, setProductos] = useState<any[]>([]);
+    const [categorias, setCategorias] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [search, setSearch] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState("");
 
     const fetchProductos = async () => {
         try {
-            const res = await fetch("/api/products");
-            const data = await res.json();
-            if (Array.isArray(data)) {
-                setProductos(data);
-            }
+            const [prodRes, catRes] = await Promise.all([
+                fetch("/api/products"),
+                fetch("/api/categories")
+            ]);
+            const prodData = await prodRes.json();
+            const catData = await catRes.json();
+            if (Array.isArray(prodData)) setProductos(prodData);
+            if (Array.isArray(catData)) setCategorias(catData);
         } catch (error) {
             console.error("Error fetching products:", error);
         } finally {
@@ -38,6 +44,14 @@ export default function ProductosPage() {
     useEffect(() => {
         fetchProductos();
     }, []);
+
+    const filtered = productos.filter(p => {
+        const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
+            p.slug.toLowerCase().includes(search.toLowerCase());
+        const matchCat = !selectedCategory ||
+            p.categories.some((c: any) => c.id === selectedCategory);
+        return matchSearch && matchCat;
+    });
 
     const handleDelete = async (id: string) => {
         const ok = await confirm({
@@ -84,20 +98,42 @@ export default function ProductosPage() {
                     </Link>
                 </div>
 
-                {/* Filtros y Búsqueda (Placeholder) */}
-                <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+                {/* Filtros y Búsqueda */}
+                <div className="flex flex-col md:flex-row gap-3 items-center">
                     <div className="relative w-full md:w-96">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
                         <input
                             type="text"
-                            placeholder="Buscar productos..."
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                            placeholder="Buscar por nombre o slug..."
                             className="w-full bg-white/[0.03] border border-white/5 rounded-2xl pl-11 pr-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
                         />
                     </div>
-                    <button className="flex items-center gap-2 px-4 py-3 bg-white/[0.02] border border-white/5 rounded-2xl text-[11px] text-white/40 hover:text-white transition-colors">
-                        <Filter className="h-4 w-4" />
-                        Filtros
-                    </button>
+                    <div className="relative">
+                        <Filter className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20 pointer-events-none" />
+                        <select
+                            value={selectedCategory}
+                            onChange={e => setSelectedCategory(e.target.value)}
+                            className="bg-white/[0.03] border border-white/5 rounded-2xl pl-11 pr-8 py-3 text-[13px] text-white/60 focus:outline-none focus:border-primary transition-colors appearance-none cursor-pointer min-w-[180px]"
+                        >
+                            <option value="" className="bg-gray-900">Todas las categorías</option>
+                            {categorias.map(cat => (
+                                <option key={cat.id} value={cat.id} className="bg-gray-900">{cat.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    {(search || selectedCategory) && (
+                        <button
+                            onClick={() => { setSearch(""); setSelectedCategory(""); }}
+                            className="text-[11px] text-white/30 hover:text-white/60 transition-colors whitespace-nowrap"
+                        >
+                            Limpiar filtros
+                        </button>
+                    )}
+                    <span className="text-[11px] text-white/20 ml-auto">
+                        {filtered.length} de {productos.length} productos
+                    </span>
                 </div>
 
                 {/* Tabla de Productos */}
@@ -127,7 +163,13 @@ export default function ProductosPage() {
                                             No hay productos en el catálogo.
                                         </td>
                                     </tr>
-                                ) : productos.map((prod) => {
+                                ) : filtered.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={6} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
+                                            No hay productos que coincidan con los filtros.
+                                        </td>
+                                    </tr>
+                                ) : filtered.map((prod) => {
                                     const images = JSON.parse(prod.images || "[]");
                                     const mainImage = images[0] || null;
 

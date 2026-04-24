@@ -32,7 +32,8 @@ Araí Yerba Mate opera sobre una plataforma de comercio electrónico desarrollad
 
 La página principal está construida para generar conversión desde el primer momento. Incluye:
 
-- **Hero interactivo de 4 columnas** — Panel visual con accesos directos a las categorías principales: Arma tu blend, Yerba Mate, Hierbas, Accesorios. Cada columna tiene imagen de fondo, animación al hover y botón de acción.
+- **Hero interactivo de 4 columnas** — Panel visual con accesos directos a las categorías principales: Arma tu blend, Yerba Mate, Hierbas, Accesorios. Cada columna tiene imagen de fondo, animación al hover y botón de acción. Las imágenes de cada columna son configurables desde el admin (Ajustes → Imágenes del Hero).
+- **Banner de productos** — Imagen centrada con ancho máximo debajo del hero, configurable.
 - **Sección "Nuestras Líneas"** — Grilla de banners de categorías con imágenes propias, nombre y link directo al catálogo filtrado por esa categoría.
 - **Sección "Favoritos de la comunidad"** — Carrusel horizontal de productos más vendidos, con imagen, precio, descuento si aplica y botón de compra rápida.
 - **Banda de beneficios** — Strip informativo con iconos: Envío Nacional, Pago Seguro, Calidad Certificada.
@@ -45,7 +46,7 @@ La página principal está construida para generar conversión desde el primer m
 
 Página de listado de todos los productos disponibles.
 
-- **Filtro por categorías** — Sidebar izquierdo con todas las categorías activas y su conteo de productos. El filtro seleccionado se sincroniza con la URL (`?categoria=yerba`) para que los links externos lleven directo a la categoría correcta.
+- **Filtro por categorías** — Sidebar izquierdo con todas las categorías activas y su conteo de productos. El filtro se sincroniza con la URL (`?categoria=yerba`) para que los links externos lleven directo a la categoría correcta. Las subcategorías aparecen anidadas bajo su categoría padre; seleccionar el padre muestra sus productos más los de todas sus subcategorías.
 - **Grilla de productos** — Vista responsiva de 2 a 4 columnas según el dispositivo. Cada tarjeta muestra imagen, nombre, precio, precio tachado si hay descuento, y porcentaje de ahorro.
 - **Ordenamiento** — Por productos destacados, precio menor a mayor, precio mayor a menor.
 - **Acceso rápido** — Desde la home, cada banner de categoría redirige directo al catálogo ya filtrado.
@@ -199,7 +200,9 @@ CRUD completo de catálogo.
 
 - Crear, editar y eliminar categorías.
 - Nombre, slug, descripción, imagen.
-- Las categorías sin productos no aparecen en el filtro de la tienda.
+- **Subcategorías** — Cada categoría puede tener una categoría padre (un solo nivel de jerarquía). En el admin se selecciona la categoría padre desde un dropdown; solo las categorías raíz pueden ser padres (no hay abuelos). La tabla muestra las subcategorías indentadas debajo de su padre con un indicador visual.
+- En la tienda, el sidebar muestra las categorías con sus subcategorías anidadas. Al clickear una categoría padre, se muestran los productos de esa categoría **más los de todas sus subcategorías**. Al clickear una subcategoría, se muestran solo sus productos.
+- Las categorías (y subcategorías) sin productos no aparecen en el filtro de la tienda.
 
 ---
 
@@ -335,6 +338,7 @@ Sistema de restricciones por código postal:
 
 - URLs de Instagram, Facebook, X (Twitter), YouTube, TikTok.
 - Número de WhatsApp (para botón flotante).
+- **Botones del Header** — URLs para los botones "Franquicias" y "Mayoristas" que aparecen en la barra superior del sitio. Se abren en ventana nueva. Si no tienen URL configurada, los botones no se muestran.
 - Modo Mantenimiento: bloquea el acceso al sitio público mientras se realizan cambios, sin afectar el panel admin.
 
 ---
@@ -395,13 +399,20 @@ Los templates son diseñados en código (React Email) para ser visualmente consi
 ### 3.4 Chat con Inteligencia Artificial
 
 - Botón flotante en el sitio que abre un chat.
-- El asistente responde preguntas sobre productos, proceso, envíos y todo lo que el admin cargue en la base de conocimiento.
-- Potenciado por Groq (modelos de lenguaje de alta velocidad).
-- El contenido del chat es completamente actualizable desde el panel admin sin tocar código.
+- El asistente se llama "Araí" y sigue un flujo de ventas consultivo: primero indaga la problemática del cliente, luego recomienda, muestra presentaciones disponibles antes del precio, incluye link directo al producto y, tras 3 intercambios, sugiere continuar por WhatsApp.
+- Los links a productos dentro del chat son clickeables (se renderizan como "Ver producto →").
+- Potenciado por Groq (modelo llama-3.3-70b-versatile, alta velocidad).
+- El contenido del chat es completamente actualizable desde el panel admin (Base de Conocimiento) sin tocar código.
+
+### 3.5 Botón flotante de WhatsApp
+
+- Botón verde fijo en la esquina inferior derecha del sitio.
+- Ícono SVG oficial de WhatsApp.
+- El número se configura desde Admin → Redes Sociales. Si no hay número configurado, usa un número por defecto.
 
 ---
 
-### 3.5 Analytics
+### 3.6 Analytics
 
 - **Google Analytics 4** — Tracking de páginas vistas, eventos de e-commerce (add to cart, purchase, etc).
 - **Meta Pixel** — Conversiones y eventos para campañas de Facebook/Instagram Ads.
@@ -439,7 +450,7 @@ La base de datos PostgreSQL tiene los siguientes modelos principales:
 | User | Clientes y administradores |
 | Product | Catálogo de productos |
 | Variant | Variantes de un producto (precio/stock/atributos propios) |
-| Category | Categorías del catálogo |
+| Category | Categorías del catálogo (con soporte de subcategorías via parentId) |
 | Attribute | Atributos (Tamaño, Tipo, etc) y sus valores |
 | Address | Direcciones guardadas por usuario |
 | Order | Órdenes de compra |
