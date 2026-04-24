@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AIChatButton } from "@/components/chat/AIChatButton";
+import { WhatsAppButton } from "@/components/common/WhatsAppButton";
 import { AnalyticsScripts } from "@/components/analytics/AnalyticsScripts";
 import { Providers } from "@/app/providers";
 import { SessionSync } from "@/components/auth/SessionSync";
@@ -59,6 +60,7 @@ export default function RootLayout({
               {children}
             </main>
             <Footer />
+            <WhatsAppButton />
             <AIChatButton />
           </MaintenanceGuard>
         </Providers>

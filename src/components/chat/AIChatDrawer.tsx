@@ -3,6 +3,21 @@
 import { useEffect, useRef, useState } from "react";
 import { X, Send, Bot, User, Loader2 } from "lucide-react";
 
+function renderMessage(content: string) {
+  const urlRegex = /(https?:\/\/[^\s\)\]]+)/g;
+  const parts = content.split(urlRegex);
+  return parts.map((part, i) =>
+    urlRegex.test(part) ? (
+      <a key={i} href={part} target="_blank" rel="noopener noreferrer"
+        className="underline text-[#2d5a27] font-medium break-all">
+        Ver producto →
+      </a>
+    ) : (
+      <span key={i}>{part}</span>
+    )
+  );
+}
+
 interface Message {
   role: "user" | "assistant";
   content: string;
@@ -132,7 +147,7 @@ export const AIChatDrawer = ({ isOpen, onClose }: AIChatDrawerProps) => {
                     : "bg-white text-gray-800 rounded-tl-sm shadow-sm"
                 }`}
               >
-                {msg.content}
+                {renderMessage(msg.content)}
               </div>
               {msg.role === "user" && (
                 <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0 mt-0.5">
