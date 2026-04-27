@@ -7,8 +7,7 @@ function escapeXml(str: string): string {
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&apos;");
+        .replace(/"/g, "&quot;");
 }
 
 export async function POST(req: Request) {
@@ -55,42 +54,51 @@ export async function POST(req: Request) {
             ? JSON.parse(order.shippingAddress)
             : order.shippingAddress as any;
 
+        const normalizeProvince = (p: string): string => {
+            const map: Record<string, string> = {
+                "CABA": "Capital Federal",
+                "Ciudad Autónoma de Buenos Aires": "Capital Federal",
+                "Ciudad Autonoma de Buenos Aires": "Capital Federal",
+            };
+            return map[p?.trim()] ?? p?.trim() ?? "";
+        };
+
+        const toTitleCase = (s: string): string =>
+            s.trim().replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+
+        const sanitizeEmail = (e: string): string => {
+            const trimmed = e?.trim() ?? "";
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed) ? trimmed : "";
+        };
+
         const totalItems = order.items.reduce((sum: number, item: any) => sum + item.quantity, 0);
         const pesoTotal = Math.max(0.5, totalItems * 0.5).toFixed(3);
         const volumen = (0.000027).toFixed(9);
         const idCentro = addr?.branchId || "0";
-        const nroEnvio = orderId.slice(-8).toUpperCase();
+        const nroEnvio = String(parseInt(orderId.replace(/\D/g, "").slice(-6) || "1", 10) || 1);
+        const provincia = normalizeProvince(addr?.province || "");
+        const localidad = toTitleCase(addr?.city || "");
+        const email = sanitizeEmail(order.contactEmail || "");
 
-        const xmlDatos = `<Datos>
-  <Origen NroCliente="${escapeXml(nroCliente)}" Operativa="${escapeXml(operativa)}" />
-  <Envio NroEnvio="${nroEnvio}" PesoTotal="${pesoTotal}" VolumenTotal="${volumen}" CantidadPaquetes="1" Valor="${Math.round(order.total)}" COD="0" Calle="${escapeXml(addr?.street || "")}" Numero="${escapeXml(addr?.number || "")}" Piso="${escapeXml(addr?.apartment || "")}" Depto="" Localidad="${escapeXml(addr?.city || "")}" Provincia="${escapeXml(addr?.province || "")}" CodigoPostal="${addr?.zipCode || ""}" Telefono="${order.contactPhone || ""}" Email="${order.contactEmail || ""}" IdCentroImposicionDestino="${idCentro}">
-    <Paquetes>
-      <Paquete Alto="15" Ancho="15" Largo="15" Peso="${pesoTotal}" Valor="${Math.round(order.total)}" />
-    </Paquetes>
-    <Destinatario NroDoc="${order.contactDni || ""}" Tipo="DNI" Nombre="${escapeXml(order.contactName || "")}" Apellido="${escapeXml(order.contactLastName || "")}" />
-  </Envio>
-</Datos>`;
+        const xmlDatos = `<Datos><Origen NroCliente="${escapeXml(nroCliente)}" Operativa="${escapeXml(operativa)}" /><Envio NroEnvio="${nroEnvio}" PesoTotal="${pesoTotal}" VolumenTotal="${volumen}" CantidadPaquetes="1" Valor="${Math.round(order.total)}" COD="0" Calle="${escapeXml((addr?.street || "").trim())}" Numero="${escapeXml((addr?.number || "").trim())}" Piso="${escapeXml((addr?.apartment || "").trim())}" Depto="" Localidad="${escapeXml(localidad)}" Provincia="${escapeXml(provincia)}" CodigoPostal="${(addr?.zipCode || "").trim()}" Telefono="${(order.contactPhone || "").trim()}" Email="${escapeXml(email)}" IdCentroImposicionDestino="${idCentro}"><Destinatario NroDoc="${order.contactDni || ""}" Tipo="DNI" Nombre="${escapeXml((order.contactName || "").trim())}" Apellido="${escapeXml((order.contactLastName || "").trim())}" /><Paquetes><Paquete NroPaquete="1" Alto="15" Ancho="15" Largo="15" Peso="${pesoTotal}" Valor="${Math.round(order.total)}" /></Paquetes></Envio></Datos>`;
 
-        const soapBody = `<?xml version="1.0" encoding="utf-8"?>
-<soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
-  <soap12:Body>
-    <IngresoOR xmlns="http://webservice.oca.com.ar/ePak_tracking/">
-      <usr>${escapeXml(usr)}</usr>
-      <psw>${escapeXml(psw)}</psw>
-      <xmlDatos><![CDATA[${xmlDatos}]]></xmlDatos>
-    </IngresoOR>
-  </soap12:Body>
-</soap12:Envelope>`;
+        console.log("OCA IngresoOR XML:", xmlDatos);
 
-        console.log("OCA IngresoOR request XML:", xmlDatos);
+        const formBody = new URLSearchParams({
+            usr,
+            psw,
+            xml_Datos: xmlDatos,
+            ConfirmarRetiro: "false",
+            DiasHastaRetiro: "0",
+            idFranjaHoraria: "0",
+            ArchivoCliente: "",
+            ArchivoProceso: ""
+        });
 
-        const response = await fetch("http://webservice.oca.com.ar/ePak_tracking/Oep_TrackEPak.asmx", {
+        const response = await fetch("http://webservice.oca.com.ar/ePak_tracking/Oep_TrackEPak.asmx/IngresoOR", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/soap+xml; charset=utf-8",
-                "SOAPAction": "http://webservice.oca.com.ar/ePak_tracking/IngresoOR"
-            },
-            body: soapBody
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: formBody.toString()
         });
 
         const xmlResult = await response.text();
@@ -98,27 +106,51 @@ export async function POST(req: Request) {
 
         const parsed = await parseStringPromise(xmlResult, {
             explicitArray: false,
-            ignoreAttrs: true,
+            ignoreAttrs: false,
             tagNameProcessors: [(name) => name.replace(/.*:/, "")]
         });
 
-        const findResult = (obj: any): string | null => {
+        // Check for errors in response
+        const findError = (obj: any): string | null => {
             if (!obj || typeof obj !== "object") return null;
-            if (obj.IngresoORResult !== undefined) return String(obj.IngresoORResult);
+            if (obj.Descripcion) return String(obj.Descripcion);
             for (const key in obj) {
-                const found = findResult(obj[key]);
-                if (found !== null) return found;
+                if (key === "_") continue;
+                const found = findError(obj[key]);
+                if (found) return found;
             }
             return null;
         };
 
-        const nroOR = findResult(parsed);
-        console.log("OCA nroOR result:", nroOR);
+        // Find the OR number — successful response has a Table with numeric value
+        const findNroOR = (obj: any): string | null => {
+            if (!obj || typeof obj !== "object") return null;
+            if (obj.Table !== undefined) {
+                const t = obj.Table;
+                const val = typeof t === "string" ? t : (t._ || t.Resultado || t.NroOR || t.Value);
+                if (val && !isNaN(Number(val))) return String(val).trim();
+            }
+            for (const key in obj) {
+                if (key === "_") continue;
+                const found = findNroOR(obj[key]);
+                if (found) return found;
+            }
+            return null;
+        };
 
-        if (!nroOR || nroOR.toUpperCase().startsWith("ERROR") || nroOR === "0" || isNaN(Number(nroOR))) {
-            return NextResponse.json({
-                error: `OCA rechazó el ingreso: ${nroOR || "Sin respuesta del servidor"}`
-            }, { status: 400 });
+        // If Errores schema found, it's an error response
+        const errorMsg = findError(parsed);
+        if (errorMsg && errorMsg !== "[object Object]") {
+            console.error("OCA error:", errorMsg);
+            return NextResponse.json({ error: `OCA: ${errorMsg}` }, { status: 400 });
+        }
+
+        const nroOR = findNroOR(parsed);
+        console.log("OCA nroOR:", nroOR);
+
+        if (!nroOR || isNaN(Number(nroOR))) {
+            console.error("Could not extract NroOR from:", JSON.stringify(parsed, null, 2));
+            return NextResponse.json({ error: "OCA no devolvió un número de OR válido" }, { status: 400 });
         }
 
         await prisma.order.update({
