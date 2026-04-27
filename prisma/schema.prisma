@@ -145,6 +145,9 @@ model StoreSettings {
   ocaOperativaSucursal  String?
   ocaOriginZipCode      String?
   ocaEnabled            Boolean  @default(true)
+  ocaUser               String?
+  ocaPassword           String?
+  ocaNroCliente         String?
 
   // DHL - International
   dhlAccountNumber      String?

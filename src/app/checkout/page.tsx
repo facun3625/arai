@@ -438,7 +438,7 @@ export default function CheckoutPage() {
                     paymentMethod: selectedPayment,
                     paymentProof: paymentProofUrl,
                     shippingAddress: selectedBranchId
-                        ? { ...shippingAddress, branchName: ocaBranches.find(b => b.id === selectedBranchId)?.name, isBranch: true }
+                        ? { ...shippingAddress, branchName: ocaBranches.find(b => b.id === selectedBranchId)?.name, branchId: selectedBranchId, isBranch: true }
                         : shippingAddress,
                     contactInfo,
                     couponCode: appliedCoupon?.code,

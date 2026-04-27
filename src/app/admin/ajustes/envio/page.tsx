@@ -28,6 +28,9 @@ export default function EnvioPage() {
         ocaOperativaSucursal: "",
         ocaOriginZipCode: "",
         ocaEnabled: true,
+        ocaUser: "",
+        ocaPassword: "",
+        ocaNroCliente: "",
         dhlAccountNumber: "",
         dhlApiKey: "",
         dhlSiteId: "",
@@ -52,6 +55,9 @@ export default function EnvioPage() {
                     ocaOperativaSucursal: data.ocaOperativaSucursal || "",
                     ocaOriginZipCode: data.ocaOriginZipCode || "",
                     ocaEnabled: data.ocaEnabled ?? true,
+                    ocaUser: data.ocaUser || "",
+                    ocaPassword: data.ocaPassword || "",
+                    ocaNroCliente: data.ocaNroCliente || "",
                     dhlAccountNumber: data.dhlAccountNumber || "",
                     dhlApiKey: data.dhlApiKey || "",
                     dhlSiteId: data.dhlSiteId || "",
@@ -150,6 +156,31 @@ export default function EnvioPage() {
                                 <input type="text" placeholder="Ej: 2000" value={settings.ocaOriginZipCode}
                                     onChange={(e) => setSettings({ ...settings, ocaOriginZipCode: e.target.value })} className={inputCls} />
                                 <p className={hintCls}>CP desde donde despachas tus pedidos.</p>
+                            </div>
+                        </div>
+
+                        {/* Credentials for IngresoOR / label generation */}
+                        <div className="mt-10 pt-8 border-t border-white/5">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-white/30 mb-6">Credenciales para generación de rótulos</p>
+                            <div className={`grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-8 transition-all duration-500 ${!settings.ocaEnabled ? 'opacity-30 pointer-events-none grayscale' : ''}`}>
+                                <div className="space-y-3">
+                                    <label className={labelCls}><Key className="h-4 w-4 text-white/60" /> Usuario OCA (email)</label>
+                                    <input type="text" placeholder="usuario@empresa.com" value={settings.ocaUser}
+                                        onChange={(e) => setSettings({ ...settings, ocaUser: e.target.value })} className={inputCls} />
+                                    <p className={hintCls}>Email con que accedés al portal OCA.</p>
+                                </div>
+                                <div className="space-y-3">
+                                    <label className={labelCls}><Lock className="h-4 w-4 text-white/60" /> Contraseña OCA</label>
+                                    <input type="password" placeholder="••••••••" value={settings.ocaPassword}
+                                        onChange={(e) => setSettings({ ...settings, ocaPassword: e.target.value })} className={inputCls} />
+                                    <p className={hintCls}>Contraseña del portal OCA.</p>
+                                </div>
+                                <div className="space-y-3">
+                                    <label className={labelCls}><Hash className="h-4 w-4 text-white/60" /> Nro. de Cliente OCA</label>
+                                    <input type="text" placeholder="Ej: 123456" value={settings.ocaNroCliente}
+                                        onChange={(e) => setSettings({ ...settings, ocaNroCliente: e.target.value })} className={inputCls} />
+                                    <p className={hintCls}>Número de cliente corporativo de OCA.</p>
+                                </div>
                             </div>
                         </div>
                     </div>

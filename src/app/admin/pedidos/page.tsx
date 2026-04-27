@@ -34,7 +34,36 @@ export default function AdminPedidosPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const [showProofModal, setShowProofModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [ocaLoading, setOcaLoading] = useState(false);
     const ITEMS_PER_PAGE = 20;
+
+    const handleIngresoOR = async (orderId: string) => {
+        setOcaLoading(true);
+        try {
+            const res = await fetch("/api/oca/ingreso-or", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ orderId, adminId: user?.id })
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                showToast(data.error || "Error al registrar en OCA", "error");
+            } else {
+                showToast(`Registrado en OCA. Nro OR: ${data.nroOR}`, "success");
+                setSelectedOrder((prev: any) => prev ? { ...prev, trackingNumber: data.nroOR } : prev);
+                setOrders(prev => prev.map(o => o.id === orderId ? { ...o, trackingNumber: data.nroOR } : o));
+            }
+        } catch {
+            showToast("Error de conexión con OCA", "error");
+        } finally {
+            setOcaLoading(false);
+        }
+    };
+
+    const handleDownloadLabel = (nroOR: string) => {
+        const url = `/api/oca/label?nroOR=${encodeURIComponent(nroOR)}&adminId=${encodeURIComponent(user?.id || "")}`;
+        window.open(url, "_blank");
+    };
 
     const handleDeleteOrder = async (orderId: string) => {
         const ok = await confirm({
@@ -565,6 +594,52 @@ export default function AdminPedidosPage() {
                                                 ))}
                                             </div>
                                         </div>
+
+                                        {/* OCA Section */}
+                                        {(selectedOrder.shippingMethod === 'oca_domicilio' || selectedOrder.shippingMethod === 'oca_sucursal') && (
+                                            <div className="pt-8 mt-8 border-t border-white/5 space-y-4">
+                                                <div className="flex items-center gap-2">
+                                                    <Truck className="h-3.5 w-3.5 text-primary/60" />
+                                                    <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold">OCA ePak</p>
+                                                    <span className="text-[9px] uppercase font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary/60">
+                                                        {selectedOrder.shippingMethod === 'oca_sucursal' ? 'Sucursal' : 'Domicilio'}
+                                                    </span>
+                                                </div>
+                                                {selectedOrder.trackingNumber ? (
+                                                    <div className="space-y-3">
+                                                        <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 flex items-center justify-between gap-3">
+                                                            <div>
+                                                                <p className="text-[9px] text-white/30 uppercase tracking-widest mb-1">Nro. OR</p>
+                                                                <p className="text-primary font-mono font-bold text-base">{selectedOrder.trackingNumber}</p>
+                                                            </div>
+                                                            <FileText className="h-6 w-6 text-primary/30" />
+                                                        </div>
+                                                        <button
+                                                            onClick={() => handleDownloadLabel(selectedOrder.trackingNumber)}
+                                                            className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-primary hover:bg-primary/90 text-white rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all shadow-lg shadow-primary/20"
+                                                        >
+                                                            <FileText className="h-4 w-4" />
+                                                            DESCARGAR RÓTULO PDF
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => handleIngresoOR(selectedOrder.id)}
+                                                        disabled={ocaLoading}
+                                                        className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-white/5 hover:bg-primary/10 border border-white/10 hover:border-primary/20 text-white/60 hover:text-primary rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all"
+                                                    >
+                                                        {ocaLoading ? (
+                                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                                        ) : (
+                                                            <>
+                                                                <Truck className="h-4 w-4" />
+                                                                REGISTRAR EN OCA
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                )}
+                                            </div>
+                                        )}
 
                                         <div className="pt-8 mt-8 border-t border-white/5">
                                             <button
