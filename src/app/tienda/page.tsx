@@ -130,25 +130,31 @@ function TiendaContent() {
                         <h2 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Categorías</h2>
                     </div>
 
-                    {/* Mobile: horizontal scroll (flat) */}
-                    <div className="overflow-x-auto pb-4 -mx-4 px-4 md:hidden scrollbar-hide">
-                        <ul className="flex flex-row gap-2 min-w-max">
-                            <li>
-                                <button onClick={() => setSelectedCategory("todas")} className={categoryButtonClass("todas")}>
-                                    <span>todas</span>
-                                    <span className={countClass("todas")}>{totalCount}</span>
+                    {/* Mobile: scrollable pills */}
+                    <div className="md:hidden relative -mx-4">
+                        {/* fade edges */}
+                        <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+                        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+                        <div className="overflow-x-auto scrollbar-hide px-4 pb-1">
+                            <div className="flex gap-2 w-max">
+                                <button
+                                    onClick={() => setSelectedCategory("todas")}
+                                    className={`shrink-0 px-4 py-2 rounded-full text-[12px] font-semibold transition-all ${selectedCategory === "todas" ? "bg-primary text-white shadow-sm" : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}
+                                >
+                                    Todas
                                 </button>
-                            </li>
-                            {flatMobileCategories.map((cat) => (
-                                <li key={cat.id}>
-                                    <button onClick={() => setSelectedCategory(cat.slug)} className={categoryButtonClass(cat.slug, cat._isChild)}>
-                                        {cat._isChild && <ChevronRight className="h-3 w-3 opacity-40 flex-shrink-0" />}
-                                        <span>{cat.name}</span>
-                                        <span className={countClass(cat.slug)}>{cat._count?.products || 0}</span>
+                                {flatMobileCategories.map((cat) => (
+                                    <button
+                                        key={cat.id}
+                                        onClick={() => setSelectedCategory(cat.slug)}
+                                        className={`shrink-0 px-4 py-2 rounded-full text-[12px] font-semibold transition-all ${selectedCategory === cat.slug ? "bg-primary text-white shadow-sm" : "bg-gray-100 text-gray-500 hover:bg-gray-200"} ${cat._isChild ? "pl-3" : ""}`}
+                                    >
+                                        {cat._isChild && <span className="opacity-40 mr-1 text-[10px]">↳</span>}
+                                        {cat.name}
                                     </button>
-                                </li>
-                            ))}
-                        </ul>
+                                ))}
+                            </div>
+                        </div>
                     </div>
 
                     {/* Desktop: nested vertical list */}

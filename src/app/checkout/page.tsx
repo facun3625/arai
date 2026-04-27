@@ -134,6 +134,7 @@ export default function CheckoutPage() {
     const [modoMode, setModoMode] = useState<"preprod" | "prod">("preprod");
     const [restrictions, setRestrictions] = useState<any[]>([]);
     const [activeRestriction, setActiveRestriction] = useState<any | null>(null);
+    const [freeShippingThreshold, setFreeShippingThreshold] = useState<number>(0);
 
     // Modo SDK se carga solo cuando se necesita (en handleFinalPurchase)
     const loadModoSDK = (): Promise<void> => {
@@ -172,6 +173,7 @@ export default function CheckoutPage() {
                     setModoEnabled(!!d.modoEnabled);
                     setPaypalEnabled(!!d.paypalEnabled);
                     setModoMode(d.modoMode === "production" ? "prod" : "preprod");
+                    setFreeShippingThreshold(Number(d.freeShippingThreshold) || 0);
                 }
             })
             .catch(() => { });
@@ -1046,7 +1048,7 @@ export default function CheckoutPage() {
                                                         </label>
                                                     )}
 
-                                                    {subtotal > 60000 && activeRestriction?.type !== 'BLOCK_SHIPPING' && (
+                                                    {freeShippingThreshold > 0 && subtotal >= freeShippingThreshold && activeRestriction?.type !== 'BLOCK_SHIPPING' && (
                                                         <label className={`block border ${selectedShippingMethod === 'gratis' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-gray-200 bg-white hover:border-gray-300'} rounded-2xl p-5 cursor-pointer transition-all relative overflow-hidden`}>
                                                             <div className="absolute top-0 left-0 w-1 h-full bg-primary"></div>
                                                             <div className="flex items-center justify-between pl-3">
@@ -1064,7 +1066,7 @@ export default function CheckoutPage() {
                                                                     />
                                                                     <div>
                                                                         <p className="font-medium text-primary text-sm flex items-center gap-2">Envío Gratuito Promocional</p>
-                                                                        <p className="text-xs text-gray-500 mt-1">Bonificado por superar los $60.000</p>
+                                                                        <p className="text-xs text-gray-500 mt-1">Bonificado por superar los ${freeShippingThreshold.toLocaleString("es-AR")}</p>
                                                                     </div>
                                                                 </div>
                                                                 <span className="font-bold text-primary uppercase text-xs tracking-widest">Gratis</span>
