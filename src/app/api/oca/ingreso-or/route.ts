@@ -55,12 +55,15 @@ export async function POST(req: Request) {
             : order.shippingAddress as any;
 
         const normalizeProvince = (p: string): string => {
-            const map: Record<string, string> = {
-                "CABA": "Capital Federal",
-                "Ciudad Autónoma de Buenos Aires": "Capital Federal",
-                "Ciudad Autonoma de Buenos Aires": "Capital Federal",
-            };
-            return map[p?.trim()] ?? p?.trim() ?? "";
+            const t = p?.trim() ?? "";
+            const cabaVariants = ["CABA", "Capital Federal", "Ciudad Autónoma de Buenos Aires", "Ciudad Autonoma de Buenos Aires", "capital federal"];
+            return cabaVariants.includes(t) ? "CABA" : t;
+        };
+
+        const normalizeCity = (city: string, province: string): string => {
+            const t = city?.trim() ?? "";
+            if (province === "CABA") return "CIUDAD AUTONOMA BUENOS AIRES";
+            return t.toUpperCase();
         };
 
         const toTitleCase = (s: string): string =>
@@ -92,7 +95,7 @@ export async function POST(req: Request) {
         const idCentro = addr?.branchId || "0";
         const nroEnvio = String(parseInt(orderId.replace(/\D/g, "").slice(-6) || "1", 10) || 1);
         const provincia = normalizeProvince(addr?.province || "");
-        const localidad = toTitleCase(addr?.city || "");
+        const localidad = normalizeCity(addr?.city || "", provincia);
         const email = sanitizeEmail(order.contactEmail || "");
         const { piso, depto } = parseApartment(addr?.apartment || "");
 
