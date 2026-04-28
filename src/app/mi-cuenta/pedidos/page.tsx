@@ -15,6 +15,7 @@ interface OrderItem {
 
 interface Order {
     id: string;
+    orderNumber: number;
     status: string;
     total: number;
     createdAt: string;
@@ -120,7 +121,7 @@ export default function PedidosPage() {
                                 </div>
                                 <div>
                                     <div className="flex items-center gap-2 mb-1">
-                                        <p className="font-bold text-gray-900 text-sm">#{order.id.slice(-6).toUpperCase()}</p>
+                                        <p className="font-bold text-gray-900 text-sm">#{String(order.orderNumber).padStart(4, "0")}</p>
                                         {(() => {
                                             const status = getStatusStyles(order.status);
                                             return (

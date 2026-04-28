@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 interface Order {
     id: string;
+    orderNumber: number;
     total: number;
     status: string;
     createdAt: string;
@@ -143,7 +144,7 @@ export default function MiCuentaPage() {
                                         <Package className="h-5 w-5 text-gray-400" />
                                     </div>
                                     <div>
-                                        <p className="text-sm font-bold text-gray-900">#{order.id.slice(-6).toUpperCase()}</p>
+                                        <p className="text-sm font-bold text-gray-900">#{String(order.orderNumber).padStart(4, "0")}</p>
                                         <div className="flex items-center gap-2 text-xs text-gray-400 mt-1">
                                             <Clock className="h-3 w-3" />
                                             {new Date(order.createdAt).toLocaleDateString()}

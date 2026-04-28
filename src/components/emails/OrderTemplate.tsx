@@ -18,6 +18,7 @@ import * as React from 'react';
 interface OrderTemplateProps {
     customerName: string;
     orderId: string;
+    orderNumber: number;
     items: any[];
     total: number;
     shippingAddress: any;
@@ -26,6 +27,7 @@ interface OrderTemplateProps {
 export const OrderTemplate = ({
     customerName,
     orderId,
+    orderNumber,
     items,
     total,
     shippingAddress,
@@ -52,7 +54,7 @@ export const OrderTemplate = ({
                     </Section>
                     <Heading style={h1}>¡Gracias por tu compra, {customerName}!</Heading>
                     <Text style={heroText}>
-                        Estamos preparando tu pedido <strong>#{orderId.slice(-6).toUpperCase()}</strong>.
+                        Estamos preparando tu pedido <strong>#{String(orderNumber).padStart(4, "0")}</strong>.
                         Te avisaremos por este medio cuando esté en camino.
                     </Text>
 

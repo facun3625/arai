@@ -32,6 +32,7 @@ interface OrderItem {
 
 interface Order {
     id: string;
+    orderNumber: number;
     status: string;
     total: number;
     subtotal: number;
@@ -158,7 +159,7 @@ export default function PedidoDetailPage() {
                         <ChevronLeft className="h-4 w-4" />
                         Volver a pedidos
                     </Link>
-                    <h1 className="text-2xl font-medium text-gray-900 mb-1">Pedido #{order.id.slice(-6).toUpperCase()}</h1>
+                    <h1 className="text-2xl font-medium text-gray-900 mb-1">Pedido #{String(order.orderNumber).padStart(4, "0")}</h1>
                     <div className="flex items-center gap-3">
                         {(() => {
                             const status = getStatusStyles(order.status);

@@ -383,7 +383,7 @@ export default function AdminPedidosPage() {
                                                 >
                                                     <td className="px-6 py-5">
                                                         <div className="flex flex-col gap-0.5">
-                                                            <span className="text-[11px] font-mono text-white/40">#{order.id.slice(-6).toUpperCase()}</span>
+                                                            <span className="text-[11px] font-mono text-white/40">#{String(order.orderNumber).padStart(4, "0")}</span>
                                                             <span className="text-white/60 text-[11px]">
                                                                 {new Date(order.createdAt).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                                                             </span>
@@ -498,7 +498,7 @@ export default function AdminPedidosPage() {
                                         <div className="flex items-center justify-between mb-8 border-b border-white/5 pb-6">
                                             <div>
                                                 <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-1">pedido</p>
-                                                <h3 className="text-xl font-light text-white font-montserrat">#{selectedOrder.id.slice(-6).toUpperCase()}</h3>
+                                                <h3 className="text-xl font-light text-white font-montserrat">#{String(selectedOrder.orderNumber).padStart(4, "0")}</h3>
                                             </div>
                                             <div className="text-right">
                                                 <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-1">pago</p>
@@ -705,7 +705,7 @@ export default function AdminPedidosPage() {
                                 <div className="p-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
                                     <div>
                                         <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-1">Comprobante de Pago</p>
-                                        <h3 className="text-white font-medium">Pedido #{selectedOrder.id.slice(-6).toUpperCase()}</h3>
+                                        <h3 className="text-white font-medium">Pedido #{String(selectedOrder.orderNumber).padStart(4, "0")}</h3>
                                     </div>
                                     <button
                                         onClick={() => setShowProofModal(false)}

@@ -147,7 +147,7 @@ export default function DashboardPage() {
                                                 <div>
                                                     <p className="text-white font-medium text-[15px]">{order.contactName} {order.contactLastName}</p>
                                                     <div className="flex items-center gap-3 mt-1">
-                                                        <p className="text-[11px] text-white/30 uppercase tracking-wider">ID: #{order.id.slice(-6).toUpperCase()}</p>
+                                                        <p className="text-[11px] text-white/30 uppercase tracking-wider">#{String(order.orderNumber).padStart(4, "0")}</p>
                                                         <span className="text-white/10">•</span>
                                                         <p className="text-[11px] text-white/30">{new Date(order.createdAt).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</p>
                                                     </div>

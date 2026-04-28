@@ -96,7 +96,7 @@ export async function PATCH(req: Request) {
                                         userId: updatedOrder.userId,
                                         orderId: orderId,
                                         amount: pointsToAward,
-                                        description: `Puntos ganados por pedido #${orderId.slice(-6)}`
+                                        description: `Puntos ganados por pedido #${String(updatedOrder.orderNumber).padStart(4, "0")}`
                                     }
                                 })
                             ]);
@@ -138,6 +138,7 @@ export async function PATCH(req: Request) {
                         react: StatusUpdateTemplate({
                             customerName: orderWithContact.contactName,
                             orderId: orderWithContact.id,
+                            orderNumber: orderWithContact.orderNumber,
                             newStatus: friendlyStatus,
                             message: emailMessage
                         })

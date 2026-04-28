@@ -200,6 +200,7 @@ model Coupon {
 
 model Order {
   id              String      @id @default(cuid())
+  orderNumber     Int         @unique @default(autoincrement())
   userId          String?
   status          String      @default("PENDING")
   total           Float

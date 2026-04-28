@@ -100,10 +100,11 @@ export async function POST(request: Request) {
             resend.emails.send({
                 from: EMAIL_FROM,
                 to: order.contactEmail,
-                subject: `¡Confirmación de tu pedido #${order.id.slice(-6).toUpperCase()}! - Araí Yerba Mate`,
+                subject: `¡Confirmación de tu pedido #${String(order.orderNumber).padStart(4, "0")}! - Araí Yerba Mate`,
                 react: OrderTemplate({
                     customerName: order.contactName,
                     orderId: order.id,
+                    orderNumber: order.orderNumber,
                     items: order.items,
                     total: order.total,
                     shippingAddress: JSON.parse(order.shippingAddress)

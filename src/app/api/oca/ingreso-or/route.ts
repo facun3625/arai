@@ -71,6 +71,21 @@ export async function POST(req: Request) {
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed) ? trimmed : "";
         };
 
+        // Remove accents — OCA's .NET backend may not handle UTF-8 accented chars correctly
+        const removeAccents = (s: string): string =>
+            s.normalize("NFD").replace(/[̀-ͯ]/g, "");
+
+        // Split apartment into floor (numeric) and unit (alpha) for OCA's Piso/Depto fields
+        const parseApartment = (apt: string): { piso: string; depto: string } => {
+            const trimmed = apt?.trim() ?? "";
+            const numMatch = trimmed.match(/^(\d+)/);
+            const alphaMatch = trimmed.match(/[a-zA-Z]+$/);
+            return {
+                piso: numMatch ? numMatch[1] : "",
+                depto: alphaMatch ? alphaMatch[0].toUpperCase() : ""
+            };
+        };
+
         const totalItems = order.items.reduce((sum: number, item: any) => sum + item.quantity, 0);
         const pesoTotal = Math.max(0.5, totalItems * 0.5).toFixed(3);
         const volumen = (0.000027).toFixed(9);
@@ -79,8 +94,9 @@ export async function POST(req: Request) {
         const provincia = normalizeProvince(addr?.province || "");
         const localidad = toTitleCase(addr?.city || "");
         const email = sanitizeEmail(order.contactEmail || "");
+        const { piso, depto } = parseApartment(addr?.apartment || "");
 
-        const xmlDatos = `<Datos><Origen NroCliente="${escapeXml(nroCliente)}" Operativa="${escapeXml(operativa)}" /><Envio NroEnvio="${nroEnvio}" PesoTotal="${pesoTotal}" VolumenTotal="${volumen}" CantidadPaquetes="1" Valor="${Math.round(order.total)}" COD="0" Calle="${escapeXml((addr?.street || "").trim())}" Numero="${escapeXml((addr?.number || "").trim())}" Piso="${escapeXml((addr?.apartment || "").trim())}" Depto="" Localidad="${escapeXml(localidad)}" Provincia="${escapeXml(provincia)}" CodigoPostal="${(addr?.zipCode || "").trim()}" Telefono="${(order.contactPhone || "").trim()}" Email="${escapeXml(email)}" IdCentroImposicionDestino="${idCentro}"><Destinatario NroDoc="${order.contactDni || ""}" Tipo="DNI" Nombre="${escapeXml((order.contactName || "").trim())}" Apellido="${escapeXml((order.contactLastName || "").trim())}" /><Paquetes><Paquete NroPaquete="1" Alto="15" Ancho="15" Largo="15" Peso="${pesoTotal}" Valor="${Math.round(order.total)}" /></Paquetes></Envio></Datos>`;
+        const xmlDatos = `<Datos><Origen NroCliente="${escapeXml(nroCliente)}" Operativa="${escapeXml(operativa)}" /><Envio NroEnvio="${nroEnvio}" PesoTotal="${pesoTotal}" VolumenTotal="${volumen}" CantidadPaquetes="1" Valor="${Math.round(order.total)}" COD="0" Calle="${escapeXml(removeAccents((addr?.street || "").trim()))}" Numero="${escapeXml((addr?.number || "").trim())}" Piso="${escapeXml(piso)}" Depto="${escapeXml(depto)}" Localidad="${escapeXml(removeAccents(localidad))}" Provincia="${escapeXml(removeAccents(provincia))}" CodigoPostal="${(addr?.zipCode || "").trim()}" Telefono="${(order.contactPhone || "").trim()}" Email="${escapeXml(email)}" IdCentroImposicionDestino="${idCentro}"><Destinatario NroDoc="${order.contactDni || ""}" Tipo="DNI" Nombre="${escapeXml(removeAccents((order.contactName || "").trim()))}" Apellido="${escapeXml(removeAccents((order.contactLastName || "").trim()))}" /><Paquetes><Paquete NroPaquete="1" Alto="15" Ancho="15" Largo="15" Peso="${pesoTotal}" Valor="${Math.round(order.total)}" /></Paquetes></Envio></Datos>`;
 
         console.log("OCA IngresoOR XML:", xmlDatos);
 

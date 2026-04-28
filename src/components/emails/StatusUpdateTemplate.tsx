@@ -15,6 +15,7 @@ import * as React from 'react';
 interface StatusUpdateTemplateProps {
     customerName: string;
     orderId: string;
+    orderNumber: number;
     newStatus: string;
     message: string;
 }
@@ -22,13 +23,14 @@ interface StatusUpdateTemplateProps {
 export const StatusUpdateTemplate = ({
     customerName,
     orderId,
+    orderNumber,
     newStatus,
     message,
 }: StatusUpdateTemplateProps) => {
     return (
         <Html>
             <Head />
-            <Preview>Actualización de tu pedido #{orderId.slice(-6).toUpperCase()}</Preview>
+            <Preview>Actualización de tu pedido #{String(orderNumber).padStart(4, "0")}</Preview>
             <Body style={main}>
                 <Container style={container}>
                     <Section style={logoContainer}>
@@ -45,7 +47,7 @@ export const StatusUpdateTemplate = ({
 
                     <Section style={section}>
                         <Text style={heroText}>
-                            El estado de tu pedido <strong>#{orderId.slice(-6).toUpperCase()}</strong> ha cambiado a:
+                            El estado de tu pedido <strong>#{String(orderNumber).padStart(4, "0")}</strong> ha cambiado a:
                         </Text>
                         <div style={statusBadge}>{newStatus}</div>
                         <Text style={messageText}>{message}</Text>
