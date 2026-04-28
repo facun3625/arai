@@ -144,6 +144,14 @@ model StoreSettings {
   ocaOperativa          String?
   ocaOperativaSucursal  String?
   ocaOriginZipCode      String?
+  ocaOriginStreet       String?
+  ocaOriginNumber       String?
+  ocaOriginFloor        String?
+  ocaOriginCity         String?
+  ocaOriginProvince     String?
+  ocaOriginContact      String?
+  ocaOriginEmail        String?
+  ocaFranjaHoraria      String?  @default("1")
   ocaEnabled            Boolean  @default(true)
   ocaUser               String?
   ocaPassword           String?

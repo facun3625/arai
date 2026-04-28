@@ -10,6 +10,37 @@ function escapeXml(str: string): string {
         .replace(/"/g, "&quot;");
 }
 
+function removeAccents(s: string): string {
+    return s.normalize("NFD").replace(/[̀-ͯ]/g, "");
+}
+
+function parseApartment(apt: string): { piso: string; depto: string } {
+    const trimmed = apt?.trim() ?? "";
+    const numMatch = trimmed.match(/^(\d+)/);
+    const alphaMatch = trimmed.match(/[a-zA-Z]+$/);
+    return {
+        piso: numMatch ? numMatch[1] : "",
+        depto: alphaMatch ? alphaMatch[0].toUpperCase() : ""
+    };
+}
+
+function sanitizeEmail(e: string): string {
+    const trimmed = e?.trim() ?? "";
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed) ? trimmed : "";
+}
+
+function normalizeProvince(p: string): string {
+    const t = p?.trim() ?? "";
+    const cabaVariants = ["CABA", "Capital Federal", "Ciudad Autónoma de Buenos Aires", "Ciudad Autonoma de Buenos Aires", "capital federal"];
+    return cabaVariants.includes(t) ? "CAPITAL FEDERAL" : removeAccents(t.toUpperCase());
+}
+
+function normalizeCity(city: string, normalizedProvince: string): string {
+    const t = city?.trim() ?? "";
+    if (normalizedProvince === "CAPITAL FEDERAL") return "CAPITAL FEDERAL";
+    return removeAccents(t.toUpperCase());
+}
+
 export async function POST(req: Request) {
     try {
         const { orderId, adminId } = await req.json();
@@ -50,59 +81,31 @@ export async function POST(req: Request) {
             }, { status: 500 });
         }
 
+        const originStreet = settings?.ocaOriginStreet || "";
+        const originNumber = settings?.ocaOriginNumber || "";
+        const originFloor = settings?.ocaOriginFloor || "";
+        const originZip = settings?.ocaOriginZipCode || "";
+        const originCity = removeAccents((settings?.ocaOriginCity || "").toUpperCase());
+        const originProvince = removeAccents((settings?.ocaOriginProvince || "").toUpperCase());
+        const originContact = removeAccents(settings?.ocaOriginContact || "");
+        const originEmail = sanitizeEmail(settings?.ocaOriginEmail || "");
+        const franjaHoraria = settings?.ocaFranjaHoraria || "1";
+
         const addr = typeof order.shippingAddress === "string"
             ? JSON.parse(order.shippingAddress)
             : order.shippingAddress as any;
 
-        const normalizeProvince = (p: string): string => {
-            const t = p?.trim() ?? "";
-            const cabaVariants = ["CABA", "Capital Federal", "Ciudad Autónoma de Buenos Aires", "Ciudad Autonoma de Buenos Aires", "capital federal"];
-            return cabaVariants.includes(t) ? "CABA" : t;
-        };
-
-        const normalizeCity = (city: string, province: string): string => {
-            const t = city?.trim() ?? "";
-            if (province === "CABA") return "CIUDAD AUTONOMA BUENOS AIRES";
-            return t.toUpperCase();
-        };
-
-        const toTitleCase = (s: string): string =>
-            s.trim().replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
-
-        const sanitizeEmail = (e: string): string => {
-            const trimmed = e?.trim() ?? "";
-            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed) ? trimmed : "";
-        };
-
-        // Remove accents — OCA's .NET backend may not handle UTF-8 accented chars correctly
-        const removeAccents = (s: string): string =>
-            s.normalize("NFD").replace(/[̀-ͯ]/g, "");
-
-        // Split apartment into floor (numeric) and unit (alpha) for OCA's Piso/Depto fields
-        const parseApartment = (apt: string): { piso: string; depto: string } => {
-            const trimmed = apt?.trim() ?? "";
-            const numMatch = trimmed.match(/^(\d+)/);
-            const alphaMatch = trimmed.match(/[a-zA-Z]+$/);
-            return {
-                piso: numMatch ? numMatch[1] : "",
-                depto: alphaMatch ? alphaMatch[0].toUpperCase() : ""
-            };
-        };
-
         const totalItems = order.items.reduce((sum: number, item: any) => sum + item.quantity, 0);
-        const pesoKg = Math.max(0.5, totalItems * 0.5);
-        // OCA .NET uses es-AR culture — decimal separator is comma
-        const pesoTotal = pesoKg.toFixed(3).replace(".", ",");
-        // Volume in cm³ as integer (15×15×15 = 3375)
-        const volumen = "3375";
+        const pesoKg = Math.max(1, Math.ceil(totalItems * 0.5));
         const idCentro = addr?.branchId || "0";
-        const nroEnvio = String(parseInt(orderId.replace(/\D/g, "").slice(-6) || "1", 10) || 1);
+        const nroRemito = String((order as any).orderNumber || parseInt(orderId.replace(/\D/g, "").slice(-6) || "1", 10) || 1);
         const provincia = normalizeProvince(addr?.province || "");
         const localidad = normalizeCity(addr?.city || "", provincia);
         const email = sanitizeEmail(order.contactEmail || "");
         const { piso, depto } = parseApartment(addr?.apartment || "");
+        const fecha = new Date().toISOString().slice(0, 10).replace(/-/g, "");
 
-        const xmlDatos = `<Datos><Origen NroCliente="${escapeXml(nroCliente)}" Operativa="${escapeXml(operativa)}" /><Envio NroEnvio="${nroEnvio}" PesoTotal="${pesoTotal}" VolumenTotal="${volumen}" CantidadPaquetes="1" Valor="${Math.round(order.total)}" COD="0" Calle="${escapeXml(removeAccents((addr?.street || "").trim()))}" Numero="${escapeXml((addr?.number || "").trim())}" Piso="${escapeXml(piso)}" Depto="${escapeXml(depto)}" Localidad="${escapeXml(removeAccents(localidad))}" Provincia="${escapeXml(removeAccents(provincia))}" CodigoPostal="${(addr?.zipCode || "").trim()}" Telefono="${(order.contactPhone || "").trim()}" Email="${escapeXml(email)}" IdCentroImposicionDestino="${idCentro}"><Destinatario NroDoc="${order.contactDni || ""}" Tipo="DNI" Nombre="${escapeXml(removeAccents((order.contactName || "").trim()))}" Apellido="${escapeXml(removeAccents((order.contactLastName || "").trim()))}" /><Paquetes><Paquete NroPaquete="1" Alto="15" Ancho="15" Largo="15" Peso="${pesoTotal}" Valor="${Math.round(order.total)}" /></Paquetes></Envio></Datos>`;
+        const xmlDatos = `<?xml version="1.0" encoding="iso-8859-1" standalone="yes"?><ROWS><cabecera ver="2.0" nrocuenta="${escapeXml(nroCliente)}" /><origenes><origen calle="${escapeXml(originStreet)}" nro="${escapeXml(originNumber)}" piso="${escapeXml(originFloor)}" depto="" cp="${escapeXml(originZip)}" localidad="${escapeXml(originCity)}" provincia="${escapeXml(originProvince)}" contacto="${escapeXml(originContact)}" email="${escapeXml(originEmail)}" solicitante="" observaciones="" centrocosto="0" idfranjahoraria="${franjaHoraria}" idcentroimposicionorigen="0" fecha="${fecha}"><envios><envio idoperativa="${escapeXml(operativa)}" nroremito="${nroRemito}"><destinatario apellido="${escapeXml(removeAccents((order.contactLastName || "").trim()))}" nombre="${escapeXml(removeAccents((order.contactName || "").trim()))}" calle="${escapeXml(removeAccents((addr?.street || "").trim()))}" nro="${escapeXml((addr?.number || "").trim())}" piso="${escapeXml(piso)}" depto="${escapeXml(depto)}" localidad="${escapeXml(localidad)}" provincia="${escapeXml(provincia)}" cp="${(addr?.zipCode || "").trim()}" telefono="${(order.contactPhone || "").trim()}" email="${escapeXml(email)}" idci="${idCentro}" celular="${(order.contactPhone || "").trim()}" observaciones="" /><paquetes><paquete alto="15" ancho="15" largo="15" peso="${pesoKg}" valor="${Math.round(order.total)}" cant="1" /></paquetes></envio></envios></origen></origenes></ROWS>`;
 
         console.log("OCA IngresoOR XML:", xmlDatos);
 
@@ -112,7 +115,7 @@ export async function POST(req: Request) {
             xml_Datos: xmlDatos,
             ConfirmarRetiro: "false",
             DiasHastaRetiro: "0",
-            idFranjaHoraria: "0",
+            idFranjaHoraria: franjaHoraria,
             ArchivoCliente: "",
             ArchivoProceso: ""
         });
@@ -132,7 +135,6 @@ export async function POST(req: Request) {
             tagNameProcessors: [(name) => name.replace(/.*:/, "")]
         });
 
-        // Check for errors in response
         const findError = (obj: any): string | null => {
             if (!obj || typeof obj !== "object") return null;
             if (obj.Descripcion) return String(obj.Descripcion);
@@ -144,7 +146,6 @@ export async function POST(req: Request) {
             return null;
         };
 
-        // Find the OR number — successful response has a Table with numeric value
         const findNroOR = (obj: any): string | null => {
             if (!obj || typeof obj !== "object") return null;
             if (obj.Table !== undefined) {
@@ -160,7 +161,6 @@ export async function POST(req: Request) {
             return null;
         };
 
-        // If Errores schema found, it's an error response
         const errorMsg = findError(parsed);
         if (errorMsg && errorMsg !== "[object Object]") {
             console.error("OCA error:", errorMsg);

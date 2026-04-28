@@ -27,6 +27,14 @@ export default function EnvioPage() {
         ocaOperativa: "",
         ocaOperativaSucursal: "",
         ocaOriginZipCode: "",
+        ocaOriginStreet: "",
+        ocaOriginNumber: "",
+        ocaOriginFloor: "",
+        ocaOriginCity: "",
+        ocaOriginProvince: "",
+        ocaOriginContact: "",
+        ocaOriginEmail: "",
+        ocaFranjaHoraria: "1",
         ocaEnabled: true,
         ocaUser: "",
         ocaPassword: "",
@@ -58,6 +66,14 @@ export default function EnvioPage() {
                     ocaUser: data.ocaUser || "",
                     ocaPassword: data.ocaPassword || "",
                     ocaNroCliente: data.ocaNroCliente || "",
+                    ocaOriginStreet: data.ocaOriginStreet || "",
+                    ocaOriginNumber: data.ocaOriginNumber || "",
+                    ocaOriginFloor: data.ocaOriginFloor || "",
+                    ocaOriginCity: data.ocaOriginCity || "",
+                    ocaOriginProvince: data.ocaOriginProvince || "",
+                    ocaOriginContact: data.ocaOriginContact || "",
+                    ocaOriginEmail: data.ocaOriginEmail || "",
+                    ocaFranjaHoraria: data.ocaFranjaHoraria || "1",
                     dhlAccountNumber: data.dhlAccountNumber || "",
                     dhlApiKey: data.dhlApiKey || "",
                     dhlSiteId: data.dhlSiteId || "",
@@ -159,6 +175,59 @@ export default function EnvioPage() {
                             </div>
                         </div>
 
+                        {/* Origin address for IngresoOR */}
+                        <div className="mt-10 pt-8 border-t border-white/5">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-white/30 mb-6">Dirección del remitente (origen del envío)</p>
+                            <div className={`grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 transition-all duration-500 ${!settings.ocaEnabled ? 'opacity-30 pointer-events-none grayscale' : ''}`}>
+                                <div className="space-y-3">
+                                    <label className={labelCls}><MapPin className="h-4 w-4 text-white/60" /> Calle</label>
+                                    <input type="text" placeholder="Ej: San Martín" value={settings.ocaOriginStreet}
+                                        onChange={(e) => setSettings({ ...settings, ocaOriginStreet: e.target.value })} className={inputCls} />
+                                </div>
+                                <div className="space-y-3">
+                                    <label className={labelCls}><Hash className="h-4 w-4 text-white/60" /> Número</label>
+                                    <input type="text" placeholder="Ej: 1234" value={settings.ocaOriginNumber}
+                                        onChange={(e) => setSettings({ ...settings, ocaOriginNumber: e.target.value })} className={inputCls} />
+                                </div>
+                                <div className="space-y-3">
+                                    <label className={labelCls}><Hash className="h-4 w-4 text-white/60" /> Piso / Depto (opcional)</label>
+                                    <input type="text" placeholder="Ej: 2" value={settings.ocaOriginFloor}
+                                        onChange={(e) => setSettings({ ...settings, ocaOriginFloor: e.target.value })} className={inputCls} />
+                                </div>
+                                <div className="space-y-3">
+                                    <label className={labelCls}><MapPin className="h-4 w-4 text-white/60" /> Localidad</label>
+                                    <input type="text" placeholder="Ej: SANTA FE" value={settings.ocaOriginCity}
+                                        onChange={(e) => setSettings({ ...settings, ocaOriginCity: e.target.value })} className={inputCls} />
+                                    <p className={hintCls}>En mayúsculas, tal como figura en OCA.</p>
+                                </div>
+                                <div className="space-y-3">
+                                    <label className={labelCls}><MapPin className="h-4 w-4 text-white/60" /> Provincia</label>
+                                    <input type="text" placeholder="Ej: SANTA FE" value={settings.ocaOriginProvince}
+                                        onChange={(e) => setSettings({ ...settings, ocaOriginProvince: e.target.value })} className={inputCls} />
+                                </div>
+                                <div className="space-y-3">
+                                    <label className={labelCls}><Settings className="h-4 w-4 text-white/60" /> Franja Horaria</label>
+                                    <select value={settings.ocaFranjaHoraria}
+                                        onChange={(e) => setSettings({ ...settings, ocaFranjaHoraria: e.target.value })}
+                                        className={inputCls}>
+                                        <option value="1">1 — Mañana (8-13h)</option>
+                                        <option value="2">2 — Tarde (14-17h)</option>
+                                        <option value="3">3 — Todo el día (8-17h)</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-3">
+                                    <label className={labelCls}><Key className="h-4 w-4 text-white/60" /> Nombre de contacto</label>
+                                    <input type="text" placeholder="Ej: Araí Yerba Mate" value={settings.ocaOriginContact}
+                                        onChange={(e) => setSettings({ ...settings, ocaOriginContact: e.target.value })} className={inputCls} />
+                                </div>
+                                <div className="space-y-3">
+                                    <label className={labelCls}><Globe className="h-4 w-4 text-white/60" /> Email de contacto</label>
+                                    <input type="email" placeholder="info@tutienda.com" value={settings.ocaOriginEmail}
+                                        onChange={(e) => setSettings({ ...settings, ocaOriginEmail: e.target.value })} className={inputCls} />
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Credentials for IngresoOR / label generation */}
                         <div className="mt-10 pt-8 border-t border-white/5">
                             <p className="text-[10px] font-bold uppercase tracking-widest text-white/30 mb-6">Credenciales para generación de rótulos</p>
@@ -177,7 +246,7 @@ export default function EnvioPage() {
                                 </div>
                                 <div className="space-y-3">
                                     <label className={labelCls}><Hash className="h-4 w-4 text-white/60" /> Nro. de Cliente OCA</label>
-                                    <input type="text" placeholder="Ej: 123456" value={settings.ocaNroCliente}
+                                    <input type="text" placeholder="Ej: 123456/0" value={settings.ocaNroCliente}
                                         onChange={(e) => setSettings({ ...settings, ocaNroCliente: e.target.value })} className={inputCls} />
                                     <p className={hintCls}>Número de cliente corporativo de OCA.</p>
                                 </div>
