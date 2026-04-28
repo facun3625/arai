@@ -173,7 +173,7 @@ export async function POST(req: Request) {
             usr,
             psw,
             XML_Datos: xmlDatos,
-            ConfirmarRetiro: "false",
+            ConfirmarRetiro: "true",
             ArchivoCliente: "",
             ArchivoProceso: ""
         });
