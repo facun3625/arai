@@ -41,6 +41,60 @@ function normalizeCity(city: string, normalizedProvince: string): string {
     return removeAccents(t.toUpperCase());
 }
 
+async function getCentroImposicion(cp: string): Promise<string> {
+    try {
+        const res = await fetch(
+            `https://webservice.oca.com.ar/epak_tracking/Oep_TrackEPak.asmx/GetCentrosImposicionConServiciosByCP?CodigoPostal=${encodeURIComponent(cp)}`,
+            { method: "GET" }
+        );
+        const xml = await res.text();
+        console.log("OCA GetCentrosImposicionConServiciosByCP cp=" + cp + ":", xml.slice(0, 800));
+        const parsed = await parseStringPromise(xml, {
+            explicitArray: true,
+            tagNameProcessors: [(name: string) => name.replace(/.*:/, "")]
+        });
+        const tables = parsed?.DataSet?.diffgram?.[0]?.NewDataSet?.[0]?.Table;
+        if (Array.isArray(tables) && tables.length > 0) {
+            const id = tables[0]?.IdCentroImposicion?.[0];
+            if (id) {
+                console.log("OCA CentroImposicionOrigen id=" + id + " for cp=" + cp);
+                return String(id).trim();
+            }
+        }
+    } catch (e) {
+        console.error("OCA GetCentrosImposicionConServiciosByCP error:", e);
+    }
+    return "0";
+}
+
+async function getCentroCosto(cuit: string, operativa: string): Promise<string> {
+    try {
+        const params = new URLSearchParams({ CUIT: cuit, Operativa: operativa });
+        const res = await fetch(
+            "https://webservice.oca.com.ar/oep_tracking/Oep_Track.asmx/GetCentroCostoPorOperativa",
+            { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: params.toString() }
+        );
+        const xml = await res.text();
+        console.log("OCA GetCentroCostoPorOperativa:", xml.slice(0, 600));
+        const parsed = await parseStringPromise(xml, {
+            explicitArray: true,
+            tagNameProcessors: [(name: string) => name.replace(/.*:/, "")]
+        });
+        const tables = parsed?.DataSet?.diffgram?.[0]?.NewDataSet?.[0]?.Table;
+        if (Array.isArray(tables) && tables.length > 0) {
+            const row = tables[0];
+            const cc = row?.NroCentroCosto?.[0] ?? row?.CentroCosto?.[0] ?? row?.IdCentroCosto?.[0];
+            if (cc) {
+                console.log("OCA CentroCosto:", cc);
+                return String(cc).trim();
+            }
+        }
+    } catch (e) {
+        console.error("OCA GetCentroCostoPorOperativa error:", e);
+    }
+    return "1";
+}
+
 export async function POST(req: Request) {
     try {
         const { orderId, adminId } = await req.json();
@@ -91,6 +145,11 @@ export async function POST(req: Request) {
         const originContact = removeAccents(settings?.ocaOriginContact || "");
         const originEmail = sanitizeEmail(settings?.ocaOriginEmail || "");
         const franjaHoraria = settings?.ocaFranjaHoraria || "1";
+        const cuit = settings?.ocaCuit || "";
+        const [idCentroOrigen, centroCosto] = await Promise.all([
+            getCentroImposicion(originZip),
+            getCentroCosto(cuit, operativa)
+        ]);
 
         const addr = typeof order.shippingAddress === "string"
             ? JSON.parse(order.shippingAddress)
@@ -106,29 +165,27 @@ export async function POST(req: Request) {
         const { piso, depto } = parseApartment(addr?.apartment || "");
         const fecha = new Date().toISOString().slice(0, 10).replace(/-/g, "");
 
-        const xmlDatos = `<?xml version="1.0" encoding="iso-8859-1" standalone="yes"?><ROWS><cabecera ver="2.0" nrocuenta="${escapeXml(nroCliente)}" /><origenes><origen calle="${escapeXml(originStreetClean)}" nro="${escapeXml(originNumber)}" piso="${escapeXml(originFloor)}" depto="" cp="${escapeXml(originZip)}" localidad="${escapeXml(originCity)}" provincia="${escapeXml(originProvince)}" contacto="${escapeXml(originContact)}" email="${escapeXml(originEmail)}" solicitante="" observaciones="" centrocosto="0" idfranjahoraria="${franjaHoraria}" idcentroimposicionorigen="0" fecha="${fecha}"><envios><envio idoperativa="${escapeXml(operativa)}" nroremito="${nroRemito}"><destinatario apellido="${escapeXml(removeAccents((order.contactLastName || "").trim()))}" nombre="${escapeXml(removeAccents((order.contactName || "").trim()))}" calle="${escapeXml(removeAccents((addr?.street || "").trim()))}" nro="${escapeXml((addr?.number || "").trim())}" piso="${escapeXml(piso)}" depto="${escapeXml(depto)}" localidad="${escapeXml(localidad)}" provincia="${escapeXml(provincia)}" cp="${(addr?.zipCode || "").trim()}" telefono="${(order.contactPhone || "").trim()}" email="${escapeXml(email)}" idci="${idCentro}" celular="${(order.contactPhone || "").trim()}" observaciones="" /><paquetes><paquete alto="15" ancho="15" largo="15" peso="${pesoKg}" valor="${Math.round(order.total)}" cant="1" /></paquetes></envio></envios></origen></origenes></ROWS>`;
+        const xmlDatos = `<?xml version="1.0" encoding="iso-8859-1" standalone="yes"?><ROWS><cabecera ver="2.0" nrocuenta="${escapeXml(nroCliente)}" origen="API" /><origenes><origen calle="${escapeXml(originStreetClean)}" nro="${escapeXml(originNumber)}" piso="${escapeXml(originFloor)}" depto="" cp="${escapeXml(originZip)}" localidad="${escapeXml(originCity)}" provincia="${escapeXml(originProvince)}" contacto="${escapeXml(originContact)}" email="${escapeXml(originEmail)}" solicitante="" observaciones="" centrocosto="${centroCosto}" idfranjahoraria="${franjaHoraria}" idcentroimposicionorigen="${idCentroOrigen}" fecha="${fecha}"><envios><envio idoperativa="${escapeXml(operativa)}" nroremito="${nroRemito}"><destinatario apellido="${escapeXml(removeAccents((order.contactLastName || "").trim()))}" nombre="${escapeXml(removeAccents((order.contactName || "").trim()))}" calle="${escapeXml(removeAccents((addr?.street || "").trim()))}" nro="${escapeXml((addr?.number || "").trim())}" piso="${escapeXml(piso)}" depto="${escapeXml(depto)}" localidad="${escapeXml(localidad)}" provincia="${escapeXml(provincia)}" cp="${(addr?.zipCode || "").trim()}" telefono="${(order.contactPhone || "").trim()}" email="${escapeXml(email)}" idci="${idCentro}" celular="${(order.contactPhone || "").trim()}" observaciones="" /><paquetes><paquete alto="15" ancho="15" largo="15" peso="${pesoKg}" valor="0" cant="1" /></paquetes></envio></envios></origen></origenes></ROWS>`;
 
-        console.log("OCA IngresoOR XML:", xmlDatos);
+        console.log("OCA IngresoORMultiplesRetiros XML:", xmlDatos);
 
         const formBody = new URLSearchParams({
             usr,
             psw,
-            xml_Datos: xmlDatos,
+            XML_Datos: xmlDatos,
             ConfirmarRetiro: "false",
-            DiasHastaRetiro: "0",
-            idFranjaHoraria: franjaHoraria,
             ArchivoCliente: "",
             ArchivoProceso: ""
         });
 
-        const response = await fetch("http://webservice.oca.com.ar/ePak_tracking/Oep_TrackEPak.asmx/IngresoOR", {
+        const response = await fetch("https://webservice.oca.com.ar/ePak_tracking/Oep_TrackEPak.asmx/IngresoORMultiplesRetiros", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: formBody.toString()
         });
 
         const xmlResult = await response.text();
-        console.log("OCA IngresoOR response:", xmlResult);
+        console.log("OCA IngresoORMultiplesRetiros response:", xmlResult);
 
         const parsed = await parseStringPromise(xmlResult, {
             explicitArray: false,
