@@ -16,27 +16,38 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const settings = await prisma.storeSettings.findUnique({ where: { id: "global" } });
-        const operativa = settings?.ocaOperativa;
-
-        if (!operativa) {
-            return NextResponse.json({ error: "Configuración OCA incompleta" }, { status: 500 });
-        }
-
-        const labelUrl = `http://www1.oca.com.ar/epak_tracking/Oep_TrackEPak.asmx/GetRotulosPorNumeroOr?nroOR=${encodeURIComponent(nroOR)}&Operativa=${encodeURIComponent(operativa)}`;
+        const labelUrl = `https://webservice.oca.com.ar/epak_tracking/Oep_Trackepak.asmx/GetPdfDeEtiquetasPorOrdenOrNumeroEnvio?idOrdenRetiro=${encodeURIComponent(nroOR)}&nroEnvio=&logisticaInversa=false`;
 
         console.log("Fetching OCA label from:", labelUrl);
 
-        const response = await fetch(labelUrl, {
-            headers: { Accept: "application/pdf,*/*" }
-        });
+        const response = await fetch(labelUrl);
 
         if (!response.ok) {
-            console.error("OCA label fetch failed:", response.status, await response.text());
+            const text = await response.text();
+            console.error("OCA label fetch failed:", response.status, text);
             return NextResponse.json({ error: "No se pudo obtener el rótulo de OCA" }, { status: 502 });
         }
 
+        const contentType = response.headers.get("content-type") || "";
         const buffer = await response.arrayBuffer();
+
+        // OCA returns base64-encoded PDF inside XML for this endpoint
+        if (contentType.includes("xml") || contentType.includes("text")) {
+            const text = new TextDecoder().decode(buffer);
+            console.log("OCA label response (text):", text.slice(0, 300));
+            const match = text.match(/<[^>]+>([A-Za-z0-9+/=\s]+)<\/[^>]+>/);
+            if (match) {
+                const pdfBuffer = Buffer.from(match[1].replace(/\s/g, ""), "base64");
+                return new NextResponse(pdfBuffer, {
+                    headers: {
+                        "Content-Type": "application/pdf",
+                        "Content-Disposition": `attachment; filename="rotulo-oca-${nroOR}.pdf"`,
+                        "Cache-Control": "no-store"
+                    }
+                });
+            }
+            return NextResponse.json({ error: "OCA no devolvió PDF válido", raw: text.slice(0, 500) }, { status: 502 });
+        }
 
         return new NextResponse(buffer, {
             headers: {
