@@ -553,6 +553,18 @@ export default function AdminPedidosPage() {
                                                         <span>Envío</span>
                                                         <span>$ {selectedOrder.shippingCost.toLocaleString('es-AR')}</span>
                                                     </div>
+                                                    {selectedOrder.discount > 0 && (
+                                                        <div className="flex justify-between text-[11px] text-green-400">
+                                                            <span>Descuento{selectedOrder.couponCode ? ` (${selectedOrder.couponCode})` : ''}</span>
+                                                            <span>- $ {selectedOrder.discount.toLocaleString('es-AR')}</span>
+                                                        </div>
+                                                    )}
+                                                    {selectedOrder.couponCode && selectedOrder.discount === 0 && (
+                                                        <div className="flex justify-between text-[11px] text-green-400">
+                                                            <span>Cupón aplicado</span>
+                                                            <span>{selectedOrder.couponCode}</span>
+                                                        </div>
+                                                    )}
                                                     <div className="flex justify-between text-[13px] text-white font-bold pt-2">
                                                         <span>Total</span>
                                                         <span className="text-primary">$ {selectedOrder.total.toLocaleString('es-AR')}</span>
@@ -568,6 +580,7 @@ export default function AdminPedidosPage() {
                                                     <p className="text-white/40">CP: {selectedOrder.shippingAddress.zipCode}</p>
                                                     <p className="text-white/40 mt-2 border-t border-white/5 pt-2">DNI: {selectedOrder.contactDni}</p>
                                                     <p className="text-white/40">TEL: {selectedOrder.contactPhone}</p>
+                                                    <p className="text-white/40">MAIL: {selectedOrder.contactEmail}</p>
                                                 </div>
                                             </div>
                                         </div>
