@@ -90,8 +90,11 @@ export async function POST(req: Request) {
         };
 
         const totalItems = order.items.reduce((sum: number, item: any) => sum + item.quantity, 0);
-        const pesoTotal = Math.max(0.5, totalItems * 0.5).toFixed(3);
-        const volumen = (0.000027).toFixed(9);
+        const pesoKg = Math.max(0.5, totalItems * 0.5);
+        // OCA .NET uses es-AR culture — decimal separator is comma
+        const pesoTotal = pesoKg.toFixed(3).replace(".", ",");
+        // Volume in cm³ as integer (15×15×15 = 3375)
+        const volumen = "3375";
         const idCentro = addr?.branchId || "0";
         const nroEnvio = String(parseInt(orderId.replace(/\D/g, "").slice(-6) || "1", 10) || 1);
         const provincia = normalizeProvince(addr?.province || "");
