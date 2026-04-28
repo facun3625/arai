@@ -193,40 +193,43 @@ export async function POST(req: Request) {
             tagNameProcessors: [(name) => name.replace(/.*:/, "")]
         });
 
-        const findError = (obj: any): string | null => {
+        // Legacy error format (auth failures, structural errors)
+        const findLegacyError = (obj: any): string | null => {
             if (!obj || typeof obj !== "object") return null;
             if (obj.Descripcion) return String(obj.Descripcion);
             for (const key in obj) {
                 if (key === "_") continue;
-                const found = findError(obj[key]);
+                const found = findLegacyError(obj[key]);
                 if (found) return found;
             }
             return null;
         };
-
-        const findNroOR = (obj: any): string | null => {
-            if (!obj || typeof obj !== "object") return null;
-            if (obj.Table !== undefined) {
-                const t = obj.Table;
-                const val = typeof t === "string" ? t : (t._ || t.Resultado || t.NroOR || t.Value);
-                if (val && !isNaN(Number(val))) return String(val).trim();
-            }
-            for (const key in obj) {
-                if (key === "_") continue;
-                const found = findNroOR(obj[key]);
-                if (found) return found;
-            }
-            return null;
-        };
-
-        const errorMsg = findError(parsed);
-        if (errorMsg && errorMsg !== "[object Object]") {
-            console.error("OCA error:", errorMsg);
-            return NextResponse.json({ error: `OCA: ${errorMsg}` }, { status: 400 });
+        const legacyError = findLegacyError(parsed);
+        if (legacyError && legacyError !== "[object Object]") {
+            console.error("OCA error:", legacyError);
+            return NextResponse.json({ error: `OCA: ${legacyError}` }, { status: 400 });
         }
 
-        const nroOR = findNroOR(parsed);
-        console.log("OCA nroOR:", nroOR);
+        // IngresoORMultiplesRetiros response format
+        const resumen = parsed?.DataSet?.diffgram?.Resultado?.Resumen;
+        const ingresados = Number(resumen?.CantidadIngresados ?? 0);
+        const rechazados = Number(resumen?.CantidadRechazados ?? 0);
+
+        if (rechazados > 0 && ingresados === 0) {
+            const det = parsed?.DataSet?.diffgram?.Resultado?.DetalleRechazos;
+            const motivo = Array.isArray(det) ? det[0]?.Motivo : det?.Motivo;
+            console.error("OCA rechazó el envío:", motivo);
+            return NextResponse.json({ error: `OCA rechazó el envío: ${motivo || "Sin motivo"}` }, { status: 400 });
+        }
+
+        const codigoOperacion = resumen?.CodigoOperacion;
+        const detalleIngresos = parsed?.DataSet?.diffgram?.Resultado?.DetalleIngresos;
+        const ordenRetiro = Array.isArray(detalleIngresos)
+            ? detalleIngresos[0]?.OrdenRetiro
+            : detalleIngresos?.OrdenRetiro;
+
+        const nroOR = ordenRetiro || codigoOperacion || null;
+        console.log("OCA nroOR:", nroOR, "| CodigoOperacion:", codigoOperacion, "| OrdenRetiro:", ordenRetiro);
 
         if (!nroOR || isNaN(Number(nroOR))) {
             console.error("Could not extract NroOR from:", JSON.stringify(parsed, null, 2));
