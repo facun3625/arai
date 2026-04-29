@@ -22,7 +22,8 @@ import {
     Truck,
     BookOpen,
     LineChart,
-    ImageIcon
+    ImageIcon,
+    Phone
 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import Image from "next/image";
@@ -67,6 +68,7 @@ const menuItems: MenuNode[] = [
         ]
     },
     { name: "pedidos", href: "/admin/pedidos", icon: ShoppingCart },
+    { name: "contactos", href: "/admin/contactos", icon: Phone },
     { name: "usuarios", href: "/admin/usuarios", icon: User },
     { name: "estadísticas", href: "/admin/estadisticas", icon: BarChart3 },
     { name: "base de conocimiento", href: "/admin/knowledge", icon: BookOpen },
@@ -99,14 +101,20 @@ export const AdminSidebar = () => {
     };
 
     const [stats, setStats] = useState<{ Pending: number; Processing: number }>({ Pending: 0, Processing: 0 });
+    const [pendingContacts, setPendingContacts] = useState(0);
 
     const fetchStats = async () => {
         if (!user?.id) return;
         try {
-            const res = await fetch(`/api/admin/orders/stats?adminId=${user.id}`);
-            const data = await res.json();
-            if (data && !data.error) {
-                setStats(data);
+            const [ordersRes, contactsRes] = await Promise.all([
+                fetch(`/api/admin/orders/stats?adminId=${user.id}`),
+                fetch(`/api/contacts?adminId=${user.id}`)
+            ]);
+            const ordersData = await ordersRes.json();
+            if (ordersData && !ordersData.error) setStats(ordersData);
+            const contactsData = await contactsRes.json();
+            if (contactsData.contacts) {
+                setPendingContacts(contactsData.contacts.filter((c: any) => c.status === "PENDING").length);
             }
         } catch (error) {
             console.error("Error fetching sidebar stats:", error);
@@ -179,6 +187,7 @@ export const AdminSidebar = () => {
                     const isActive = pathname === item.href;
                     const Icon = item.icon;
                     const isOrders = item.href === "/admin/pedidos";
+                    const isContacts = item.href === "/admin/contactos";
 
                     return (
                         <Link
@@ -207,6 +216,11 @@ export const AdminSidebar = () => {
                                         </span>
                                     )}
                                 </div>
+                            )}
+                            {isContacts && pendingContacts > 0 && (
+                                <span className="bg-orange-500 text-white min-w-[18px] h-[18px] px-1 rounded-full text-[9px] font-bold flex items-center justify-center shadow-lg shadow-orange-500/20 animate-in zoom-in duration-300">
+                                    {pendingContacts}
+                                </span>
                             )}
                         </Link>
                     );

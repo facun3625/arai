@@ -329,3 +329,14 @@ model KnowledgeDocument {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Contact {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String
+  status    String   @default("PENDING")
+  notes     String?
+  source    String   @default("chat")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

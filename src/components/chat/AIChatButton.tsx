@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles, X } from "lucide-react";
+import { MessageCircle, X } from "lucide-react";
 import { AIChatDrawer } from "./AIChatDrawer";
 
 export const AIChatButton = () => {
@@ -20,7 +20,7 @@ export const AIChatButton = () => {
         {isOpen ? (
           <X className="h-6 w-6 relative z-10" />
         ) : (
-          <Sparkles className="h-6 w-6 relative z-10" />
+          <MessageCircle className="h-6 w-6 relative z-10" />
         )}
         <span className="absolute inset-0 rounded-full animate-ping bg-[#2d5a27]/40 -z-10" />
       </button>
