@@ -16,7 +16,9 @@ import {
     Loader2,
     ChevronDown,
     X,
-    Trash2
+    Trash2,
+    Copy,
+    Check
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -35,6 +37,13 @@ export default function AdminPedidosPage() {
     const [showProofModal, setShowProofModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [ocaLoading, setOcaLoading] = useState(false);
+    const [copiedTracking, setCopiedTracking] = useState(false);
+
+    const copyTracking = (nroOR: string) => {
+        navigator.clipboard.writeText(nroOR);
+        setCopiedTracking(true);
+        setTimeout(() => setCopiedTracking(false), 2000);
+    };
     const ITEMS_PER_PAGE = 20;
 
     const handleIngresoOR = async (orderId: string) => {
@@ -155,6 +164,17 @@ export default function AdminPedidosPage() {
             console.error("Error updating status:", error);
         } finally {
             setStatusUpdating(null);
+        }
+    };
+
+    const getPaymentMethodStyle = (method: string) => {
+        switch (method?.toLowerCase()) {
+            case 'mercadopago': return { label: 'MercadoPago', color: 'text-sky-400' };
+            case 'transferencia': return { label: 'Transferencia', color: 'text-amber-400' };
+            case 'modo': return { label: 'Modo', color: 'text-violet-400' };
+            case 'paypal': return { label: 'PayPal', color: 'text-blue-400' };
+            case 'efectivo': return { label: 'Efectivo', color: 'text-green-400' };
+            default: return { label: method || '', color: 'text-white/30' };
         }
     };
 
@@ -397,8 +417,15 @@ export default function AdminPedidosPage() {
                                                             <span className="text-[11px] text-white/20">{order.contactEmail}</span>
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-5 font-medium text-white">
-                                                        $ {order.total.toLocaleString('es-AR')}
+                                                    <td className="px-6 py-5">
+                                                        <div className="flex flex-col gap-0.5">
+                                                            <span className="font-medium text-white">$ {order.total.toLocaleString('es-AR')}</span>
+                                                            {order.paymentMethod && (
+                                                                <span className={`text-[10px] font-bold uppercase tracking-widest ${getPaymentMethodStyle(order.paymentMethod).color}`}>
+                                                                    {getPaymentMethodStyle(order.paymentMethod).label}
+                                                                </span>
+                                                            )}
+                                                        </div>
                                                     </td>
                                                     <td className="px-6 py-5 text-center">
                                                         <div className="relative group/status inline-block" onClick={(e) => e.stopPropagation()}>
@@ -620,12 +647,29 @@ export default function AdminPedidosPage() {
                                                 </div>
                                                 {selectedOrder.trackingNumber ? (
                                                     <div className="space-y-3">
-                                                        <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 flex items-center justify-between gap-3">
-                                                            <div>
-                                                                <p className="text-[9px] text-white/30 uppercase tracking-widest mb-1">Nro. OR</p>
-                                                                <p className="text-primary font-mono font-bold text-base">{selectedOrder.trackingNumber}</p>
+                                                        <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 space-y-3">
+                                                            <div className="flex items-center justify-between gap-3">
+                                                                <div>
+                                                                    <p className="text-[9px] text-white/30 uppercase tracking-widest mb-1">Nro. Seguimiento</p>
+                                                                    <p className="text-primary font-mono font-bold text-base">{selectedOrder.trackingNumber}</p>
+                                                                </div>
+                                                                <button
+                                                                    onClick={() => copyTracking(selectedOrder.trackingNumber)}
+                                                                    title="Copiar número"
+                                                                    className="p-2.5 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary transition-all"
+                                                                >
+                                                                    {copiedTracking ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                                                                </button>
                                                             </div>
-                                                            <FileText className="h-6 w-6 text-primary/30" />
+                                                            <a
+                                                                href={`https://www.oca.com.ar/seguimiento/?nroEnvio=${selectedOrder.trackingNumber}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/50 hover:text-white text-[10px] font-bold uppercase tracking-widest transition-all border border-white/5"
+                                                            >
+                                                                <ExternalLink className="h-3 w-3" />
+                                                                Abrir seguimiento OCA
+                                                            </a>
                                                         </div>
                                                         <button
                                                             onClick={() => handleDownloadLabel(selectedOrder.trackingNumber)}

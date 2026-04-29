@@ -223,16 +223,17 @@ Vista y gestión completa de todas las órdenes.
 - Búsqueda por nombre de cliente o ID.
 
 **Detalle de Orden:**
+- Número de pedido secuencial con formato `#0001`, `#0009`, etc.
 - Items comprados con nombre, cantidad, precio.
-- Datos de contacto del cliente.
-- Dirección de envío.
+- Subtotal, costo de envío, descuento aplicado (con código de cupón si usó uno), total.
+- Datos de contacto del cliente: dirección, DNI, teléfono y **email**.
 - Método de pago y estado.
 - Comprobante de transferencia (si subió).
-- Número de tracking OCA (si aplica).
+- Sección OCA e-Pak (si el método de envío es OCA): muestra número de OR, botón para descargar el rótulo en PDF y botón "Registrar en OCA" para generar la etiqueta si aún no fue registrada.
 
 **Acciones:**
-- Cambiar estado de la orden (dropdown).
-- Cargar número de tracking.
+- Cambiar estado de la orden.
+- Registrar envío en OCA y descargar rótulo PDF directamente desde el panel.
 - Eliminar orden.
 - Enviar email de actualización al cliente.
 
@@ -255,6 +256,9 @@ Vista y gestión completa de todas las órdenes.
 - Tipo: porcentaje (%) o monto fijo ($).
 - Monto mínimo de compra para activarse.
 - Asignar a un usuario específico o dejar público.
+- Fecha de vencimiento opcional (`expiresAt`).
+- Límite de usos total (`usageLimit`) y por usuario (`usageLimitPerUser`).
+- Contador de usos actual (`usageCount`) visible en el admin.
 - Activar/desactivar sin eliminar.
 
 #### Pop-ups
@@ -320,7 +324,14 @@ Cada método tiene un toggle de habilitación/deshabilitación sin necesidad de 
 ### 2.11 Configuración — Envíos
 
 - Umbral de envío gratis (monto mínimo de compra).
-- OCA: CUIT del comercio, operativa, sucursal origen, código postal origen, habilitado.
+- **OCA e-Pak** — Configuración completa para generar rótulos desde el admin:
+  - Usuario y contraseña de e-Pak (`ocaUser`, `ocaPassword`)
+  - Número de cuenta OCA (formato `XXXXXX/000`)
+  - CUIT del comercio con guiones (requerido para obtener el centro de costo)
+  - ID de operativa a domicilio e ID de operativa a sucursal (pueden ser distintas)
+  - Dirección de origen del remitente: calle, número, piso, localidad, provincia, CP
+  - Contacto y email del remitente para la orden de retiro
+  - Franja horaria de retiro (1 = 8-17, 2 = 8-12, 3 = 14-17)
 - DHL: Account Number, API Key, Site ID (preparado para integración futura).
 
 ---
@@ -381,6 +392,7 @@ Todos los webhooks están implementados: cuando el pago es confirmado por la pla
 - Listado de sucursales cercanas al CP del cliente.
 - Tracking de órdenes.
 - Integración completa en el paso 2 del checkout.
+- **Generación de rótulos desde el panel admin**: con un click el admin registra el envío en OCA (`IngresoORMultiplesRetiros`) y obtiene el número de OR. El rótulo PDF se descarga directamente desde el detalle del pedido (`GetPdfDeEtiquetasPorOrdenOrNumeroEnvio`). El número de OR queda guardado en el pedido.
 
 ---
 

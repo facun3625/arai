@@ -57,14 +57,24 @@ export async function POST(request: Request) {
                     contactDni: contactInfo.dni,
                     shippingMethod: body.selectedShippingMethod || null,
                     items: {
-                        create: items.map((item: any) => ({
-                            productId: item.productId || item.id,
-                            variantId: item.variantId || null,
-                            name: item.name,
-                            quantity: Number(item.quantity),
-                            price: Number(item.price),
-                            image: item.image
-                        }))
+                        create: items.map((item: any) => {
+                            let displayName = item.name;
+                            if (item.variant) {
+                                try {
+                                    const attrs = typeof item.variant === "string" ? JSON.parse(item.variant) : item.variant;
+                                    const attrStr = Object.values(attrs).filter(Boolean).join(" / ");
+                                    if (attrStr) displayName = `${item.name} — ${attrStr}`;
+                                } catch {}
+                            }
+                            return {
+                                productId: item.productId || item.id,
+                                variantId: item.variantId || null,
+                                name: displayName,
+                                quantity: Number(item.quantity),
+                                price: Number(item.price),
+                                image: item.image
+                            };
+                        })
                     }
                 },
                 include: {
