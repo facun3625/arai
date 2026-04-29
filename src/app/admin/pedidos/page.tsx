@@ -544,20 +544,21 @@ export default function AdminPedidosPage() {
                                                         Este pedido está pendiente de validación por transferencia bancaria.
                                                         Verifica el comprobante antes de procesar.
                                                     </p>
-                                                    {selectedOrder.paymentProof ? (
-                                                        <button
-                                                            onClick={() => setShowProofModal(true)}
-                                                            className="mt-3 w-full flex items-center justify-center gap-2 text-[10px] font-bold text-white bg-primary hover:bg-primary-dark p-3 rounded-xl transition-all shadow-lg shadow-primary/20"
-                                                        >
-                                                            <Eye className="h-3 w-3" />
-                                                            VER COMPROBANTE
-                                                            <ExternalLink className="h-3 w-3 ml-auto opacity-40" />
-                                                        </button>
-                                                    ) : (
-                                                        <div className="mt-3 px-2 py-1 bg-white/5 rounded-md text-[9px] text-white/30 italic">
-                                                            Comprobante no adjuntado aún
-                                                        </div>
-                                                    )}
+                                                </div>
+                                            )}
+
+                                            {selectedOrder.paymentProof ? (
+                                                <button
+                                                    onClick={() => setShowProofModal(true)}
+                                                    className="w-full flex items-center justify-center gap-2 text-[10px] font-bold text-white bg-primary hover:bg-primary/90 p-3 rounded-xl transition-all shadow-lg shadow-primary/20"
+                                                >
+                                                    <Eye className="h-3 w-3" />
+                                                    VER COMPROBANTE
+                                                    <ExternalLink className="h-3 w-3 ml-auto opacity-40" />
+                                                </button>
+                                            ) : selectedOrder.paymentMethod === 'transferencia' && (
+                                                <div className="px-2 py-1 bg-white/5 rounded-md text-[9px] text-white/30 italic text-center">
+                                                    Comprobante no adjuntado aún
                                                 </div>
                                             )}
 
