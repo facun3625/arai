@@ -43,6 +43,7 @@ export const AIChatDrawer = ({ isOpen, onClose }: AIChatDrawerProps) => {
   const [contactName, setContactName] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const sessionId = useRef<string>(crypto.randomUUID());
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -121,6 +122,7 @@ export const AIChatDrawer = ({ isOpen, onClose }: AIChatDrawerProps) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: updatedMessages.map((m) => ({ role: m.role, content: m.content })),
+          sessionId: sessionId.current,
         }),
       });
 

@@ -23,7 +23,8 @@ import {
     BookOpen,
     LineChart,
     ImageIcon,
-    Phone
+    Phone,
+    MessagesSquare
 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import Image from "next/image";
@@ -69,6 +70,7 @@ const menuItems: MenuNode[] = [
     },
     { name: "pedidos", href: "/admin/pedidos", icon: ShoppingCart },
     { name: "contactos", href: "/admin/contactos", icon: Phone },
+    { name: "conversaciones", href: "/admin/conversaciones", icon: MessagesSquare },
     { name: "usuarios", href: "/admin/usuarios", icon: User },
     { name: "estadísticas", href: "/admin/estadisticas", icon: BarChart3 },
     { name: "base de conocimiento", href: "/admin/knowledge", icon: BookOpen },

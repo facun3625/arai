@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 export async function POST(req: NextRequest) {
   const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
   try {
-    const { messages } = await req.json();
+    const { messages, sessionId } = await req.json();
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json({ error: "messages requerido" }, { status: 400 });
@@ -112,6 +112,36 @@ ${assistantTurns >= 3 && whatsappLink ? `- Ya tuviste 3 intercambios con este cl
     });
 
     const reply = completion.choices[0]?.message?.content || "No pude procesar tu consulta. ¿Podés reformularla?";
+
+    // Persist conversation asynchronously (don't block response)
+    if (sessionId) {
+      (async () => {
+        try {
+          const conversation = await prisma.conversation.upsert({
+            where: { sessionId },
+            create: { sessionId },
+            update: { updatedAt: new Date() },
+            include: { messages: { select: { id: true } } },
+          });
+          const existingCount = conversation.messages.length;
+          const newMessages = messages.slice(existingCount);
+          if (newMessages.length > 0) {
+            await prisma.conversationMessage.createMany({
+              data: newMessages.map((m: { role: string; content: string }) => ({
+                conversationId: conversation.id,
+                role: m.role,
+                content: m.content,
+              })),
+            });
+          }
+          await prisma.conversationMessage.create({
+            data: { conversationId: conversation.id, role: "assistant", content: reply },
+          });
+        } catch (e) {
+          console.error("Error saving conversation:", e);
+        }
+      })();
+    }
 
     return NextResponse.json({ reply });
   } catch (error) {
