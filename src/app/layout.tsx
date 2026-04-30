@@ -17,6 +17,19 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: "araí yerba mate - tienda oficial",
   description: "plataforma e-commerce multi-franquicia para araí yerba mate.",
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+  },
+  openGraph: {
+    title: "araí yerba mate - tienda oficial",
+    description: "plataforma e-commerce multi-franquicia para araí yerba mate.",
+    images: [{ url: "/arai_logo.png", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/arai_logo.png"],
+  },
 };
 
 import { MaintenanceGuard } from "@/components/layout/MaintenanceGuard";
