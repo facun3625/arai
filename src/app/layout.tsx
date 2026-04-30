@@ -20,6 +20,7 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
+    apple: "/apple-touch-icon.png",
   },
   openGraph: {
     title: "araí yerba mate - tienda oficial",
@@ -42,6 +43,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <AnalyticsScripts />
         {/* Google Translate Widget - hidden, triggered by buttons in Header */}
         <script dangerouslySetInnerHTML={{ __html: `
