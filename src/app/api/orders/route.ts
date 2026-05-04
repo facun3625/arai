@@ -72,7 +72,8 @@ export async function POST(request: Request) {
                                 name: displayName,
                                 quantity: Number(item.quantity),
                                 price: Number(item.price),
-                                image: item.image
+                                image: item.image,
+                                addons: item.addons && typeof item.addons === 'object' ? JSON.stringify(item.addons) : "{}"
                             };
                         })
                     }

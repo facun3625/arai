@@ -196,28 +196,42 @@ export default function PedidoDetailPage() {
                             </h3>
                         </div>
                         <div className="divide-y divide-gray-50">
-                            {order.items.map((item) => (
-                                <div key={item.id} className="p-6 flex items-center gap-4">
-                                    <div className="h-16 w-16 bg-gray-50 rounded-xl overflow-hidden shrink-0 border border-gray-100">
-                                        {item.image ? (
-                                            <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
-                                        ) : (
-                                            <div className="h-full w-full flex items-center justify-center">
-                                                <Package className="h-6 w-6 text-gray-200" />
-                                            </div>
-                                        )}
+                            {order.items.map((item) => {
+                                let addons: [string, string][] = [];
+                                try {
+                                    const parsed = typeof (item as any).addons === 'string' ? JSON.parse((item as any).addons) : ((item as any).addons || {});
+                                    for (const [k, v] of Object.entries(parsed)) {
+                                        if (!/^\d+$/.test(k) && Array.isArray(v) && (v as string[]).length > 0) {
+                                            addons.push([k, (v as string[]).join(', ')]);
+                                        }
+                                    }
+                                } catch {}
+                                return (
+                                    <div key={item.id} className="p-6 flex items-center gap-4">
+                                        <div className="h-16 w-16 bg-gray-50 rounded-xl overflow-hidden shrink-0 border border-gray-100">
+                                            {item.image ? (
+                                                <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                                            ) : (
+                                                <div className="h-full w-full flex items-center justify-center">
+                                                    <Package className="h-6 w-6 text-gray-200" />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="text-sm font-medium text-gray-900 truncate">{item.name}</h4>
+                                            {addons.map(([k, v]) => (
+                                                <p key={k} className="text-[11px] text-primary font-medium mt-0.5">{k}: {v}</p>
+                                            ))}
+                                            <p className="text-[11px] text-gray-400 mt-0.5 uppercase tracking-wider">
+                                                {item.quantity} x $ {item.price.toLocaleString('es-AR')}
+                                            </p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-sm font-bold text-gray-900">$ {(item.price * item.quantity).toLocaleString('es-AR')}</p>
+                                        </div>
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <h4 className="text-sm font-medium text-gray-900 truncate">{item.name}</h4>
-                                        <p className="text-[11px] text-gray-400 mt-0.5 uppercase tracking-wider">
-                                            {item.quantity} x $ {item.price.toLocaleString('es-AR')}
-                                        </p>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="text-sm font-bold text-gray-900">$ {(item.price * item.quantity).toLocaleString('es-AR')}</p>
-                                    </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
 

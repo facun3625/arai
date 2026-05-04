@@ -565,12 +565,28 @@ export default function AdminPedidosPage() {
                                             <div className="space-y-4">
                                                 <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Resumen de Productos</p>
                                                 <div className="space-y-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
-                                                    {selectedOrder.items.map((item: any) => (
-                                                        <div key={item.id} className="flex justify-between items-center gap-4 text-[12px]">
-                                                            <span className="text-white/80">{item.quantity}x {item.name}</span>
-                                                            <span className="text-white font-medium">$ {item.price.toLocaleString('es-AR')}</span>
-                                                        </div>
-                                                    ))}
+                                                    {selectedOrder.items.map((item: any) => {
+                                                        let addons: [string, string][] = [];
+                                                        try {
+                                                            const parsed = typeof item.addons === 'string' ? JSON.parse(item.addons) : (item.addons || {});
+                                                            for (const [k, v] of Object.entries(parsed)) {
+                                                                if (!/^\d+$/.test(k) && Array.isArray(v) && v.length > 0) {
+                                                                    addons.push([k, (v as string[]).join(', ')]);
+                                                                }
+                                                            }
+                                                        } catch {}
+                                                        return (
+                                                            <div key={item.id} className="flex justify-between items-start gap-4 text-[12px]">
+                                                                <div>
+                                                                    <span className="text-white/80">{item.quantity}x {item.name}</span>
+                                                                    {addons.map(([k, v]) => (
+                                                                        <p key={k} className="text-[10px] text-primary/80 mt-0.5">{k}: {v}</p>
+                                                                    ))}
+                                                                </div>
+                                                                <span className="text-white font-medium shrink-0">$ {item.price.toLocaleString('es-AR')}</span>
+                                                            </div>
+                                                        );
+                                                    })}
                                                 </div>
                                                 <div className="pt-4 border-t border-white/5 space-y-2">
                                                     <div className="flex justify-between text-[11px] text-white/40">
