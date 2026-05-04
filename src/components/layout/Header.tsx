@@ -15,6 +15,7 @@ export const Header = () => {
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [bankDiscount, setBankDiscount] = useState<number | null>(null);
     const [currentLang, setCurrentLang] = useState<'es' | 'en'>('es');
 
@@ -112,7 +113,7 @@ export const Header = () => {
                 onClose={() => setIsAuthModalOpen(false)}
             />
             {/* 1. Black Top Bar */}
-            <div className="bg-[#1a1a1a] text-white py-2 font-montserrat relative z-[60]">
+            <div className="bg-[#1a1a1a] text-white py-2 font-montserrat relative z-[60] overflow-hidden">
                 <div className="max-w-7xl mx-auto px-4 lg:px-8 flex items-center justify-between">
                     <div className="flex gap-2">
                         {socialLinks.franquiciasUrl && (
@@ -164,7 +165,7 @@ export const Header = () => {
                                 Español
                             </button>
                         </div>
-                        <div className="flex items-center gap-2 border-l border-white/10 pl-4">
+                        <div className="hidden lg:flex items-center gap-2 border-l border-white/10 pl-4">
                             {socialLinks.facebookUrl && (
                                 <a href={socialLinks.facebookUrl} target="_blank" rel="noopener noreferrer">
                                     <Facebook className="h-3.5 w-3.5 text-white/70 hover:text-white cursor-pointer transition-colors" />
@@ -250,21 +251,34 @@ export const Header = () => {
                         {/* Right: Actions */}
                         <div className="flex items-center gap-3 md:gap-5">
                             {/* User Section - Client Side Sensitive */}
-                            <div className="relative group/user min-w-[32px] md:min-w-[40px] flex justify-end">
+                            <div className="relative min-w-[32px] md:min-w-[40px] flex justify-end">
                                 {mounted ? (
                                     <>
                                         {isAuthenticated && user ? (
-                                            <div className="flex items-center gap-2 cursor-pointer py-1">
-                                                <span className="hidden md:inline text-[10px] xl:text-[11px] font-normal text-white/90 lowercase">
-                                                    {user.name.split(' ')[0]}
-                                                </span>
-                                                <div className="bg-white/10 p-1.5 rounded-full border border-white/10 group-hover/user:bg-white/20 transition-all">
-                                                    <User className="h-4 w-4 text-white" />
-                                                </div>
-                                                <ChevronDown className="h-3 w-3 text-white/50 group-hover/user:text-white transition-colors" />
+                                            <>
+                                                <button
+                                                    onClick={() => setIsUserMenuOpen(v => !v)}
+                                                    className="flex items-center gap-2 cursor-pointer py-1"
+                                                >
+                                                    <span className="hidden md:inline text-[10px] xl:text-[11px] font-normal text-white/90 lowercase">
+                                                        {user.name.split(' ')[0]}
+                                                    </span>
+                                                    <div className={`bg-white/10 p-1.5 rounded-full border border-white/10 transition-all ${isUserMenuOpen ? 'bg-white/20' : ''}`}>
+                                                        <User className="h-4 w-4 text-white" />
+                                                    </div>
+                                                    <ChevronDown className={`h-3 w-3 text-white/50 transition-all duration-200 ${isUserMenuOpen ? 'rotate-180 text-white' : ''}`} />
+                                                </button>
+
+                                                {/* Backdrop */}
+                                                {isUserMenuOpen && (
+                                                    <div
+                                                        className="fixed inset-0 z-[65]"
+                                                        onClick={() => setIsUserMenuOpen(false)}
+                                                    />
+                                                )}
 
                                                 {/* Dropdown Menu */}
-                                                <div className="absolute right-0 top-[calc(100%+8px)] w-52 bg-white border border-gray-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] opacity-0 invisible group-hover/user:opacity-100 group-hover/user:visible transition-all duration-300 transform origin-top-right scale-95 group-hover/user:scale-100 z-[70] overflow-hidden">
+                                                <div className={`absolute right-0 top-[calc(100%+8px)] w-52 bg-white border border-gray-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] transition-all duration-200 origin-top-right z-[70] overflow-hidden ${isUserMenuOpen ? 'opacity-100 visible scale-100' : 'opacity-0 invisible scale-95'}`}>
                                                     <div className="p-3 bg-gray-50/50 border-b border-gray-100 text-left">
                                                         <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">mi cuenta</p>
                                                     </div>
@@ -273,6 +287,7 @@ export const Header = () => {
                                                         {user.role === 'ADMIN' && (
                                                             <Link
                                                                 href="/admin/dashboard"
+                                                                onClick={() => setIsUserMenuOpen(false)}
                                                                 className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[11.5px] text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all group/item mb-1"
                                                             >
                                                                 <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center group-hover/item:bg-primary transition-colors">
@@ -284,6 +299,7 @@ export const Header = () => {
                                                         {user.role !== 'ADMIN' && (
                                                             <Link
                                                                 href="/mi-cuenta"
+                                                                onClick={() => setIsUserMenuOpen(false)}
                                                                 className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[11.5px] text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all group/item mb-1"
                                                             >
                                                                 <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center group-hover/item:bg-primary transition-colors">
@@ -296,17 +312,17 @@ export const Header = () => {
                                                         <div className="h-px bg-gray-50 my-1 mx-2"></div>
 
                                                         <button
-                                                            onClick={logoutHandler}
+                                                            onClick={() => { setIsUserMenuOpen(false); logoutHandler(); }}
                                                             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[11.5px] text-red-500 hover:text-red-600 hover:bg-red-50 transition-all group/logout cursor-pointer"
                                                         >
-                                                            <div className="w-6 h-6 rounded-lg bg-red-50 flex items-center justify-center group-hover/logout:bg-red-500 transition-colors pointer-events-none">
+                                                            <div className="w-6 h-6 rounded-lg bg-red-50 flex items-center justify-center group-hover/logout:bg-red-500 transition-colors">
                                                                 <LogOut className="h-3.5 w-3.5 text-red-500 group-hover/logout:text-white transition-colors" />
                                                             </div>
-                                                            <span className="pointer-events-none">Cerrar Sesión</span>
+                                                            <span>Cerrar Sesión</span>
                                                         </button>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </>
                                         ) : (
                                             <button
                                                 onClick={() => setIsAuthModalOpen(true)}
