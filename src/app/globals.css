@@ -17,6 +17,12 @@
   --font-montserrat: "Montserrat", sans-serif;
 }
 
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
