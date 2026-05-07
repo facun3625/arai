@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
         where: { stock: { gt: 0 } },
         include: { categories: true, variants: true },
         orderBy: { createdAt: "desc" },
-        take: 50,
+        take: 20,
       }),
       prisma.knowledgeDocument.findMany({
         where: { isActive: true },
@@ -26,25 +26,22 @@ export async function POST(req: NextRequest) {
       prisma.storeSettings.findUnique({ where: { id: "global" } }),
     ]);
 
-    // Construir resumen de productos
+    // Construir resumen de productos (compacto para ahorrar tokens)
     const productsSummary = products
       .map((p) => {
         const price = p.variants.length
           ? Math.min(...p.variants.map((v) => v.price))
           : p.price;
-        const stock = p.variants.length
-          ? p.variants.reduce((sum, v) => sum + v.stock, 0)
-          : p.stock;
-        const cats = p.categories.map((c) => c.name).join(", ");
+        const cats = p.categories.map((c) => c.name).join("/");
         const link = `${process.env.NEXTAUTH_URL}/producto/${p.slug}`;
-        return `- ${p.name} | Precio desde: $${price} | Stock: ${stock} | Categoría: ${cats} | Link: ${link}${p.description ? ` | ${p.description.slice(0, 100)}` : ""}`;
+        return `- ${p.name} | $${price} | ${cats} | ${link}`;
       })
       .join("\n");
 
-    // Construir contexto de negocio desde documentos
+    // Construir contexto de negocio desde documentos (truncado)
     const businessContext = knowledgeDocs
-      .map((d) => `### ${d.title}\n${d.content}`)
-      .join("\n\n---\n\n");
+      .map((d) => `${d.title}: ${d.content.slice(0, 300)}`)
+      .join("\n");
 
     // Info de pagos y envíos
     const paymentInfo = [
@@ -69,37 +66,20 @@ export async function POST(req: NextRequest) {
       ? `https://wa.me/${settings.whatsappNumber}`
       : null;
 
-    const systemPrompt = `Sos Araí, el asesor de ventas de Araí Yerba Mate. Sos un experto mateador, cálido, apasionado y consultivo. Tu objetivo es que el cliente encuentre el producto ideal y quiera comprarlo.
+    const systemPrompt = `Sos Araí, asesora de ventas de Araí Yerba Mate. Cálida, experta, consultiva. Máximo 4 oraciones por respuesta.
 
-CATÁLOGO ACTUAL (solo productos con stock):
-${productsSummary || "No hay productos disponibles en este momento."}
+CATÁLOGO (con stock):
+${productsSummary || "Sin productos disponibles."}
 
-MEDIOS DE PAGO: ${paymentInfo || "Consultar en tienda"}
-ENVÍOS: ${shippingInfo || "Consultar disponibilidad"}
+PAGOS: ${paymentInfo || "Consultar"} | ENVÍOS: ${shippingInfo || "Consultar"}
+${businessContext ? `INFO: ${businessContext}` : ""}
 
-CONOCIMIENTO DEL NEGOCIO:
-${businessContext || ""}
-
-FLUJO DE CONVERSACIÓN — seguí este orden siempre:
-1. PRIMERO indagá en la dolencia o problemática del cliente. Preguntá cómo toma el mate, si le cae pesado, qué busca, qué le gusta.
-2. SIEMPRE hacé al menos una pregunta antes de recomendar. Que el cliente sea quien más escribe.
-3. Escuchá su respuesta y RECOMENDÁ un producto específico del catálogo.
-4. Hablá siempre de la CALIDAD y el tiempo de estacionamiento de nuestras yerbas.
-5. Si corresponde, comparar con otros productos premium del mercado (vinos, quesos, helados artesanales) para transmitir valor.
-6. Mencioná DESCUENTOS, PACKS y PROMOCIONES disponibles.
-7. AL FINAL de la recomendación, dá el precio con la presentación exacta (ej: "$3.000 los 100g").
-8. Enviá el LINK DIRECTO al producto recomendado.
-9. Agradecé la charla y sugerí que prueben y comprueben la calidad del producto.
-
-REGLAS ESTRICTAS:
-- Respuestas MÁS CORTAS. Máximo 5 renglones por mensaje.
-- NUNCA menciones precios hasta que el cliente haya elegido un producto y una presentación.
-- Cuando recomendés un producto, primero mostrá las presentaciones disponibles (ej: 500g, 1kg) y preguntá cuál prefiere. El precio va DESPUÉS de que elija la presentación.
-- Siempre incluí el link al producto cuando lo recomendés.
-- No inventés precios ni productos que no estén en el catálogo.
-- Respondé siempre en español, de forma cálida y natural.
-- Si no sabés algo, decilo honestamente y ofrecé contactar por WhatsApp.
-${assistantTurns >= 3 && whatsappLink ? `- Ya tuviste 3 intercambios con este cliente. En tu próxima respuesta, además de seguir ayudando, incluí una invitación cálida a continuar la charla por WhatsApp e incluí este link: ${whatsappLink}` : ""}`;
+REGLAS:
+- Preguntá al menos una vez antes de recomendar.
+- Nunca inventes precios ni productos.
+- Siempre incluí el link al recomendar.
+- Respondé en español, natural y cálido.
+- No menciones precios hasta que el cliente elija presentación.${assistantTurns >= 3 && whatsappLink ? `\n- Invitá a continuar por WhatsApp: ${whatsappLink}` : ""}`;
 
     const completion = await groq.chat.completions.create({
       model: "llama-3.3-70b-versatile",

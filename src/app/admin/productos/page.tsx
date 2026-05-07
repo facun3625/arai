@@ -9,7 +9,9 @@ import {
     Trash2,
     Image as ImageIcon,
     ExternalLink,
-    Filter
+    Filter,
+    EyeOff,
+    Eye
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -27,7 +29,7 @@ export default function ProductosPage() {
     const fetchProductos = async () => {
         try {
             const [prodRes, catRes] = await Promise.all([
-                fetch("/api/products"),
+                fetch("/api/products?admin=1"),
                 fetch("/api/categories")
             ]);
             const prodData = await prodRes.json();
@@ -52,6 +54,22 @@ export default function ProductosPage() {
             p.categories.some((c: any) => c.id === selectedCategory);
         return matchSearch && matchCat;
     });
+
+    const handleToggleActive = async (id: string, currentActive: boolean) => {
+        try {
+            const res = await fetch("/api/products", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id, isActive: !currentActive })
+            });
+            if (res.ok) {
+                showToast(currentActive ? "Producto ocultado de la tienda" : "Producto publicado en la tienda");
+                setProductos(prev => prev.map(p => p.id === id ? { ...p, isActive: !currentActive } : p));
+            }
+        } catch {
+            showToast("Error al actualizar producto", "error");
+        }
+    };
 
     const handleDelete = async (id: string) => {
         const ok = await confirm({
@@ -230,6 +248,13 @@ export default function ProductosPage() {
                                             </td>
                                             <td className="px-6 py-6 text-right">
                                                 <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <button
+                                                        onClick={() => handleToggleActive(prod.id, prod.isActive !== false)}
+                                                        title={prod.isActive === false ? "Publicar en tienda" : "Ocultar de tienda"}
+                                                        className={`p-2 rounded-lg transition-colors ${prod.isActive === false ? "text-yellow-400 hover:bg-yellow-400/10" : "text-white/40 hover:text-yellow-400 hover:bg-yellow-400/5"}`}
+                                                    >
+                                                        {prod.isActive === false ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                                                    </button>
                                                     <Link
                                                         href={`/admin/productos/editar/${prod.id}`}
                                                         className="p-2 hover:bg-white/5 rounded-lg transition-colors text-white/40 hover:text-white"
@@ -243,6 +268,9 @@ export default function ProductosPage() {
                                                         <Trash2 className="h-4 w-4" />
                                                     </button>
                                                 </div>
+                                                {prod.isActive === false && (
+                                                    <span className="text-[9px] uppercase tracking-widest text-yellow-500/60 font-bold">oculto</span>
+                                                )}
                                             </td>
                                         </tr>
                                     );

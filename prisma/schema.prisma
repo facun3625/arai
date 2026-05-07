@@ -76,6 +76,7 @@ model Product {
   height         Float?
   length         Float?
   addons         String     @default("[]")
+  isActive       Boolean    @default(true)
   variants       Variant[]
   categories     Category[] @relation("CategoryToProduct")
 }

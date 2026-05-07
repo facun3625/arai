@@ -38,6 +38,22 @@ export async function POST(request: Request) {
                 }
             }
 
+            // Validate and lock stock for each item
+            for (const item of items) {
+                const productId = item.productId || item.id;
+                if (item.variantId) {
+                    const variant = await tx.variant.findUnique({ where: { id: item.variantId } });
+                    if (!variant || variant.stock < Number(item.quantity)) {
+                        throw new Error(`Sin stock suficiente para "${item.name}". Disponible: ${variant?.stock ?? 0}`);
+                    }
+                } else {
+                    const product = await tx.product.findUnique({ where: { id: productId } });
+                    if (!product || product.stock < Number(item.quantity)) {
+                        throw new Error(`Sin stock suficiente para "${item.name}". Disponible: ${product?.stock ?? 0}`);
+                    }
+                }
+            }
+
             const newOrder = await tx.order.create({
                 data: {
                     userId: validUserId,
@@ -82,6 +98,22 @@ export async function POST(request: Request) {
                     items: true
                 }
             });
+
+            // Decrement stock for each item
+            for (const item of items) {
+                const productId = item.productId || item.id;
+                if (item.variantId) {
+                    await tx.variant.update({
+                        where: { id: item.variantId },
+                        data: { stock: { decrement: Number(item.quantity) } }
+                    });
+                } else {
+                    await tx.product.update({
+                        where: { id: productId },
+                        data: { stock: { decrement: Number(item.quantity) } }
+                    });
+                }
+            }
 
             // Handle coupon usage tracking
             if (couponCode) {

@@ -198,6 +198,8 @@ export default function ProductoDetallePage() {
         const sameAddons = JSON.stringify(item.addons || {}) === JSON.stringify(selectedAddons || {});
         return sameId && sameAddons;
     });
+    const availableStock = selectedVariant ? selectedVariant.stock : product.stock;
+    const isOutOfStock = availableStock <= 0;
 
     return (
         <div className="bg-white min-h-screen font-montserrat">
@@ -277,33 +279,42 @@ export default function ProductoDetallePage() {
                                 </div>
 
                                 <div className="flex items-center gap-4 flex-wrap mt-2">
-                                    <div className="flex items-center bg-gray-50 rounded-xl border border-gray-100 h-12">
-                                        <button
-                                            onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                            className="w-10 h-full flex items-center justify-center text-gray-400 hover:text-primary transition-all"
-                                        >
-                                            <Minus className="h-4 w-4" />
-                                        </button>
-                                        <span className="w-10 text-center font-medium text-[14px] text-gray-600">{quantity}</span>
-                                        <button
-                                            onClick={() => setQuantity(quantity + 1)}
-                                            className="w-10 h-full flex items-center justify-center text-gray-400 hover:text-primary transition-all"
-                                        >
-                                            <Plus className="h-4 w-4" />
-                                        </button>
-                                    </div>
+                                    {isOutOfStock ? (
+                                        <div className="h-12 px-6 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center text-red-400 font-medium text-[12px] uppercase tracking-widest w-full">
+                                            Sin stock disponible
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="flex items-center bg-gray-50 rounded-xl border border-gray-100 h-12">
+                                                <button
+                                                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                                    className="w-10 h-full flex items-center justify-center text-gray-400 hover:text-primary transition-all"
+                                                >
+                                                    <Minus className="h-4 w-4" />
+                                                </button>
+                                                <span className="w-10 text-center font-medium text-[14px] text-gray-600">{quantity}</span>
+                                                <button
+                                                    onClick={() => setQuantity(Math.min(availableStock, quantity + 1))}
+                                                    disabled={quantity >= availableStock}
+                                                    className="w-10 h-full flex items-center justify-center text-gray-400 hover:text-primary transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                                                >
+                                                    <Plus className="h-4 w-4" />
+                                                </button>
+                                            </div>
 
-                                    <button
-                                        onClick={handleAddToCart}
-                                        disabled={isInCart}
-                                        className={`h-12 rounded-xl font-medium text-[12px] uppercase tracking-widest flex items-center justify-center gap-2.5 transition-all active:scale-95 px-6 ${isInCart
-                                            ? "bg-[#23553d]/20 text-[#23553d] border border-[#23553d]/10 cursor-default"
-                                            : "bg-primary text-white shadow-md hover:-translate-y-0.5 hover:shadow-xl shadow-primary/10"
-                                            }`}
-                                    >
-                                        {isInCart ? <CheckCircle2 className="h-4 w-4" /> : <ShoppingBag className="h-4 w-4" />}
-                                        {isInCart ? "Ya en el Carrito" : "Añadir al Carrito"}
-                                    </button>
+                                            <button
+                                                onClick={handleAddToCart}
+                                                disabled={isInCart}
+                                                className={`h-12 rounded-xl font-medium text-[12px] uppercase tracking-widest flex items-center justify-center gap-2.5 transition-all active:scale-95 px-6 ${isInCart
+                                                    ? "bg-[#23553d]/20 text-[#23553d] border border-[#23553d]/10 cursor-default"
+                                                    : "bg-primary text-white shadow-md hover:-translate-y-0.5 hover:shadow-xl shadow-primary/10"
+                                                    }`}
+                                            >
+                                                {isInCart ? <CheckCircle2 className="h-4 w-4" /> : <ShoppingBag className="h-4 w-4" />}
+                                                {isInCart ? "Ya en el Carrito" : "Añadir al Carrito"}
+                                            </button>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </div>
