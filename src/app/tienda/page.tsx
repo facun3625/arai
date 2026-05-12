@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
-import { ShoppingBag, SlidersHorizontal, Loader2, CheckCircle2, ChevronRight } from "lucide-react";
+import { ShoppingBag, SlidersHorizontal, Loader2, CheckCircle2, ChevronRight, Ban } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
@@ -223,6 +223,7 @@ function TiendaContent() {
                                 ? Math.min(...product.variants.map((v: any) => v.price))
                                 : product.price;
                             const isInCart = !hasVariations && cartItems.some(item => item.id === product.id);
+                            const isOutOfStock = !hasVariations && product.stock <= 0;
 
                             return (
                                 <div key={product.id} className="group bg-white rounded-[24px] border border-gray-100 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_60px_-10px_rgba(35,85,61,0.08)] hover:-translate-y-1.5 transition-all duration-700 overflow-hidden flex flex-col">
@@ -244,18 +245,20 @@ function TiendaContent() {
                                                         e.preventDefault();
                                                         if (hasVariations) {
                                                             router.push(`/producto/${product.slug}`);
-                                                        } else if (!isInCart) {
+                                                        } else if (!isInCart && !isOutOfStock) {
                                                             addItem({ ...product, price: displayPrice, image: mainImage, quantity: 1 });
                                                         }
                                                     }}
-                                                    disabled={isInCart}
-                                                    className={`w-full text-[11px] font-medium py-3.5 rounded-xl shadow-2xl transition-all flex items-center justify-center gap-2 transform translate-y-8 group-hover:translate-y-0 transition-transform duration-700 cursor-pointer ${isInCart
-                                                        ? "bg-[#23553d]/40 text-white/80 backdrop-blur-sm shadow-none cursor-default"
-                                                        : "bg-primary text-white hover:bg-[#1a3f2d]"
+                                                    disabled={isInCart || isOutOfStock}
+                                                    className={`w-full text-[11px] font-medium py-3.5 rounded-xl shadow-2xl transition-all flex items-center justify-center gap-2 transform translate-y-8 group-hover:translate-y-0 transition-transform duration-700 cursor-pointer ${isOutOfStock
+                                                        ? "bg-red-50/80 text-red-400 backdrop-blur-sm shadow-none cursor-default border border-red-100"
+                                                        : isInCart
+                                                            ? "bg-[#23553d]/40 text-white/80 backdrop-blur-sm shadow-none cursor-default"
+                                                            : "bg-primary text-white hover:bg-[#1a3f2d]"
                                                         }`}
                                                 >
-                                                    {isInCart ? <CheckCircle2 className="h-4 w-4" /> : <ShoppingBag className="h-4 w-4" />}
-                                                    {hasVariations ? "Ver opciones" : isInCart ? "Ya en el carrito" : "Añadir al carrito"}
+                                                    {isOutOfStock ? <Ban className="h-4 w-4" /> : isInCart ? <CheckCircle2 className="h-4 w-4" /> : <ShoppingBag className="h-4 w-4" />}
+                                                    {hasVariations ? "Ver opciones" : isOutOfStock ? "Sin stock" : isInCart ? "Ya en el carrito" : "Añadir al carrito"}
                                                 </button>
                                             </div>
                                         </Link>

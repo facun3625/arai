@@ -448,7 +448,7 @@ export default function CheckoutPage() {
 
             if (!orderRes.ok) {
                 const errorData = await orderRes.json();
-                throw new Error(errorData.error || "Error al crear el pedido");
+                throw new Error(errorData.details || errorData.error || "Error al crear el pedido");
             }
 
             const { order } = await orderRes.json();
