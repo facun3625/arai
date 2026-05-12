@@ -22,7 +22,7 @@ export async function GET(request: Request) {
         const ordersInRange = await prisma.order.findMany({
             where: {
                 createdAt: { gte: from, lte: to },
-                status: { in: ["COMPLETED", "SHIPPED"] }
+                status: "COMPLETED"
             },
             include: {
                 items: true
