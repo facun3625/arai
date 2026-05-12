@@ -184,7 +184,8 @@ export default function AbandonedCartsPage() {
                                         const status = getStatusLabel(cart);
                                         const displayName = cart.user ? `${cart.user.name} ${cart.user.lastName}` : (cart.name || "Usuario Anónimo");
                                         const displayEmail = cart.email || cart.user?.email || "-";
-                                        const itemsCount = JSON.parse(cart.items || "[]").length;
+                                        const parsedItems = JSON.parse(cart.items || "[]");
+                                        const itemsCount = parsedItems.length;
 
                                         return (
                                             <tr key={cart.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors group">
@@ -211,11 +212,18 @@ export default function AbandonedCartsPage() {
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-5">
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="p-2 rounded-xl bg-white/5 group-hover:bg-primary/20 transition-colors">
+                                                    <div className="flex items-start gap-2">
+                                                        <div className="p-2 rounded-xl bg-white/5 group-hover:bg-primary/20 transition-colors mt-0.5">
                                                             <ShoppingBag className="h-3.5 w-3.5 text-white/40 group-hover:text-primary transition-colors" />
                                                         </div>
-                                                        <span className="text-[11px] text-white/70">{itemsCount} productos</span>
+                                                        <div className="flex flex-col gap-0.5">
+                                                            {parsedItems.map((item: any, i: number) => (
+                                                                <span key={i} className="text-[11px] text-white/70">
+                                                                    {item.quantity > 1 && <span className="text-primary/80 font-medium mr-1">{item.quantity}x</span>}
+                                                                    {item.name}
+                                                                </span>
+                                                            ))}
+                                                        </div>
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-5">
