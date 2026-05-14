@@ -139,6 +139,8 @@ export default function ProductoDetallePage() {
 
         const itemToAdd = {
             id: selectedVariant ? `${product.id}-${selectedVariant.id}` : product.id,
+            productId: product.id,
+            variantId: selectedVariant?.id,
             name: product.name,
             price: isNaN(basePrice) ? 0 : basePrice,
             image: activeImage,
