@@ -49,7 +49,7 @@ export const Footer = () => {
                         />
                     </a>
                     <p className="text-[13px] text-white/60 leading-relaxed font-medium max-w-[200px]">
-                        Llevamos lo mejor de nuestra tierra a tu mesa. Yerba mate de autor con alma misionera.
+                        {settings?.footerDescription || "Llevamos lo mejor de nuestra tierra a tu mesa. Yerba mate de autor con alma misionera."}
                     </p>
                 </div>
                 <div>
@@ -65,7 +65,7 @@ export const Footer = () => {
                     <ul className="text-xs space-y-4 text-white/70 font-medium">
                         <li className="flex flex-col gap-1">
                             <span className="text-[10px] uppercase text-white/30">Email</span>
-                            info@arayerba.com
+                            {settings?.footerEmail || "info@arayerba.com"}
                         </li>
                         <li className="flex flex-col gap-1">
                             <span className="text-[10px] uppercase text-white/30">WhatsApp</span>
@@ -82,7 +82,7 @@ export const Footer = () => {
                         </li>
                         <li className="flex flex-col gap-1">
                             <span className="text-[10px] uppercase text-white/30">Ubicación</span>
-                            Misiones, Argentina
+                            {settings?.footerLocation || "Misiones, Argentina"}
                         </li>
                     </ul>
                 </div>

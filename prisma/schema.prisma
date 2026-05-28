@@ -188,6 +188,11 @@ model StoreSettings {
   // CTA Links
   franquiciasUrl        String?
   mayoristasUrl         String?
+
+  // Footer
+  footerDescription     String?
+  footerEmail           String?
+  footerLocation        String?
 }
 
 model Coupon {

@@ -29,7 +29,10 @@ export default function PlataformasPage() {
         tiktokUrl: "",
         whatsappNumber: "",
         franquiciasUrl: "",
-        mayoristasUrl: ""
+        mayoristasUrl: "",
+        footerDescription: "",
+        footerEmail: "",
+        footerLocation: ""
     });
 
     const showToast = (message: string, type: "success" | "error" = "success") => {
@@ -51,7 +54,10 @@ export default function PlataformasPage() {
                         tiktokUrl: data.tiktokUrl || "",
                         whatsappNumber: data.whatsappNumber || "",
                         franquiciasUrl: data.franquiciasUrl || "",
-                        mayoristasUrl: data.mayoristasUrl || ""
+                        mayoristasUrl: data.mayoristasUrl || "",
+                        footerDescription: data.footerDescription || "",
+                        footerEmail: data.footerEmail || "",
+                        footerLocation: data.footerLocation || ""
                     });
                 }
             } catch (error) {
@@ -176,6 +182,43 @@ export default function PlataformasPage() {
                                     className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10"
                                 />
                                 <p className="text-[11px] text-white/20 italic mt-2 ml-1">Sin espacios, sin el +, incluyendo código de país y área.</p>
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="border-t border-white/5 pt-8 space-y-2">
+                            <h3 className="text-white/80 text-sm font-semibold mb-6">Contenido del Footer</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+                                <div className="space-y-3 md:col-span-2">
+                                    <label className="text-white/80 text-sm font-medium">Descripción (texto bajo el logo)</label>
+                                    <textarea
+                                        rows={2}
+                                        placeholder="Llevamos lo mejor de nuestra tierra a tu mesa..."
+                                        value={settings.footerDescription}
+                                        onChange={(e) => setSettings({ ...settings, footerDescription: e.target.value })}
+                                        className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10 resize-none"
+                                    />
+                                </div>
+                                <div className="space-y-3">
+                                    <label className="text-white/80 text-sm font-medium">Email de contacto</label>
+                                    <input
+                                        type="text"
+                                        placeholder="info@arayerba.com"
+                                        value={settings.footerEmail}
+                                        onChange={(e) => setSettings({ ...settings, footerEmail: e.target.value })}
+                                        className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10"
+                                    />
+                                </div>
+                                <div className="space-y-3">
+                                    <label className="text-white/80 text-sm font-medium">Ubicación</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Misiones, Argentina"
+                                        value={settings.footerLocation}
+                                        onChange={(e) => setSettings({ ...settings, footerLocation: e.target.value })}
+                                        className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10"
+                                    />
+                                </div>
                             </div>
                         </div>
 
