@@ -193,6 +193,9 @@ model StoreSettings {
   footerDescription     String?
   footerEmail           String?
   footerLocation        String?
+
+  // Shipping methods
+  acordarEnabled        Boolean  @default(true)
 }
 
 model Coupon {

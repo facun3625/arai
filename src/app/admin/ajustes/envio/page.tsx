@@ -42,7 +42,8 @@ export default function EnvioPage() {
         dhlAccountNumber: "",
         dhlApiKey: "",
         dhlSiteId: "",
-        dhlEnabled: false
+        dhlEnabled: false,
+        acordarEnabled: true
     });
     const [initialSettings, setInitialSettings] = useState<any>(null);
     const [lastSaved, setLastSaved] = useState(false);
@@ -77,7 +78,8 @@ export default function EnvioPage() {
                     dhlAccountNumber: data.dhlAccountNumber || "",
                     dhlApiKey: data.dhlApiKey || "",
                     dhlSiteId: data.dhlSiteId || "",
-                    dhlEnabled: data.dhlEnabled ?? false
+                    dhlEnabled: data.dhlEnabled ?? false,
+                    acordarEnabled: data.acordarEnabled ?? true
                 };
                 setSettings(s);
                 setInitialSettings(s);
@@ -301,6 +303,28 @@ export default function EnvioPage() {
                                 <input type="password" placeholder="dhl_key_..." value={settings.dhlApiKey}
                                     onChange={(e) => setSettings({ ...settings, dhlApiKey: e.target.value })} className={inputCls} />
                                 <p className={hintCls}>Clave de acceso a la API de DHL (Consumer Key).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ── Acordar ── */}
+                    <div className="bg-[#0a0a0a] border border-white/5 rounded-[32px] p-10 md:p-12 shadow-2xl">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <div className="p-2 bg-white/5 rounded-xl"><Globe className="h-6 w-6 text-white/60" /></div>
+                                    <h2 className="text-white text-2xl font-bold tracking-tight">Envío a coordinar</h2>
+                                </div>
+                                <p className="text-white/40 text-sm tracking-wide">Muestra la opción "Envío a acordar / Otros medios" en el checkout. Si todo está deshabilitado, el cliente verá un mensaje para contactarse.</p>
+                            </div>
+                            <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5 flex-shrink-0">
+                                <span className={`text-[10px] font-bold uppercase tracking-widest ${settings.acordarEnabled ? 'text-primary' : 'text-white/20'}`}>
+                                    {settings.acordarEnabled ? 'Visible' : 'Oculto'}
+                                </span>
+                                <button type="button" onClick={() => setSettings({ ...settings, acordarEnabled: !settings.acordarEnabled })}
+                                    className={`relative w-14 h-7 rounded-full transition-all duration-300 ${settings.acordarEnabled ? 'bg-primary' : 'bg-white/10'}`}>
+                                    <div className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-all duration-300 ${settings.acordarEnabled ? 'translate-x-7 shadow-[0_0_10px_rgba(255,255,255,0.5)]' : 'translate-x-0'}`} />
+                                </button>
                             </div>
                         </div>
                     </div>

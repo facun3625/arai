@@ -128,6 +128,7 @@ export async function POST(request: Request) {
             ...(body.footerDescription !== undefined && { footerDescription: parseStr(body.footerDescription) }),
             ...(body.footerEmail !== undefined && { footerEmail: parseStr(body.footerEmail) }),
             ...(body.footerLocation !== undefined && { footerLocation: parseStr(body.footerLocation) }),
+            ...(body.acordarEnabled !== undefined && { acordarEnabled: !!body.acordarEnabled }),
         };
 
         // Remove undefined keys to avoid Prisma errors
