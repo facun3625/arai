@@ -138,6 +138,7 @@ export default function CheckoutPage() {
     const [ocaEnabled, setOcaEnabled] = useState(true);
     const [acordarEnabled, setAcordarEnabled] = useState(true);
     const [whatsappNumber, setWhatsappNumber] = useState("");
+    const [zipDiscount, setZipDiscount] = useState<{ discountType: string; discountValue: number; label?: string } | null>(null);
 
     // Modo SDK se carga solo cuando se necesita (en handleFinalPurchase)
     const loadModoSDK = (): Promise<void> => {
@@ -289,6 +290,16 @@ export default function CheckoutPage() {
         }));
     };
 
+    // Zip code discount detection
+    useEffect(() => {
+        const zip = shippingAddress.zipCode;
+        if (!zip || zip.length < 4) { setZipDiscount(null); return; }
+        fetch(`/api/settings/zip-discounts?zipCode=${zip}`)
+            .then(r => r.json())
+            .then(data => setZipDiscount(data?.isActive ? data : null))
+            .catch(() => setZipDiscount(null));
+    }, [shippingAddress.zipCode]);
+
     // Auto-select "coordinar" when no shipping method is enabled
     useEffect(() => {
         if (currentStep === 2 && !ocaEnabled && !acordarEnabled) {
@@ -421,6 +432,15 @@ export default function CheckoutPage() {
     // 2. Apply dynamic discount if transfer is selected
     if (selectedPayment === 'transferencia') {
         totalDiscount += subtotal * (bankTransferInfo.discount / 100);
+    }
+
+    // 3. Zip code discount
+    if (zipDiscount) {
+        if (zipDiscount.discountType === 'PERCENTAGE') {
+            totalDiscount += subtotal * (zipDiscount.discountValue / 100);
+        } else {
+            totalDiscount += zipDiscount.discountValue;
+        }
     }
 
     // Shipping cost only counts if not null
@@ -1476,7 +1496,8 @@ export default function CheckoutPage() {
                                         <span className="text-[10px]">
                                             {[
                                                 selectedPayment === 'transferencia' ? `Transferencia (${bankTransferInfo.discount}%)` : null,
-                                                appliedCoupon ? `Cupón ${appliedCoupon.code}` : null
+                                                appliedCoupon ? `Cupón ${appliedCoupon.code}` : null,
+                                                zipDiscount ? (zipDiscount.label || `Descuento CP ${shippingAddress.zipCode}`) : null
                                             ].filter(Boolean).join(' + ')}
                                         </span>
                                     </div>

@@ -318,6 +318,17 @@ model SentCampaign {
   createdAt DateTime @default(now())
 }
 
+model ZipCodeDiscount {
+  id            String   @id @default(cuid())
+  zipCode       String   @unique
+  discountType  String   // 'PERCENTAGE' | 'FIXED'
+  discountValue Float
+  label         String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
 model ZipCodeRestriction {
   id        String   @id @default(cuid())
   zipCode   String

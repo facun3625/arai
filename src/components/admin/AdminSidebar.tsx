@@ -24,7 +24,8 @@ import {
     LineChart,
     ImageIcon,
     Phone,
-    MessagesSquare
+    MessagesSquare,
+    Percent
 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import Image from "next/image";
@@ -64,6 +65,7 @@ const menuItems: MenuNode[] = [
             { name: "plataformas de pago", href: "/admin/ajustes/pago", icon: DollarSign },
             { name: "plataformas de envío", href: "/admin/ajustes/envio", icon: Truck },
             { name: "zonas restringidas", href: "/admin/ajustes/zonas", icon: Layers },
+            { name: "descuentos por CP", href: "/admin/ajustes/descuentos-cp", icon: Percent },
             { name: "analytics & tracking", href: "/admin/ajustes/analytics", icon: LineChart },
             { name: "imágenes del hero", href: "/admin/ajustes/hero", icon: ImageIcon },
         ]
