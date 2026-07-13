@@ -79,13 +79,14 @@ export default function PedidoDetailPage() {
             // Iterate through items and add to cart
             for (const item of order.items) {
                 addItem({
-                    id: item.productId,
+                    id: item.variantId ? `${item.productId}-${item.variantId}` : item.productId,
+                    productId: item.productId,
+                    variantId: item.variantId || undefined,
                     name: item.name,
                     price: item.price,
                     image: item.image || "",
                     quantity: item.quantity,
-                    variant: item.variantId || undefined,
-                    // Note: addons are not stored explicitly in OrderItem schema as JSON yet, 
+                    // Note: addons are not stored explicitly in OrderItem schema as JSON yet,
                     // but for basic reorder this works well for standard products/variants.
                 });
             }

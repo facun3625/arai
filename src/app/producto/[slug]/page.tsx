@@ -71,18 +71,6 @@ export default function ProductoDetallePage() {
                         }
                     } catch { /* ignore */ }
 
-                    // Initial attribute selection if variable
-                    if (data.type === "VARIABLE" && data.variants?.length > 0) {
-                        const firstVariant = data.variants[0];
-                        try {
-                            const initialAttrs = typeof firstVariant.attributes === 'string'
-                                ? JSON.parse(firstVariant.attributes)
-                                : (firstVariant.attributes || {});
-                            setSelectedAttributes(initialAttrs);
-                        } catch (e) {
-                            // ignore parsing error
-                        }
-                    }
                 } else {
                     router.push("/tienda");
                 }
@@ -98,18 +86,28 @@ export default function ProductoDetallePage() {
     // Update variant matching when attributes change
     useEffect(() => {
         if (product?.type === "VARIABLE" && product.variants?.length > 0) {
-            const match = product.variants.find((v: any) => {
-                let vAttrs: Record<string, any> = {};
-                try {
-                    vAttrs = typeof v.attributes === 'string' ? JSON.parse(v.attributes) : (v.attributes || {});
-                } catch (e) {
-                    // ignore
-                }
+            let firstAttrs: Record<string, any> = {};
+            try {
+                const fv = product.variants[0];
+                firstAttrs = typeof fv.attributes === 'string' ? JSON.parse(fv.attributes) : (fv.attributes || {});
+            } catch (e) {
+                // ignore
+            }
+            const requiredNames = Object.keys(firstAttrs);
+            const hasAllSelections = requiredNames.length > 0 && requiredNames.every((name) => selectedAttributes[name] !== undefined);
 
-                return Object.entries(selectedAttributes).every(([key, value]) => {
-                    return vAttrs[key] === value;
-                });
-            });
+            const match = hasAllSelections
+                ? product.variants.find((v: any) => {
+                    let vAttrs: Record<string, any> = {};
+                    try {
+                        vAttrs = typeof v.attributes === 'string' ? JSON.parse(v.attributes) : (v.attributes || {});
+                    } catch (e) {
+                        // ignore
+                    }
+
+                    return requiredNames.every((key) => vAttrs[key] === selectedAttributes[key]);
+                })
+                : null;
 
             if (match) {
                 setSelectedVariant(match);
@@ -200,8 +198,9 @@ export default function ProductoDetallePage() {
         const sameAddons = JSON.stringify(item.addons || {}) === JSON.stringify(selectedAddons || {});
         return sameId && sameAddons;
     });
-    const availableStock = selectedVariant ? selectedVariant.stock : product.stock;
-    const isOutOfStock = availableStock <= 0;
+    const needsVariantSelection = product.type === "VARIABLE" && !selectedVariant;
+    const availableStock = selectedVariant ? selectedVariant.stock : (product.type === "VARIABLE" ? null : product.stock);
+    const isOutOfStock = availableStock !== null && availableStock <= 0;
 
     return (
         <div className="bg-white min-h-screen font-montserrat">
@@ -296,8 +295,8 @@ export default function ProductoDetallePage() {
                                                 </button>
                                                 <span className="w-10 text-center font-medium text-[14px] text-gray-600">{quantity}</span>
                                                 <button
-                                                    onClick={() => setQuantity(Math.min(availableStock, quantity + 1))}
-                                                    disabled={quantity >= availableStock}
+                                                    onClick={() => setQuantity(availableStock !== null ? Math.min(availableStock, quantity + 1) : quantity)}
+                                                    disabled={availableStock === null || quantity >= availableStock}
                                                     className="w-10 h-full flex items-center justify-center text-gray-400 hover:text-primary transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                                                 >
                                                     <Plus className="h-4 w-4" />
@@ -306,14 +305,17 @@ export default function ProductoDetallePage() {
 
                                             <button
                                                 onClick={handleAddToCart}
-                                                disabled={isInCart}
+                                                disabled={isInCart || needsVariantSelection}
+                                                title={needsVariantSelection ? "Selecciona todas las opciones antes de agregar al carrito" : undefined}
                                                 className={`h-12 rounded-xl font-medium text-[12px] uppercase tracking-widest flex items-center justify-center gap-2.5 transition-all active:scale-95 px-6 ${isInCart
                                                     ? "bg-[#23553d]/20 text-[#23553d] border border-[#23553d]/10 cursor-default"
-                                                    : "bg-primary text-white shadow-md hover:-translate-y-0.5 hover:shadow-xl shadow-primary/10"
+                                                    : needsVariantSelection
+                                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                                        : "bg-primary text-white shadow-md hover:-translate-y-0.5 hover:shadow-xl shadow-primary/10"
                                                     }`}
                                             >
                                                 {isInCart ? <CheckCircle2 className="h-4 w-4" /> : <ShoppingBag className="h-4 w-4" />}
-                                                {isInCart ? "Ya en el Carrito" : "Añadir al Carrito"}
+                                                {isInCart ? "Ya en el Carrito" : needsVariantSelection ? "Elegí las opciones" : "Añadir al Carrito"}
                                             </button>
                                         </>
                                     )}
@@ -344,7 +346,11 @@ export default function ProductoDetallePage() {
                                         return (
                                             <div key={name} className="space-y-5">
                                                 <div className="flex items-center justify-between">
-                                                    <p className="text-[14px] font-medium text-gray-900 capitalize">{name}: <span className="text-primary ml-1">{selectedAttributes[name]}</span></p>
+                                                    <p className="text-[14px] font-medium text-gray-900 capitalize">{name}: {selectedAttributes[name] ? (
+                                                        <span className="text-primary ml-1">{selectedAttributes[name]}</span>
+                                                    ) : (
+                                                        <span className="text-gray-400 font-normal ml-1 normal-case">sin elegir</span>
+                                                    )}</p>
                                                 </div>
                                                 <div className="flex flex-wrap gap-4">
                                                     {values.map((val: any) => (

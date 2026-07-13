@@ -41,15 +41,25 @@ export async function POST(request: Request) {
             // Validate and lock stock for each item
             for (const item of items) {
                 const productId = item.productId || item.id;
-                if (item.variantId) {
+                const product = await tx.product.findUnique({ where: { id: productId } });
+                if (!product) {
+                    throw new Error(`Producto no encontrado: "${item.name}"`);
+                }
+
+                if (product.type === "VARIABLE") {
+                    if (!item.variantId) {
+                        throw new Error(`Falta seleccionar una opción (molienda) para "${item.name}"`);
+                    }
                     const variant = await tx.variant.findUnique({ where: { id: item.variantId } });
-                    if (!variant || variant.stock < Number(item.quantity)) {
-                        throw new Error(`Sin stock suficiente para "${item.name}". Disponible: ${variant?.stock ?? 0}`);
+                    if (!variant || variant.productId !== product.id) {
+                        throw new Error(`Opción inválida para "${item.name}"`);
+                    }
+                    if (variant.stock < Number(item.quantity)) {
+                        throw new Error(`Sin stock suficiente para "${item.name}". Disponible: ${variant.stock}`);
                     }
                 } else {
-                    const product = await tx.product.findUnique({ where: { id: productId } });
-                    if (!product || product.stock < Number(item.quantity)) {
-                        throw new Error(`Sin stock suficiente para "${item.name}". Disponible: ${product?.stock ?? 0}`);
+                    if (product.stock < Number(item.quantity)) {
+                        throw new Error(`Sin stock suficiente para "${item.name}". Disponible: ${product.stock}`);
                     }
                 }
             }
