@@ -55,6 +55,7 @@ model Category {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   products    Product[]  @relation("CategoryToProduct")
+  promotion   CategoryPromotion?
 }
 
 model Product {
@@ -327,6 +328,15 @@ model ZipCodeDiscount {
   isActive      Boolean  @default(true)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+model CategoryPromotion {
+  id         String   @id @default(cuid())
+  categoryId String   @unique
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 }
 
 model ZipCodeRestriction {

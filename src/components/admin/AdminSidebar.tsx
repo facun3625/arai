@@ -52,6 +52,7 @@ const menuItems: MenuNode[] = [
         icon: Tag,
         items: [
             { name: "carritos abandonados", href: "/admin/carritos-abandonados", icon: ShoppingBag },
+            { name: "promociones por categoría", href: "/admin/marketing/promociones-categoria", icon: Percent },
             { name: "configuración", href: "/admin/marketing", icon: Settings2 },
             { name: "suscriptores", href: "/admin/marketing/suscriptores", icon: User },
         ]

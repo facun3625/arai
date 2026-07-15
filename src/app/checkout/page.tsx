@@ -227,6 +227,29 @@ export default function CheckoutPage() {
     const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discountType: string; discountValue: number } | null>(null);
     const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
 
+    // Category promotion ("2x1 por categoría") state
+    const [categoryPromo, setCategoryPromo] = useState<{ discount: number; details: { categoryId: string; categoryName: string; freeUnits: number }[] }>({ discount: 0, details: [] });
+
+    useEffect(() => {
+        if (!items.length) {
+            setCategoryPromo({ discount: 0, details: [] });
+            return;
+        }
+        const controller = new AbortController();
+        fetch('/api/promotions/category-discount', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                items: items.map(i => ({ productId: i.productId || i.id, variantId: i.variantId, quantity: i.quantity }))
+            }),
+            signal: controller.signal
+        })
+            .then(res => res.ok ? res.json() : { discount: 0, details: [] })
+            .then(data => setCategoryPromo({ discount: data.discount || 0, details: data.details || [] }))
+            .catch(() => {});
+        return () => controller.abort();
+    }, [items]);
+
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -418,29 +441,32 @@ export default function CheckoutPage() {
     }, 0);
 
     // Calculate discounts
-    let totalDiscount = 0;
+    // 1. Coupon + zip code discounts (stack with each other)
+    let couponAndZipDiscount = 0;
 
-    // 1. Coupon Discount is evaluated first on subtotal
     if (appliedCoupon) {
         if (appliedCoupon.discountType === 'PERCENTAGE') {
-            totalDiscount = subtotal * (appliedCoupon.discountValue / 100);
+            couponAndZipDiscount += subtotal * (appliedCoupon.discountValue / 100);
         } else {
-            totalDiscount = appliedCoupon.discountValue;
+            couponAndZipDiscount += appliedCoupon.discountValue;
         }
     }
 
-    // 2. Apply dynamic discount if transfer is selected
-    if (selectedPayment === 'transferencia') {
-        totalDiscount += subtotal * (bankTransferInfo.discount / 100);
-    }
-
-    // 3. Zip code discount
     if (zipDiscount) {
         if (zipDiscount.discountType === 'PERCENTAGE') {
-            totalDiscount += subtotal * (zipDiscount.discountValue / 100);
+            couponAndZipDiscount += subtotal * (zipDiscount.discountValue / 100);
         } else {
-            totalDiscount += zipDiscount.discountValue;
+            couponAndZipDiscount += zipDiscount.discountValue;
         }
+    }
+
+    // 2. Category promotion ("2x1") doesn't stack with coupon/zip — whichever benefits the customer more wins
+    const isCategoryPromoBetter = categoryPromo.discount > couponAndZipDiscount;
+    let totalDiscount = isCategoryPromoBetter ? categoryPromo.discount : couponAndZipDiscount;
+
+    // 3. Apply dynamic discount if transfer is selected (always stacks, it's a payment-method discount)
+    if (selectedPayment === 'transferencia') {
+        totalDiscount += subtotal * (bankTransferInfo.discount / 100);
     }
 
     // Shipping cost only counts if not null
@@ -1496,8 +1522,12 @@ export default function CheckoutPage() {
                                         <span className="text-[10px]">
                                             {[
                                                 selectedPayment === 'transferencia' ? `Transferencia (${bankTransferInfo.discount}%)` : null,
-                                                appliedCoupon ? `Cupón ${appliedCoupon.code}` : null,
-                                                zipDiscount ? (zipDiscount.label || `Descuento CP ${shippingAddress.zipCode}`) : null
+                                                isCategoryPromoBetter
+                                                    ? categoryPromo.details.map(d => `2x1 ${d.categoryName}`).join(' + ')
+                                                    : [
+                                                        appliedCoupon ? `Cupón ${appliedCoupon.code}` : null,
+                                                        zipDiscount ? (zipDiscount.label || `Descuento CP ${shippingAddress.zipCode}`) : null
+                                                    ].filter(Boolean).join(' + ')
                                             ].filter(Boolean).join(' + ')}
                                         </span>
                                     </div>
