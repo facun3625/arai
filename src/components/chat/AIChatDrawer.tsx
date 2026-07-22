@@ -34,7 +34,7 @@ export const AIChatDrawer = ({ isOpen, onClose }: AIChatDrawerProps) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "¡Hola! 🌿 Soy Araí, tu guía en el mundo del mate. Contame, ¿cómo te gusta el mate? ¿Suave, intenso, o estás buscando algo especial?",
+      content: "¡Hola! 🌿 Soy Araí, tu asistente virtual en el mundo del mate. Contame, ¿cómo te gusta el mate? ¿Suave, intenso, o estás buscando algo especial?",
     },
   ]);
   const [input, setInput] = useState("");
@@ -172,7 +172,7 @@ export const AIChatDrawer = ({ isOpen, onClose }: AIChatDrawerProps) => {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-white font-semibold text-sm leading-tight">Araí IA</p>
-            <p className="text-white/70 text-xs">Experta en yerba mate</p>
+            <p className="text-white/70 text-xs">Asistente virtual · Experta en yerba mate</p>
           </div>
           <button
             onClick={onClose}

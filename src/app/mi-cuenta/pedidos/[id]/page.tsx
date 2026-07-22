@@ -27,6 +27,7 @@ interface OrderItem {
     name: string;
     quantity: number;
     price: number;
+    weight: number | null;
     image: string | null;
 }
 
@@ -85,6 +86,7 @@ export default function PedidoDetailPage() {
                     name: item.name,
                     price: item.price,
                     image: item.image || "",
+                    weight: item.weight ?? undefined,
                     quantity: item.quantity,
                     // Note: addons are not stored explicitly in OrderItem schema as JSON yet,
                     // but for basic reorder this works well for standard products/variants.

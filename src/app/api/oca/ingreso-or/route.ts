@@ -155,8 +155,8 @@ export async function POST(req: Request) {
             ? JSON.parse(order.shippingAddress)
             : order.shippingAddress as any;
 
-        const totalItems = order.items.reduce((sum: number, item: any) => sum + item.quantity, 0);
-        const pesoKg = Math.max(1, Math.ceil(totalItems * 0.5));
+        const totalWeightKg = order.items.reduce((sum: number, item: any) => sum + (Number(item.weight) || 1) * item.quantity, 0);
+        const pesoKg = Math.max(1, Math.ceil(totalWeightKg));
         const idCentro = addr?.branchId || "0";
         const nroRemito = String((order as any).orderNumber || parseInt(orderId.replace(/\D/g, "").slice(-6) || "1", 10) || 1);
         const provincia = normalizeProvince(addr?.province || "");

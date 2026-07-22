@@ -143,6 +143,7 @@ export default function ProductoDetallePage() {
             price: isNaN(basePrice) ? 0 : basePrice,
             image: activeImage,
             variant: selectedVariant?.attributes,
+            weight: selectedVariant?.weight ?? product.weight,
             addons: selectedAddons,
             quantity: quantity
         };

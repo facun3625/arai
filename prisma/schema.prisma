@@ -250,6 +250,7 @@ model OrderItem {
   name      String
   quantity  Int
   price     Float
+  weight    Float?
   image     String?
   addons    String  @default("{}")
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)

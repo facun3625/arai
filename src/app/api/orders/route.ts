@@ -39,7 +39,9 @@ export async function POST(request: Request) {
                 }
             }
 
-            // Validate and lock stock for each item
+            // Validate and lock stock for each item, and resolve the real weight from the DB
+            // (never trust the client for this — it's what gets declared to the carrier).
+            const itemWeights: (number | null)[] = [];
             for (const item of items) {
                 const productId = item.productId || item.id;
                 const product = await tx.product.findUnique({ where: { id: productId } });
@@ -58,10 +60,12 @@ export async function POST(request: Request) {
                     if (variant.stock < Number(item.quantity)) {
                         throw new Error(`Sin stock suficiente para "${item.name}". Disponible: ${variant.stock}`);
                     }
+                    itemWeights.push(variant.weight ?? product.weight ?? null);
                 } else {
                     if (product.stock < Number(item.quantity)) {
                         throw new Error(`Sin stock suficiente para "${item.name}". Disponible: ${product.stock}`);
                     }
+                    itemWeights.push(product.weight ?? null);
                 }
             }
 
@@ -99,7 +103,7 @@ export async function POST(request: Request) {
                     contactDni: contactInfo.dni,
                     shippingMethod: body.selectedShippingMethod || null,
                     items: {
-                        create: items.map((item: any) => {
+                        create: items.map((item: any, idx: number) => {
                             let displayName = item.name;
                             if (item.variant) {
                                 try {
@@ -112,6 +116,7 @@ export async function POST(request: Request) {
                                 productId: item.productId || item.id,
                                 variantId: item.variantId || null,
                                 name: displayName,
+                                weight: itemWeights[idx],
                                 quantity: Number(item.quantity),
                                 price: Number(item.price),
                                 image: item.image,
