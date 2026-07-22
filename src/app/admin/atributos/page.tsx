@@ -26,6 +26,7 @@ export default function AtributosPage() {
         slug: "",
         terms: "",
         isAddon: false,
+        required: false,
         maxSelections: "" as string | number,
         blocksAttributeId: "",
     });
@@ -63,7 +64,7 @@ export default function AtributosPage() {
 
             if (res.ok) {
                 showToast(editingId ? "Atributo actualizado" : "Atributo creado");
-                setFormData({ name: "", slug: "", terms: "", isAddon: false, maxSelections: "", blocksAttributeId: "" });
+                setFormData({ name: "", slug: "", terms: "", isAddon: false, required: false, maxSelections: "", blocksAttributeId: "" });
                 setEditingId(null);
                 fetchAtributos();
             } else {
@@ -84,6 +85,7 @@ export default function AtributosPage() {
             slug: attr.slug,
             terms: attr.terms || "",
             isAddon: attr.isAddon || false,
+            required: attr.required || false,
             maxSelections: attr.maxSelections ?? "",
             blocksAttributeId: attr.blocksAttributeId || "",
         });
@@ -92,7 +94,7 @@ export default function AtributosPage() {
 
     const handleCancelEdit = () => {
         setEditingId(null);
-        setFormData({ name: "", slug: "", terms: "", isAddon: false, maxSelections: "", blocksAttributeId: "" });
+        setFormData({ name: "", slug: "", terms: "", isAddon: false, required: false, maxSelections: "", blocksAttributeId: "" });
     };
 
     const handleDelete = async (id: string) => {
@@ -198,6 +200,16 @@ export default function AtributosPage() {
 
                             {formData.isAddon && (
                                 <>
+                                    <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3 cursor-pointer group" onClick={() => setFormData({ ...formData, required: !formData.required })}>
+                                        <div className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${formData.required ? 'bg-primary border-primary' : 'bg-white/5 border-white/20'}`}>
+                                            {formData.required && <Plus className="h-3 w-3 text-white" />}
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-[11px] text-white group-hover:text-primary transition-colors">¿Es obligatorio elegir una opción?</span>
+                                            <span className="text-[9px] text-white/40 italic">El cliente no podrá agregar el producto al carrito sin elegir al menos una.</span>
+                                        </div>
+                                    </div>
+
                                     <div className="space-y-1.5">
                                         <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Máximo de selecciones</label>
                                         <input
@@ -288,6 +300,11 @@ export default function AtributosPage() {
                                                             {attr.isAddon && (
                                                                 <span className="text-[8px] bg-[#23553d]/40 text-white/80 border border-[#23553d]/50 px-2 py-0.5 rounded-full uppercase font-bold tracking-tighter">
                                                                     Complemento
+                                                                </span>
+                                                            )}
+                                                            {attr.isAddon && attr.required && (
+                                                                <span className="text-[8px] bg-orange-500/20 text-orange-300 border border-orange-500/40 px-2 py-0.5 rounded-full uppercase font-bold tracking-tighter">
+                                                                    Obligatorio
                                                                 </span>
                                                             )}
                                                         </div>

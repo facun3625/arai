@@ -39,6 +39,10 @@ export async function POST(request: Request) {
                 }
             }
 
+            const requiredAttributeIds = new Set(
+                (await tx.attribute.findMany({ where: { required: true }, select: { id: true } })).map(a => a.id)
+            );
+
             // Validate and lock stock for each item, and resolve the real weight from the DB
             // (never trust the client for this — it's what gets declared to the carrier).
             const itemWeights: (number | null)[] = [];
@@ -66,6 +70,23 @@ export async function POST(request: Request) {
                         throw new Error(`Sin stock suficiente para "${item.name}". Disponible: ${product.stock}`);
                     }
                     itemWeights.push(product.weight ?? null);
+                }
+
+                if (product.addons) {
+                    let addonsList: any[] = [];
+                    try {
+                        addonsList = typeof product.addons === 'string' ? JSON.parse(product.addons) : product.addons;
+                    } catch {
+                        addonsList = [];
+                    }
+                    const itemAddons = item.addons && typeof item.addons === 'object' ? item.addons : {};
+                    for (const addon of addonsList) {
+                        if (!requiredAttributeIds.has(addon.attributeId)) continue;
+                        const selected = itemAddons[addon.name];
+                        if (!Array.isArray(selected) || selected.length === 0) {
+                            throw new Error(`Falta elegir una opción de "${addon.name}" para "${item.name}"`);
+                        }
+                    }
                 }
             }
 

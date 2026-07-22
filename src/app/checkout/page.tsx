@@ -21,7 +21,8 @@ import {
     Phone
 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { trackPixelEvent } from "@/lib/fbPixel";
 import { motion, AnimatePresence } from "framer-motion";
 
 type CheckoutStep = 1 | 2 | 3;
@@ -473,6 +474,21 @@ export default function CheckoutPage() {
     const effectiveShippingCost = selectedShipping !== null ? selectedShipping : 0;
     const total = Math.max(0, subtotal + effectiveShippingCost - totalDiscount);
 
+    const hasTrackedInitiateCheckout = useRef(false);
+    useEffect(() => {
+        if (isHydrated && items.length > 0 && !hasTrackedInitiateCheckout.current) {
+            hasTrackedInitiateCheckout.current = true;
+            trackPixelEvent('InitiateCheckout', {
+                content_ids: items.map(i => i.productId || i.id),
+                content_type: 'product',
+                contents: items.map(i => ({ id: i.productId || i.id, quantity: i.quantity })),
+                num_items: items.reduce((sum, i) => sum + i.quantity, 0),
+                value: subtotal,
+                currency: 'ARS'
+            });
+        }
+    }, [isHydrated, items, subtotal]);
+
     const handleNextStep = (e: React.FormEvent) => {
         e.preventDefault();
         if (currentStep < 3) setCurrentStep((prev) => (prev + 1) as CheckoutStep);
@@ -673,6 +689,16 @@ export default function CheckoutPage() {
                 });
                 setTimeout(() => router.push('/mi-cuenta/pedidos'), 3000);
             } else {
+                // Bank transfer never redirects through /checkout/success, so track Purchase here
+                trackPixelEvent('Purchase', {
+                    content_ids: items.map(i => i.productId || i.id),
+                    content_type: 'product',
+                    contents: items.map(i => ({ id: i.productId || i.id, quantity: i.quantity })),
+                    num_items: items.reduce((sum, i) => sum + i.quantity, 0),
+                    value: order.total,
+                    currency: 'ARS'
+                });
+
                 // Clear cart for transferency
                 clearCart();
                 // Success feedback and redirect to Orders for Transferency

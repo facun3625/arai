@@ -165,7 +165,7 @@ export const AdminSidebar = () => {
                                     <ChevronDown className={`h-4 w-4 transition-all duration-300 ${isOpen ? 'rotate-180' : ''}`} />
                                 </button>
 
-                                <div className={`space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-64 opacity-100 mt-1' : 'max-h-0 opacity-0'}`}>
+                                <div className={`space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[32rem] opacity-100 mt-1' : 'max-h-0 opacity-0'}`}>
                                     {node.items.map((item) => {
                                         const isActive = pathname === item.href;
                                         const Icon = item.icon;

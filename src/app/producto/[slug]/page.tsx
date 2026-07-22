@@ -23,6 +23,7 @@ import {
     CheckCircle2
 } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
+import { trackPixelEvent } from "@/lib/fbPixel";
 import Link from "next/link";
 
 export default function ProductoDetallePage() {
@@ -35,7 +36,7 @@ export default function ProductoDetallePage() {
     const [quantity, setQuantity] = useState(1);
     const [activeImage, setActiveImage] = useState("");
     const [selectedAddons, setSelectedAddons] = useState<Record<string, string[]>>({});
-    const [addonMeta, setAddonMeta] = useState<Record<string, { maxSelections?: number; blocksAttributeId?: string }>>({});
+    const [addonMeta, setAddonMeta] = useState<Record<string, { maxSelections?: number; blocksAttributeId?: string; required?: boolean }>>({});
     const addItem = useCartStore((state) => state.addItem);
     const cartItems = useCartStore((state) => state.items);
 
@@ -46,6 +47,14 @@ export default function ProductoDetallePage() {
                 if (res.ok) {
                     const data = await res.json();
                     setProduct(data);
+
+                    trackPixelEvent('ViewContent', {
+                        content_ids: [data.id],
+                        content_type: 'product',
+                        content_name: data.name,
+                        value: Number(data.price) || 0,
+                        currency: 'ARS'
+                    });
 
                     // Parse images safely
                     let pImages = [];
@@ -63,9 +72,9 @@ export default function ProductoDetallePage() {
                         const attrRes = await fetch("/api/attributes");
                         if (attrRes.ok) {
                             const attrs = await attrRes.json();
-                            const meta: Record<string, { maxSelections?: number; blocksAttributeId?: string }> = {};
+                            const meta: Record<string, { maxSelections?: number; blocksAttributeId?: string; required?: boolean }> = {};
                             attrs.forEach((a: any) => {
-                                meta[a.id] = { maxSelections: a.maxSelections, blocksAttributeId: a.blocksAttributeId };
+                                meta[a.id] = { maxSelections: a.maxSelections, blocksAttributeId: a.blocksAttributeId, required: a.required };
                             });
                             setAddonMeta(meta);
                         }
@@ -127,9 +136,28 @@ export default function ProductoDetallePage() {
         }
     }, [selectedAttributes, product]);
 
+    const getMissingRequiredAddons = (): string[] => {
+        if (!product?.addons) return [];
+        let addonsList: any[] = [];
+        try {
+            addonsList = typeof product.addons === 'string' ? JSON.parse(product.addons) : product.addons;
+        } catch {
+            return [];
+        }
+        return addonsList
+            .filter((addon: any) => addonMeta[addon.attributeId]?.required && (selectedAddons[addon.name] || []).length === 0)
+            .map((addon: any) => addon.name);
+    };
+
     const handleAddToCart = () => {
         if (product.type === "VARIABLE" && !selectedVariant) {
             alert("Por favor selecciona todas las opciones");
+            return;
+        }
+
+        const missingRequiredAddons = getMissingRequiredAddons();
+        if (missingRequiredAddons.length > 0) {
+            alert(`Por favor elegí una opción para: ${missingRequiredAddons.join(', ')}`);
             return;
         }
 
@@ -149,6 +177,15 @@ export default function ProductoDetallePage() {
         };
 
         addItem(itemToAdd);
+
+        trackPixelEvent('AddToCart', {
+            content_ids: [product.id],
+            content_type: 'product',
+            content_name: product.name,
+            value: itemToAdd.price * quantity,
+            currency: 'ARS',
+            contents: [{ id: product.id, quantity }]
+        });
     };
 
     if (isLoading) {
@@ -200,6 +237,8 @@ export default function ProductoDetallePage() {
         return sameId && sameAddons;
     });
     const needsVariantSelection = product.type === "VARIABLE" && !selectedVariant;
+    const missingRequiredAddons = getMissingRequiredAddons();
+    const needsMoreSelection = needsVariantSelection || missingRequiredAddons.length > 0;
     const availableStock = selectedVariant ? selectedVariant.stock : (product.type === "VARIABLE" ? null : product.stock);
     const isOutOfStock = availableStock !== null && availableStock <= 0;
 
@@ -306,17 +345,17 @@ export default function ProductoDetallePage() {
 
                                             <button
                                                 onClick={handleAddToCart}
-                                                disabled={isInCart || needsVariantSelection}
-                                                title={needsVariantSelection ? "Selecciona todas las opciones antes de agregar al carrito" : undefined}
+                                                disabled={isInCart || needsMoreSelection}
+                                                title={needsMoreSelection ? "Selecciona todas las opciones antes de agregar al carrito" : undefined}
                                                 className={`h-12 rounded-xl font-medium text-[12px] uppercase tracking-widest flex items-center justify-center gap-2.5 transition-all active:scale-95 px-6 ${isInCart
                                                     ? "bg-[#23553d]/20 text-[#23553d] border border-[#23553d]/10 cursor-default"
-                                                    : needsVariantSelection
+                                                    : needsMoreSelection
                                                         ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                                         : "bg-primary text-white shadow-md hover:-translate-y-0.5 hover:shadow-xl shadow-primary/10"
                                                     }`}
                                             >
                                                 {isInCart ? <CheckCircle2 className="h-4 w-4" /> : <ShoppingBag className="h-4 w-4" />}
-                                                {isInCart ? "Ya en el Carrito" : needsVariantSelection ? "Elegí las opciones" : "Añadir al Carrito"}
+                                                {isInCart ? "Ya en el Carrito" : needsMoreSelection ? "Elegí las opciones" : "Añadir al Carrito"}
                                             </button>
                                         </>
                                     )}
@@ -422,7 +461,11 @@ export default function ProductoDetallePage() {
                                             <div key={addon.attributeId} className={`space-y-5 transition-opacity ${isBlocked ? 'opacity-30 pointer-events-none' : ''}`}>
                                                 <p className="text-[14px] font-medium text-gray-900 capitalize flex items-center gap-2">
                                                     {addon.name}
-                                                    <span className="text-[11px] opacity-40 font-normal">(opcional)</span>
+                                                    {meta?.required ? (
+                                                        <span className="text-[11px] text-orange-500 font-normal">(obligatorio)</span>
+                                                    ) : (
+                                                        <span className="text-[11px] opacity-40 font-normal">(opcional)</span>
+                                                    )}
                                                     {meta?.maxSelections && (
                                                         <span className="text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
                                                             máx. {meta.maxSelections}

@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { ShoppingBag, SlidersHorizontal, Loader2, CheckCircle2, ChevronRight, Ban } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
+import { trackPixelEvent } from "@/lib/fbPixel";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -247,6 +248,14 @@ function TiendaContent() {
                                                             router.push(`/producto/${product.slug}`);
                                                         } else if (!isInCart && !isOutOfStock) {
                                                             addItem({ ...product, price: displayPrice, image: mainImage, quantity: 1 });
+                                                            trackPixelEvent('AddToCart', {
+                                                                content_ids: [product.id],
+                                                                content_type: 'product',
+                                                                content_name: product.name,
+                                                                value: displayPrice,
+                                                                currency: 'ARS',
+                                                                contents: [{ id: product.id, quantity: 1 }]
+                                                            });
                                                         }
                                                     }}
                                                     disabled={isInCart || isOutOfStock}
