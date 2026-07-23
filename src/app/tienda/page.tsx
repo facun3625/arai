@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
-import { ShoppingBag, SlidersHorizontal, Loader2, CheckCircle2, ChevronRight, Ban } from "lucide-react";
+import { ShoppingBag, SlidersHorizontal, Loader2, CheckCircle2, ChevronRight, Ban, Search } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
 import { trackPixelEvent } from "@/lib/fbPixel";
 import { AnimatePresence, motion } from "framer-motion";
@@ -24,6 +24,7 @@ function TiendaContent() {
     const [products, setProducts] = useState<any[]>([]);
     const [categories, setCategories] = useState<any[]>([]);
     const [selectedCategory, setSelectedCategory] = useState(() => searchParams.get("categoria") || "todas");
+    const [searchTerm, setSearchTerm] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const addItem = useCartStore((state) => state.addItem);
     const cartItems = useCartStore((state) => state.items);
@@ -75,12 +76,13 @@ function TiendaContent() {
         return [slug, ...(cat.children || []).map((c: any) => c.slug)];
     };
 
-    const filteredProducts = selectedCategory === "todas"
+    const filteredProducts = (selectedCategory === "todas"
         ? products
         : products.filter(p => {
             const slugs = getRelevantSlugs(selectedCategory);
             return p.categories.some((c: any) => slugs.includes(c.slug));
-        });
+        })
+    ).filter(p => !searchTerm.trim() || p.name.toLowerCase().includes(searchTerm.trim().toLowerCase()));
 
     // Count for a category including its children
     const getCategoryCount = (cat: any): number => {
@@ -106,11 +108,11 @@ function TiendaContent() {
     const categoryButtonClass = (slug: string, isChild = false) =>
         `whitespace-nowrap transition-all text-[11px] capitalize flex justify-between items-center gap-3 md:w-full ${isChild ? "pl-5 md:pl-6" : ""} ${selectedCategory === slug
             ? "bg-primary text-white md:bg-primary/8 md:text-primary md:font-semibold px-4 py-2 md:py-2 md:px-3 rounded-full md:rounded-xl"
-            : "bg-gray-50 text-gray-400 md:bg-transparent md:text-gray-400 md:hover:text-gray-700 md:hover:bg-gray-50 px-4 py-2 md:py-2 md:px-3 rounded-full md:rounded-xl"
+            : "bg-gray-50 text-gray-600 md:bg-transparent md:text-gray-600 md:hover:text-gray-900 md:hover:bg-gray-50 px-4 py-2 md:py-2 md:px-3 rounded-full md:rounded-xl"
         }`;
 
     const countClass = (slug: string) =>
-        `text-[10px] font-medium ${selectedCategory === slug ? "text-white/70 md:text-primary/50" : "text-gray-300"}`;
+        `text-[10px] font-medium ${selectedCategory === slug ? "text-white/70 md:text-primary/50" : "text-gray-500"}`;
 
     if (isLoading) {
         return (
@@ -202,6 +204,17 @@ function TiendaContent() {
 
                 {/* Grid de Productos */}
                 <main className="flex-1">
+                    <div className="relative mb-6">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
+                        <input
+                            type="text"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="Buscar productos..."
+                            className="w-full bg-gray-50/60 border border-gray-100 rounded-2xl pl-11 pr-4 py-3 text-[13px] text-gray-700 focus:outline-none focus:border-primary/30 focus:bg-white transition-colors placeholder:text-gray-300"
+                        />
+                    </div>
+
                     <div className="flex items-center justify-between mb-10 pb-4 border-b border-gray-50">
                         <p className="text-[11px] text-gray-400 font-medium lowercase">
                             mostrando {filteredProducts.length} productos
