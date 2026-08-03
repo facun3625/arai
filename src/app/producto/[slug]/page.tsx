@@ -144,8 +144,25 @@ export default function ProductoDetallePage() {
         } catch {
             return [];
         }
+
+        // A group that another selection has blocked can't be selected — it's an alternative
+        // to whatever blocked it, not an unmet requirement.
+        const blockedGroups = new Set<string>();
+        addonsList.forEach((addon: any) => {
+            const meta = addonMeta[addon.attributeId];
+            const hasSelection = (selectedAddons[addon.name] || []).length > 0;
+            if (hasSelection && meta?.blocksAttributeId) {
+                const blocked = addonsList.find((a: any) => a.attributeId === meta.blocksAttributeId);
+                if (blocked) blockedGroups.add(blocked.name);
+            }
+        });
+
         return addonsList
-            .filter((addon: any) => addonMeta[addon.attributeId]?.required && (selectedAddons[addon.name] || []).length === 0)
+            .filter((addon: any) =>
+                addonMeta[addon.attributeId]?.required &&
+                !blockedGroups.has(addon.name) &&
+                (selectedAddons[addon.name] || []).length === 0
+            )
             .map((addon: any) => addon.name);
     };
 

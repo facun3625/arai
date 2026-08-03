@@ -412,7 +412,7 @@ export default function CheckoutPage() {
             const res = await fetch("/api/coupons/validate", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ code: couponCodeInput.trim() }),
+                body: JSON.stringify({ code: couponCodeInput.trim(), subtotal }),
             });
             const data = await res.json();
 
@@ -448,9 +448,10 @@ export default function CheckoutPage() {
     if (appliedCoupon) {
         if (appliedCoupon.discountType === 'PERCENTAGE') {
             couponAndZipDiscount += subtotal * (appliedCoupon.discountValue / 100);
-        } else {
+        } else if (appliedCoupon.discountType === 'FIXED') {
             couponAndZipDiscount += appliedCoupon.discountValue;
         }
+        // FREE_SHIPPING doesn't discount the subtotal — it zeroes the shipping cost instead (see effectiveShippingCost below)
     }
 
     if (zipDiscount) {
@@ -470,8 +471,9 @@ export default function CheckoutPage() {
         totalDiscount += subtotal * (bankTransferInfo.discount / 100);
     }
 
-    // Shipping cost only counts if not null
-    const effectiveShippingCost = selectedShipping !== null ? selectedShipping : 0;
+    // Shipping cost only counts if not null — a FREE_SHIPPING coupon zeroes it out
+    const hasFreeShippingCoupon = appliedCoupon?.discountType === 'FREE_SHIPPING';
+    const effectiveShippingCost = hasFreeShippingCoupon ? 0 : (selectedShipping !== null ? selectedShipping : 0);
     const total = Math.max(0, subtotal + effectiveShippingCost - totalDiscount);
 
     const hasTrackedInitiateCheckout = useRef(false);
@@ -922,7 +924,11 @@ export default function CheckoutPage() {
                                                     <div className="flex flex-col">
                                                         <span className="text-xs font-bold text-primary uppercase tracking-widest leading-none mb-1">{appliedCoupon.code}</span>
                                                         <span className="text-[10px] text-gray-500">
-                                                            {appliedCoupon.discountType === 'PERCENTAGE' ? `${appliedCoupon.discountValue}% OFF en productos` : `$${appliedCoupon.discountValue} OFF en productos`}
+                                                            {appliedCoupon.discountType === 'PERCENTAGE'
+                                                                ? `${appliedCoupon.discountValue}% OFF en productos`
+                                                                : appliedCoupon.discountType === 'FREE_SHIPPING'
+                                                                    ? 'Envío gratis'
+                                                                    : `$${appliedCoupon.discountValue} OFF en productos`}
                                                         </span>
                                                     </div>
                                                     <button type="button" onClick={handleRemoveCoupon} className="text-[10px] text-red-500 font-bold uppercase hover:underline">
@@ -1531,9 +1537,16 @@ export default function CheckoutPage() {
                                 ) : isCalculatingShipping ? (
                                     <span className="text-xs text-primary animate-pulse font-medium">calculando...</span>
                                 ) : (ocaQuote || selectedShipping !== null) ? (
-                                    <span className="font-medium text-gray-900">
-                                        $ {(selectedShipping || ocaQuote?.price || 0).toLocaleString('es-AR')}
-                                    </span>
+                                    hasFreeShippingCoupon ? (
+                                        <span className="font-medium text-primary flex items-center gap-1.5">
+                                            <span className="line-through text-gray-300 font-normal">$ {(selectedShipping || ocaQuote?.price || 0).toLocaleString('es-AR')}</span>
+                                            Gratis
+                                        </span>
+                                    ) : (
+                                        <span className="font-medium text-gray-900">
+                                            $ {(selectedShipping || ocaQuote?.price || 0).toLocaleString('es-AR')}
+                                        </span>
+                                    )
                                 ) : shippingAddress.zipCode?.length === 4 ? (
                                     <span className="text-xs text-red-400 italic">Error de conexión</span>
                                 ) : (

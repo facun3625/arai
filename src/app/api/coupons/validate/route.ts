@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { code, userId, email } = body;
+        const { code, userId, email, subtotal } = body;
 
         if (!code) return NextResponse.json({ error: "Missing coupon code" }, { status: 400 });
 
@@ -14,6 +14,13 @@ export async function POST(req: Request) {
 
         if (!coupon) return NextResponse.json({ error: "Cupón no encontrado" }, { status: 404 });
         if (!coupon.isActive) return NextResponse.json({ error: "Este cupón ya no está activo" }, { status: 400 });
+
+        // Check minimum purchase amount
+        if (coupon.minPurchaseAmount && typeof subtotal === "number" && subtotal < coupon.minPurchaseAmount) {
+            return NextResponse.json({
+                error: `La compra mínima para este cupón es $${coupon.minPurchaseAmount.toLocaleString('es-AR')}`
+            }, { status: 400 });
+        }
 
         // Check expiration
         if (coupon.expiresAt && new Date() > coupon.expiresAt) {

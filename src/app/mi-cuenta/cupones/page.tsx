@@ -97,7 +97,9 @@ export default function MisCuponesPage() {
                                 <h3 className="text-2xl font-medium text-gray-900 tracking-tight mb-1">
                                     {coupon.discountType === 'PERCENTAGE'
                                         ? `${coupon.discountValue}% OFF`
-                                        : `$${coupon.discountValue} OFF`}
+                                        : coupon.discountType === 'FREE_SHIPPING'
+                                            ? 'Envío gratis'
+                                            : `$${coupon.discountValue} OFF`}
                                 </h3>
                                 <p className="text-xs text-gray-500">
                                     Generado el {new Date(coupon.createdAt).toLocaleDateString('es-AR')}

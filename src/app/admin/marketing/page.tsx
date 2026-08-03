@@ -291,14 +291,15 @@ export default function MarketingPage() {
 
     const handleCreateCoupon = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!couponForm.code || !couponForm.discountValue) return;
+        const isFreeShipping = couponForm.discountType === "FREE_SHIPPING";
+        if (!couponForm.code || (!isFreeShipping && !couponForm.discountValue)) return;
 
         setIsSubmittingCoupon(true);
         try {
             const res = await fetch("/api/coupons", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(couponForm)
+                body: JSON.stringify({ ...couponForm, discountValue: isFreeShipping ? "0" : couponForm.discountValue })
             });
             const data = await res.json();
 
@@ -980,22 +981,29 @@ export default function MarketingPage() {
                                             <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Tipo</label>
                                             <select
                                                 value={couponForm.discountType}
-                                                onChange={(e) => setCouponForm({ ...couponForm, discountType: e.target.value })}
+                                                onChange={(e) => setCouponForm({ ...couponForm, discountType: e.target.value, discountValue: e.target.value === "FREE_SHIPPING" ? "0" : couponForm.discountValue })}
                                                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors appearance-none"
                                             >
                                                 <option value="PERCENTAGE">Porcentaje (%)</option>
                                                 <option value="FIXED">Monto Fijo ($)</option>
+                                                <option value="FREE_SHIPPING">Envío Gratis</option>
                                             </select>
                                         </div>
                                         <div className="space-y-1.5">
                                             <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Valor</label>
-                                            <input
-                                                type="number"
-                                                value={couponForm.discountValue}
-                                                onChange={(e) => setCouponForm({ ...couponForm, discountValue: e.target.value })}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
-                                                required
-                                            />
+                                            {couponForm.discountType === "FREE_SHIPPING" ? (
+                                                <div className="w-full bg-white/[0.02] border border-white/5 rounded-xl px-4 py-3 text-[13px] text-white/30 italic">
+                                                    No aplica
+                                                </div>
+                                            ) : (
+                                                <input
+                                                    type="number"
+                                                    value={couponForm.discountValue}
+                                                    onChange={(e) => setCouponForm({ ...couponForm, discountValue: e.target.value })}
+                                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                                    required
+                                                />
+                                            )}
                                         </div>
                                     </div>
 
@@ -1117,7 +1125,7 @@ export default function MarketingPage() {
                                                             {!c.isActive && <span className="ml-2 text-[9px] text-red-400 border border-red-400/20 px-1.5 py-0.5 rounded uppercase font-bold tracking-widest">Inactivo</span>}
                                                         </td>
                                                         <td className="px-6 py-4 text-[13px] text-white">
-                                                            {c.discountType === 'PERCENTAGE' ? `${c.discountValue}% OFF` : `$${c.discountValue.toLocaleString('es-AR')} OFF`}
+                                                            {c.discountType === 'PERCENTAGE' ? `${c.discountValue}% OFF` : c.discountType === 'FREE_SHIPPING' ? 'Envío gratis' : `$${c.discountValue.toLocaleString('es-AR')} OFF`}
                                                         </td>
                                                         <td className="px-6 py-4 text-[11px] text-white/60 space-y-0.5">
                                                             {c.minPurchaseAmount ? <div>Mín. ${c.minPurchaseAmount.toLocaleString('es-AR')}</div> : null}
