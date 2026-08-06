@@ -39,9 +39,13 @@ export async function POST(request: Request) {
                 }
             }
 
-            const requiredAttributeIds = new Set(
-                (await tx.attribute.findMany({ where: { required: true }, select: { id: true } })).map(a => a.id)
-            );
+            // Need every addon attribute's required + blocksAttributeId, not just the required ones —
+            // a required addon that got blocked by another selection is no longer a pending requirement.
+            const addonAttributes = await tx.attribute.findMany({
+                where: { isAddon: true },
+                select: { id: true, required: true, blocksAttributeId: true }
+            });
+            const addonAttributeById = new Map(addonAttributes.map(a => [a.id, a]));
 
             // Validate and lock stock for each item, and resolve the real weight from the DB
             // (never trust the client for this — it's what gets declared to the carrier).
@@ -80,8 +84,21 @@ export async function POST(request: Request) {
                         addonsList = [];
                     }
                     const itemAddons = item.addons && typeof item.addons === 'object' ? item.addons : {};
+
+                    // A group that another selected addon blocks isn't a pending requirement anymore.
+                    const blockedAttributeIds = new Set<string>();
                     for (const addon of addonsList) {
-                        if (!requiredAttributeIds.has(addon.attributeId)) continue;
+                        const selected = itemAddons[addon.name];
+                        const hasSelection = Array.isArray(selected) && selected.length > 0;
+                        const meta = addonAttributeById.get(addon.attributeId);
+                        if (hasSelection && meta?.blocksAttributeId) {
+                            blockedAttributeIds.add(meta.blocksAttributeId);
+                        }
+                    }
+
+                    for (const addon of addonsList) {
+                        const meta = addonAttributeById.get(addon.attributeId);
+                        if (!meta?.required || blockedAttributeIds.has(addon.attributeId)) continue;
                         const selected = itemAddons[addon.name];
                         if (!Array.isArray(selected) || selected.length === 0) {
                             throw new Error(`Falta elegir una opción de "${addon.name}" para "${item.name}"`);
