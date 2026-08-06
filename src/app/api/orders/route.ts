@@ -27,6 +27,10 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Datos de pedido incompletos' }, { status: 400 });
         }
 
+        if (paymentMethod === 'transferencia' && !paymentProof) {
+            return NextResponse.json({ error: 'Falta adjuntar el comprobante de la transferencia' }, { status: 400 });
+        }
+
         const order = await prisma.$transaction(async (tx) => {
             // Verify if user exists if userId is provided
             let validUserId = null;

@@ -499,6 +499,11 @@ export default function CheckoutPage() {
     const handleFinalPurchase = async () => {
         if (!selectedPayment) return;
 
+        if (selectedPayment === 'transferencia' && !paymentProofUrl) {
+            setNotification({ message: "Adjuntá el comprobante de la transferencia para poder finalizar la compra.", type: 'error' });
+            return;
+        }
+
         setIsProcessing(true);
 
         try {
@@ -701,11 +706,9 @@ export default function CheckoutPage() {
                     currency: 'ARS'
                 });
 
-                // Clear cart for transferency
-                clearCart();
-                // Success feedback and redirect to Orders for Transferency
-                setNotification({ message: "¡Compra realizada con éxito! Tu pedido ha sido registrado.", type: 'success' });
-                setTimeout(() => router.push('/mi-cuenta/pedidos'), 2000);
+                // Redirect immediately to the pending-payment page (it clears the cart itself) —
+                // waiting here with an already-empty cart flashed the "Checkout Incompleto" guard below.
+                router.push(`/checkout/pending?orderId=${order.id}`);
             }
         } catch (error: any) {
             console.error("Error finalizing purchase:", error);
@@ -1299,7 +1302,7 @@ export default function CheckoutPage() {
                                                                     <p className="text-[10px] text-emerald-600 italic">Hacé clic en el número para copiarlo.</p>
                                                                 </div>
                                                             )}
-                                                            <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-4">Adjuntar Comprobante (Opcional)</p>
+                                                            <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-4">Adjuntar Comprobante <span className="text-orange-500">(Obligatorio)</span></p>
                                                             <div className="flex items-center gap-4">
                                                                 <label className="flex-1">
                                                                     <div className={`border-2 border-dashed rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer transition-all ${paymentProofUrl ? 'border-emerald-200 bg-emerald-50/30' : 'border-gray-100 bg-gray-50/30 hover:border-gray-200'}`}>
@@ -1384,7 +1387,7 @@ export default function CheckoutPage() {
 
                                     <button
                                         type="button"
-                                        disabled={selectedPayment === null || isProcessing}
+                                        disabled={selectedPayment === null || isProcessing || (selectedPayment === 'transferencia' && !paymentProofUrl)}
                                         onClick={handleFinalPurchase}
                                         className="w-full h-16 bg-primary hover:bg-primary/90 text-white rounded-2xl font-bold text-sm uppercase tracking-widest flex items-center justify-center gap-3 shadow-[0_10px_40px_-10px_rgba(40,167,69,0.5)] transition-all hover:-translate-y-1 active:scale-95 disabled:opacity-50 disabled:hover:translate-y-0 disabled:shadow-none disabled:cursor-not-allowed mt-8"
                                     >
