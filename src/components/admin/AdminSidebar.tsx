@@ -150,7 +150,7 @@ export const AdminSidebar = ({ mobileOpen = false, onClose }: { mobileOpen?: boo
                     className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] lg:hidden"
                 />
             )}
-            <aside className={`fixed lg:sticky top-0 left-0 h-screen z-[70] lg:z-auto w-64 bg-[#0c120e] text-white/90 flex flex-col border-r border-white/5 font-montserrat transform transition-transform duration-300 lg:translate-x-0 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <aside className={`fixed lg:sticky top-0 left-0 h-[100dvh] z-[70] lg:z-auto w-64 bg-[#0c120e] text-white/90 flex flex-col border-r border-white/5 font-montserrat transform transition-transform duration-300 lg:translate-x-0 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
             {/* Navigation */}
             <nav className="flex-1 p-4 space-y-1 mt-8 overflow-y-auto">
                 {menuItems.map((node, i) => {
