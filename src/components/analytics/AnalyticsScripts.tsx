@@ -1,7 +1,13 @@
 import Script from "next/script";
+import { unstable_noStore as noStore } from "next/cache";
 import { prisma } from "@/lib/prisma";
 
 export async function AnalyticsScripts() {
+    // Never cache this — the pixel/analytics IDs come from admin settings and must reflect
+    // the latest value immediately, without waiting for a rebuild. Without this, Next.js
+    // bakes the build-time IDs into the static HTML and keeps serving the old pixel.
+    noStore();
+
     const settings = await prisma.storeSettings.findUnique({
         where: { id: "global" },
         select: { metaPixelId: true, ga4MeasurementId: true },
