@@ -47,7 +47,7 @@ export const SideCart = () => {
                         animate={{ x: 0 }}
                         exit={{ x: "100%" }}
                         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                        className="fixed right-0 top-0 h-full w-full max-w-[450px] bg-white z-[101] shadow-2xl flex flex-col font-montserrat"
+                        className="fixed right-0 top-0 h-full w-[88%] max-w-[450px] bg-white z-[101] shadow-2xl flex flex-col font-montserrat"
                     >
                         {/* Header */}
                         <div className="p-6 md:p-8 flex items-center justify-between border-b border-gray-100">
