@@ -79,7 +79,7 @@ const menuItems: MenuNode[] = [
     { name: "base de conocimiento", href: "/admin/knowledge", icon: BookOpen },
 ];
 
-export const AdminSidebar = () => {
+export const AdminSidebar = ({ mobileOpen = false, onClose }: { mobileOpen?: boolean; onClose?: () => void }) => {
     const pathname = usePathname();
     const { user, logout } = useAuthStore();
     const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
@@ -142,7 +142,15 @@ export const AdminSidebar = () => {
     }, [user?.id]);
 
     return (
-        <aside className="w-64 bg-[#0c120e] text-white/90 flex flex-col h-screen sticky top-0 border-r border-white/5 font-montserrat">
+        <>
+            {/* Mobile backdrop */}
+            {mobileOpen && (
+                <div
+                    onClick={onClose}
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] lg:hidden"
+                />
+            )}
+            <aside className={`fixed lg:sticky top-0 left-0 h-screen z-[70] lg:z-auto w-64 bg-[#0c120e] text-white/90 flex flex-col border-r border-white/5 font-montserrat transform transition-transform duration-300 lg:translate-x-0 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
             {/* Navigation */}
             <nav className="flex-1 p-4 space-y-1 mt-8 overflow-y-auto">
                 {menuItems.map((node, i) => {
@@ -173,6 +181,7 @@ export const AdminSidebar = () => {
                                             <Link
                                                 key={item.name}
                                                 href={item.href}
+                                                onClick={onClose}
                                                 className={`flex items-center gap-3 pl-11 pr-4 py-2.5 rounded-xl text-[10.5px] transition-all group ${isActive
                                                     ? "bg-primary/20 text-primary font-medium"
                                                     : "hover:bg-white/5 text-white/50 hover:text-white"
@@ -198,6 +207,7 @@ export const AdminSidebar = () => {
                         <Link
                             key={item.name}
                             href={item.href}
+                            onClick={onClose}
                             className={`flex items-center justify-between px-4 py-3 rounded-xl text-[11px] transition-all group ${isActive
                                 ? "bg-primary text-white shadow-lg shadow-primary/20"
                                 : "hover:bg-white/5 text-white/60 hover:text-white"
@@ -260,6 +270,7 @@ export const AdminSidebar = () => {
                     cerrar sesión
                 </button>
             </div>
-        </aside>
+            </aside>
+        </>
     );
 };
