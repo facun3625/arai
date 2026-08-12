@@ -167,6 +167,12 @@ export const SideCart = () => {
                                     >
                                         ver carrito completo
                                     </Link>
+                                    <button
+                                        onClick={closeDrawer}
+                                        className="w-full text-[11px] font-bold text-gray-400 hover:text-primary uppercase tracking-widest transition-colors pt-1"
+                                    >
+                                        seguir comprando
+                                    </button>
                                 </div>
                             </div>
                         )}
