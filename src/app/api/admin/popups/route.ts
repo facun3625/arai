@@ -27,7 +27,8 @@ export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
         console.log("DEBUG: Saving popup request body:", body);
-        const { adminId, location, isActive, imageUrl, displayFrequency } = body;
+        const { adminId, location, isActive, imageUrl, displayFrequency, title, description } = body;
+        const type = body.type === "NEWSLETTER" ? "NEWSLETTER" : "IMAGE";
 
         if (!adminId) {
             return NextResponse.json({ error: "Missing adminId" }, { status: 401 });
@@ -42,24 +43,28 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Forbidden: Admin role required" }, { status: 403 });
         }
 
-        if (!location || !imageUrl) {
-            return NextResponse.json({ error: "Missing required fields (location or imageUrl)" }, { status: 400 });
+        if (!location) {
+            return NextResponse.json({ error: "Missing required field (location)" }, { status: 400 });
         }
+
+        // An image popup needs an image; a newsletter popup doesn't.
+        if (type === "IMAGE" && !imageUrl) {
+            return NextResponse.json({ error: "Falta la imagen del pop-up" }, { status: 400 });
+        }
+
+        const data = {
+            isActive: Boolean(isActive),
+            type,
+            imageUrl: imageUrl || "",
+            title: title || null,
+            description: description || null,
+            displayFrequency: displayFrequency || "SESSION",
+        };
 
         const popup = await prisma.popup.upsert({
             where: { location },
-            update: {
-                isActive: Boolean(isActive),
-                imageUrl,
-                displayFrequency: displayFrequency || "SESSION",
-                updatedAt: new Date()
-            },
-            create: {
-                location,
-                isActive: Boolean(isActive),
-                imageUrl,
-                displayFrequency: displayFrequency || "SESSION"
-            }
+            update: { ...data, updatedAt: new Date() },
+            create: { location, ...data }
         });
 
         return NextResponse.json(popup);

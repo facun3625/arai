@@ -261,7 +261,10 @@ model Popup {
   id               String   @id @default(cuid())
   location         String   @unique
   isActive         Boolean  @default(false)
-  imageUrl         String
+  type             String   @default("IMAGE") // "IMAGE" | "NEWSLETTER"
+  imageUrl         String   @default("")
+  title            String?
+  description      String?
   displayFrequency String   @default("SESSION")
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt

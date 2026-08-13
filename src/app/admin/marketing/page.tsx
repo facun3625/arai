@@ -223,7 +223,7 @@ export default function MarketingPage() {
     };
 
     const handleLocalPopupUpdate = (location: string, updates: Partial<any>) => {
-        const currentPopup = popups.find(p => p.location === location) || { location, imageUrl: "", isActive: false, displayFrequency: "SESSION" };
+        const currentPopup = popups.find(p => p.location === location) || { location, type: "IMAGE", imageUrl: "", title: "", description: "", isActive: false, displayFrequency: "SESSION" };
         const baseEditing = editingPopups[location] || currentPopup;
         
         setEditingPopups({
@@ -1311,7 +1311,7 @@ export default function MarketingPage() {
                 {activeTab === "popups" && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {["HOME", "SHOP"].map((loc) => {
-                            const originalPopup = popups.find(p => p.location === loc) || { location: loc, imageUrl: "", isActive: false, displayFrequency: "SESSION" };
+                            const originalPopup = popups.find(p => p.location === loc) || { location: loc, type: "IMAGE", imageUrl: "", title: "", description: "", isActive: false, displayFrequency: "SESSION" };
                             const popup = editingPopups[loc] || originalPopup;
                             const hasChanges = JSON.stringify(popup) !== JSON.stringify(originalPopup);
                             const isSaved = lastSavedPopup === loc;
@@ -1343,9 +1343,54 @@ export default function MarketingPage() {
                                     </div>
 
                                     <div className="space-y-4">
+                                        {/* Popup type selector */}
+                                        <div className="bg-black/20 rounded-2xl p-4 border border-white/5 space-y-3">
+                                            <label className="text-[11px] text-white/60 font-medium">Tipo de pop-up</label>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <button
+                                                    onClick={() => handleLocalPopupUpdate(loc, { type: "IMAGE" })}
+                                                    className={`py-2 px-3 rounded-lg text-[10px] font-bold uppercase tracking-tight transition-all border ${popup.type !== 'NEWSLETTER' ? 'bg-primary/10 border-primary/40 text-primary' : 'bg-white/5 border-white/10 text-white/40 hover:text-white/60'}`}
+                                                >
+                                                    Imagen
+                                                </button>
+                                                <button
+                                                    onClick={() => handleLocalPopupUpdate(loc, { type: "NEWSLETTER" })}
+                                                    className={`py-2 px-3 rounded-lg text-[10px] font-bold uppercase tracking-tight transition-all border ${popup.type === 'NEWSLETTER' ? 'bg-primary/10 border-primary/40 text-primary' : 'bg-white/5 border-white/10 text-white/40 hover:text-white/60'}`}
+                                                >
+                                                    Newsletter
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Newsletter texts */}
+                                        {popup.type === 'NEWSLETTER' && (
+                                            <div className="bg-black/20 rounded-2xl p-4 border border-white/5 space-y-3">
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[11px] text-white/60 font-medium">Título</label>
+                                                    <input
+                                                        type="text"
+                                                        value={popup.title || ""}
+                                                        onChange={(e) => handleLocalPopupUpdate(loc, { title: e.target.value })}
+                                                        placeholder="Suscribite a nuestro newsletter"
+                                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[13px] text-white focus:outline-none focus:border-primary transition-colors placeholder:text-white/20"
+                                                    />
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[11px] text-white/60 font-medium">Descripción</label>
+                                                    <textarea
+                                                        rows={2}
+                                                        value={popup.description || ""}
+                                                        onChange={(e) => handleLocalPopupUpdate(loc, { description: e.target.value })}
+                                                        placeholder="Enterate primero de nuestras novedades y promociones."
+                                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[13px] text-white focus:outline-none focus:border-primary transition-colors resize-none placeholder:text-white/20"
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+
                                         <div className="bg-black/20 rounded-2xl p-4 border border-white/5">
                                             <div className="flex items-center justify-between mb-4">
-                                                <span className="text-[11px] text-white/60 font-medium">Imagen del Pop-up</span>
+                                                <span className="text-[11px] text-white/60 font-medium">{popup.type === 'NEWSLETTER' ? 'Imagen (opcional)' : 'Imagen del Pop-up'}</span>
                                                 <span className="text-[10px] text-primary/60 font-mono italic">Tamaño flexible</span>
                                             </div>
 
