@@ -28,7 +28,7 @@ import { motion, AnimatePresence } from "framer-motion";
 type CheckoutStep = 1 | 2 | 3;
 
 export default function CheckoutPage() {
-    const { items, clearCart } = useCartStore();
+    const { items, clearCart, removeItem } = useCartStore();
     const { isAuthenticated, user } = useAuthStore();
     const [currentStep, setCurrentStep] = useState<CheckoutStep>(1);
     const [isHydrated, setIsHydrated] = useState(false);
@@ -712,6 +712,26 @@ export default function CheckoutPage() {
             }
         } catch (error: any) {
             console.error("Error finalizing purchase:", error);
+
+            // Some errors mean the cart is referencing a product/variant that no longer exists
+            // (e.g. it was edited/removed in admin after being added to a cart persisted in
+            // localStorage) — retrying changes nothing, the customer gets stuck forever. Detect
+            // that specific case, drop the stale item automatically, and explain what happened.
+            const staleMatch = typeof error.message === 'string'
+                && error.message.match(/^(?:Opción inválida para|Producto no encontrado:) "(.+)"$/);
+            if (staleMatch) {
+                const staleName = staleMatch[1];
+                const staleItem = items.find(i => i.name === staleName);
+                if (staleItem) {
+                    removeItem(staleItem.id);
+                    setNotification({
+                        message: `"${staleName}" ya no está disponible con esa opción (el producto fue actualizado). Lo quitamos del carrito, por favor volvé a agregarlo y elegí la opción nuevamente.`,
+                        type: 'error'
+                    });
+                    return;
+                }
+            }
+
             setNotification({
                 message: error.message || "Ocurrió un error al procesar la compra. Por favor, revisa los datos.",
                 type: 'error'

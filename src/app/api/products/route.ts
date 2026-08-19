@@ -230,13 +230,23 @@ export async function PUT(req: Request) {
             }
         }
 
-        // Reconcile variants if variable
+        // Reconcile variants if variable.
+        // IMPORTANT: update-in-place by id instead of delete-all+recreate — customer carts
+        // (persisted in localStorage) reference a variantId, and blowing away every variant
+        // on any unrelated edit (e.g. just a stock tweak) silently invalidated every cart that
+        // already had the product, permanently blocking checkout with "Opción inválida".
         if (type === "VARIABLE" && variants) {
-            // Delete old variants
-            await prisma.variant.deleteMany({ where: { productId: id } });
-            // Create new ones
-            await prisma.variant.createMany({
-                data: variants.map((v: any) => ({
+            const existingVariants = await prisma.variant.findMany({ where: { productId: id }, select: { id: true } });
+            const existingIds = new Set(existingVariants.map(v => v.id));
+            const incomingIds = new Set(variants.filter((v: any) => v.id && existingIds.has(v.id)).map((v: any) => v.id));
+
+            const idsToDelete = [...existingIds].filter(vid => !incomingIds.has(vid));
+            if (idsToDelete.length > 0) {
+                await prisma.variant.deleteMany({ where: { id: { in: idsToDelete } } });
+            }
+
+            for (const v of variants) {
+                const variantData = {
                     productId: id,
                     price: parseFloat(v.price) || 0,
                     compareAtPrice: (v.compareAtPrice && !isNaN(parseFloat(v.compareAtPrice))) ? parseFloat(v.compareAtPrice) : null,
@@ -247,8 +257,13 @@ export async function PUT(req: Request) {
                     height: (v.height && !isNaN(parseFloat(v.height))) ? parseFloat(v.height) : null,
                     length: (v.length && !isNaN(parseFloat(v.length))) ? parseFloat(v.length) : null,
                     attributes: JSON.stringify(v.attributes || {})
-                }))
-            });
+                };
+                if (v.id && existingIds.has(v.id)) {
+                    await prisma.variant.update({ where: { id: v.id }, data: variantData });
+                } else {
+                    await prisma.variant.create({ data: variantData });
+                }
+            }
         }
 
         return NextResponse.json(product);
