@@ -79,11 +79,18 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: table?.Error || "No se pudo obtener cotización de OCA" }, { status: 400 });
         }
 
-        const price = parseFloat(table.Total || table.Precio || "0");
+        // OCA's tariff comes back without IVA — add the 21% here, once, so every
+        // consumer of this quote (domicilio, sucursal discount, final charge) is consistent.
+        // priceBeforeTax/iva are kept separate so the UI can show the breakdown to the customer.
+        const priceBeforeTax = parseFloat(table.Total || table.Precio || "0");
+        const iva = priceBeforeTax * 0.21;
+        const price = priceBeforeTax + iva;
         const deliveryDays = parseInt(table.PlazoEntrega || "0");
 
         return NextResponse.json({
             price: price,
+            priceBeforeTax: priceBeforeTax,
+            iva: iva,
             deliveryDays: deliveryDays,
             method: "OCA a Domicilio"
         });

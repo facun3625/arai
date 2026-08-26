@@ -157,6 +157,17 @@ export async function POST(req: Request) {
 
         const totalWeightKg = order.items.reduce((sum: number, item: any) => sum + (Number(item.weight) || 1) * item.quantity, 0);
         const pesoKg = Math.max(1, Math.ceil(totalWeightKg));
+
+        // Box dimensions: OCA only takes one package per shipment here, so we can't
+        // truly bin-pack — use the largest item's real dimensions (from the DB, captured
+        // at order time) as a conservative single-box estimate instead of a fixed value
+        // that doesn't reflect what's actually being shipped.
+        const DEFAULT_DIM_CM = 20;
+        const maxDim = (key: "width" | "height" | "length") =>
+            order.items.reduce((max: number, item: any) => Math.max(max, Number(item[key]) || 0), 0) || DEFAULT_DIM_CM;
+        const altoCm = Math.ceil(maxDim("height"));
+        const anchoCm = Math.ceil(maxDim("width"));
+        const largoCm = Math.ceil(maxDim("length"));
         const idCentro = addr?.branchId || "0";
         const nroRemito = String((order as any).orderNumber || parseInt(orderId.replace(/\D/g, "").slice(-6) || "1", 10) || 1);
         const provincia = normalizeProvince(addr?.province || "");
@@ -165,7 +176,7 @@ export async function POST(req: Request) {
         const { piso, depto } = parseApartment(addr?.apartment || "");
         const fecha = new Date().toISOString().slice(0, 10).replace(/-/g, "");
 
-        const xmlDatos = `<?xml version="1.0" encoding="iso-8859-1" standalone="yes"?><ROWS><cabecera ver="2.0" nrocuenta="${escapeXml(nroCliente)}" origen="API" /><origenes><origen calle="${escapeXml(originStreetClean)}" nro="${escapeXml(originNumber)}" piso="${escapeXml(originFloor)}" depto="" cp="${escapeXml(originZip)}" localidad="${escapeXml(originCity)}" provincia="${escapeXml(originProvince)}" contacto="${escapeXml(originContact)}" email="${escapeXml(originEmail)}" solicitante="" observaciones="" centrocosto="${centroCosto}" idfranjahoraria="${franjaHoraria}" idcentroimposicionorigen="${idCentroOrigen}" fecha="${fecha}"><envios><envio idoperativa="${escapeXml(operativa)}" nroremito="${nroRemito}"><destinatario apellido="${escapeXml(removeAccents((order.contactLastName || "").trim()))}" nombre="${escapeXml(removeAccents((order.contactName || "").trim()))}" calle="${escapeXml(removeAccents((addr?.street || "").trim()))}" nro="${escapeXml((addr?.number || "").trim())}" piso="${escapeXml(piso)}" depto="${escapeXml(depto)}" localidad="${escapeXml(localidad)}" provincia="${escapeXml(provincia)}" cp="${(addr?.zipCode || "").trim()}" telefono="${(order.contactPhone || "").trim()}" email="${escapeXml(email)}" idci="${idCentro}" celular="${(order.contactPhone || "").trim()}" observaciones="" /><paquetes><paquete alto="15" ancho="15" largo="15" peso="${pesoKg}" valor="0" cant="1" /></paquetes></envio></envios></origen></origenes></ROWS>`;
+        const xmlDatos = `<?xml version="1.0" encoding="iso-8859-1" standalone="yes"?><ROWS><cabecera ver="2.0" nrocuenta="${escapeXml(nroCliente)}" origen="API" /><origenes><origen calle="${escapeXml(originStreetClean)}" nro="${escapeXml(originNumber)}" piso="${escapeXml(originFloor)}" depto="" cp="${escapeXml(originZip)}" localidad="${escapeXml(originCity)}" provincia="${escapeXml(originProvince)}" contacto="${escapeXml(originContact)}" email="${escapeXml(originEmail)}" solicitante="" observaciones="" centrocosto="${centroCosto}" idfranjahoraria="${franjaHoraria}" idcentroimposicionorigen="${idCentroOrigen}" fecha="${fecha}"><envios><envio idoperativa="${escapeXml(operativa)}" nroremito="${nroRemito}"><destinatario apellido="${escapeXml(removeAccents((order.contactLastName || "").trim()))}" nombre="${escapeXml(removeAccents((order.contactName || "").trim()))}" calle="${escapeXml(removeAccents((addr?.street || "").trim()))}" nro="${escapeXml((addr?.number || "").trim())}" piso="${escapeXml(piso)}" depto="${escapeXml(depto)}" localidad="${escapeXml(localidad)}" provincia="${escapeXml(provincia)}" cp="${(addr?.zipCode || "").trim()}" telefono="${(order.contactPhone || "").trim()}" email="${escapeXml(email)}" idci="${idCentro}" celular="${(order.contactPhone || "").trim()}" observaciones="" /><paquetes><paquete alto="${altoCm}" ancho="${anchoCm}" largo="${largoCm}" peso="${pesoKg}" valor="0" cant="1" /></paquetes></envio></envios></origen></origenes></ROWS>`;
 
         console.log("OCA IngresoORMultiplesRetiros XML:", xmlDatos);
 

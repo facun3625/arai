@@ -118,7 +118,7 @@ export default function CheckoutPage() {
 
     const [selectedShipping, setSelectedShipping] = useState<number | null>(null);
     const [selectedShippingMethod, setSelectedShippingMethod] = useState<string | null>(null);
-    const [ocaQuote, setOcaQuote] = useState<{ price: number; deliveryDays: number } | null>(null);
+    const [ocaQuote, setOcaQuote] = useState<{ price: number; priceBeforeTax: number; iva: number; deliveryDays: number } | null>(null);
     const [ocaBranches, setOcaBranches] = useState<any[]>([]);
     const [selectedBranchId, setSelectedBranchId] = useState<string | null>(null);
     const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
@@ -475,6 +475,19 @@ export default function CheckoutPage() {
     const hasFreeShippingCoupon = appliedCoupon?.discountType === 'FREE_SHIPPING';
     const effectiveShippingCost = hasFreeShippingCoupon ? 0 : (selectedShipping !== null ? selectedShipping : 0);
     const total = Math.max(0, subtotal + effectiveShippingCost - totalDiscount);
+
+    // Discriminated shipping breakdown (envío + IVA) for OCA methods — sucursal is priced
+    // at 70% of domicilio, so the base/iva split scales down with it too.
+    const shippingBreakdown = ocaQuote && (selectedShippingMethod === 'oca_domicilio' || selectedShippingMethod === 'oca_sucursal')
+        ? (() => {
+            const factor = selectedShippingMethod === 'oca_sucursal' ? 0.7 : 1;
+            return {
+                base: ocaQuote.priceBeforeTax * factor,
+                iva: ocaQuote.iva * factor,
+                total: ocaQuote.price * factor
+            };
+        })()
+        : null;
 
     const hasTrackedInitiateCheckout = useRef(false);
     useEffect(() => {
@@ -1553,29 +1566,52 @@ export default function CheckoutPage() {
                                 <span className="font-medium text-gray-900">$ {subtotal.toLocaleString('es-AR')}</span>
                             </div>
 
-                            <div className="flex justify-between items-center text-sm">
-                                <span className="text-gray-500">Costo de envío</span>
-                                {currentStep === 1 ? (
+                            {currentStep === 1 ? (
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-gray-500">Costo de envío</span>
                                     <span className="text-[10px] text-gray-400 italic">Se calcula en el siguiente paso</span>
-                                ) : isCalculatingShipping ? (
+                                </div>
+                            ) : isCalculatingShipping ? (
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-gray-500">Costo de envío</span>
                                     <span className="text-xs text-primary animate-pulse font-medium">calculando...</span>
-                                ) : (ocaQuote || selectedShipping !== null) ? (
-                                    hasFreeShippingCoupon ? (
-                                        <span className="font-medium text-primary flex items-center gap-1.5">
-                                            <span className="line-through text-gray-300 font-normal">$ {(selectedShipping || ocaQuote?.price || 0).toLocaleString('es-AR')}</span>
-                                            Gratis
-                                        </span>
+                                </div>
+                            ) : shippingBreakdown && !hasFreeShippingCoupon ? (
+                                <div className="space-y-1.5">
+                                    <div className="flex justify-between items-center text-sm">
+                                        <span className="text-gray-500">Envío</span>
+                                        <span className="font-medium text-gray-900">$ {shippingBreakdown.base.toLocaleString('es-AR', { maximumFractionDigits: 0 })}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-sm">
+                                        <span className="text-gray-500">IVA (21%)</span>
+                                        <span className="font-medium text-gray-900">$ {shippingBreakdown.iva.toLocaleString('es-AR', { maximumFractionDigits: 0 })}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-sm">
+                                        <span className="text-gray-700 font-medium">Total envío</span>
+                                        <span className="font-bold text-gray-900">$ {shippingBreakdown.total.toLocaleString('es-AR', { maximumFractionDigits: 0 })}</span>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-gray-500">Costo de envío</span>
+                                    {(ocaQuote || selectedShipping !== null) ? (
+                                        hasFreeShippingCoupon ? (
+                                            <span className="font-medium text-primary flex items-center gap-1.5">
+                                                <span className="line-through text-gray-300 font-normal">$ {(shippingBreakdown?.total ?? selectedShipping ?? ocaQuote?.price ?? 0).toLocaleString('es-AR')}</span>
+                                                Gratis
+                                            </span>
+                                        ) : (
+                                            <span className="font-medium text-gray-900">
+                                                $ {(selectedShipping || ocaQuote?.price || 0).toLocaleString('es-AR')}
+                                            </span>
+                                        )
+                                    ) : shippingAddress.zipCode?.length === 4 ? (
+                                        <span className="text-xs text-red-400 italic">Error de conexión</span>
                                     ) : (
-                                        <span className="font-medium text-gray-900">
-                                            $ {(selectedShipping || ocaQuote?.price || 0).toLocaleString('es-AR')}
-                                        </span>
-                                    )
-                                ) : shippingAddress.zipCode?.length === 4 ? (
-                                    <span className="text-xs text-red-400 italic">Error de conexión</span>
-                                ) : (
-                                    <span className="text-xs text-gray-400 italic">Ingresa CP</span>
-                                )}
-                            </div>
+                                        <span className="text-xs text-gray-400 italic">Ingresa CP</span>
+                                    )}
+                                </div>
+                            )}
 
                             {totalDiscount > 0 && (
                                 <div className="flex justify-between items-center text-sm text-primary animate-fade-in bg-primary/5 px-3 py-2 rounded-lg border border-primary/10">

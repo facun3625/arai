@@ -51,9 +51,10 @@ export async function POST(request: Request) {
             });
             const addonAttributeById = new Map(addonAttributes.map(a => [a.id, a]));
 
-            // Validate and lock stock for each item, and resolve the real weight from the DB
-            // (never trust the client for this — it's what gets declared to the carrier).
+            // Validate and lock stock for each item, and resolve the real weight/dimensions from
+            // the DB (never trust the client for this — it's what gets declared to the carrier).
             const itemWeights: (number | null)[] = [];
+            const itemDims: ({ width: number | null; height: number | null; length: number | null })[] = [];
             for (const item of items) {
                 const productId = item.productId || item.id;
                 const product = await tx.product.findUnique({ where: { id: productId } });
@@ -73,11 +74,17 @@ export async function POST(request: Request) {
                         throw new Error(`Sin stock suficiente para "${item.name}". Disponible: ${variant.stock}`);
                     }
                     itemWeights.push(variant.weight ?? product.weight ?? null);
+                    itemDims.push({
+                        width: variant.width ?? product.width ?? null,
+                        height: variant.height ?? product.height ?? null,
+                        length: variant.length ?? product.length ?? null
+                    });
                 } else {
                     if (product.stock < Number(item.quantity)) {
                         throw new Error(`Sin stock suficiente para "${item.name}". Disponible: ${product.stock}`);
                     }
                     itemWeights.push(product.weight ?? null);
+                    itemDims.push({ width: product.width ?? null, height: product.height ?? null, length: product.length ?? null });
                 }
 
                 if (product.addons) {
@@ -159,6 +166,9 @@ export async function POST(request: Request) {
                                 variantId: item.variantId || null,
                                 name: displayName,
                                 weight: itemWeights[idx],
+                                width: itemDims[idx]?.width ?? null,
+                                height: itemDims[idx]?.height ?? null,
+                                length: itemDims[idx]?.length ?? null,
                                 quantity: Number(item.quantity),
                                 price: Number(item.price),
                                 image: item.image,

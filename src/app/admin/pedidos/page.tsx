@@ -18,7 +18,8 @@ import {
     X,
     Trash2,
     Copy,
-    Check
+    Check,
+    MessageCircle
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -697,21 +698,78 @@ export default function AdminPedidosPage() {
                                                         </button>
                                                     </div>
                                                 ) : (
-                                                    <button
-                                                        onClick={() => handleIngresoOR(selectedOrder.id)}
-                                                        disabled={ocaLoading}
-                                                        className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-white/5 hover:bg-primary/10 border border-white/10 hover:border-primary/20 text-white/60 hover:text-primary rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all"
-                                                    >
-                                                        {ocaLoading ? (
-                                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                                        ) : (
-                                                            <>
-                                                                <Truck className="h-4 w-4" />
-                                                                REGISTRAR EN OCA
-                                                            </>
-                                                        )}
-                                                    </button>
+                                                    <>
+                                                        {(() => {
+                                                            // Mirrors the exact calculation in /api/oca/ingreso-or,
+                                                            // so what you see here is what OCA will actually receive.
+                                                            const DEFAULT_DIM_CM = 20;
+                                                            const maxDim = (key: "width" | "height" | "length") =>
+                                                                selectedOrder.items.reduce((max: number, item: any) => Math.max(max, Number(item[key]) || 0), 0) || DEFAULT_DIM_CM;
+                                                            const totalWeightKg = selectedOrder.items.reduce((sum: number, item: any) => sum + (Number(item.weight) || 1) * item.quantity, 0);
+                                                            const pesoKg = Math.max(1, Math.ceil(totalWeightKg));
+                                                            const altoCm = Math.ceil(maxDim("height"));
+                                                            const anchoCm = Math.ceil(maxDim("width"));
+                                                            const largoCm = Math.ceil(maxDim("length"));
+                                                            const anyMissingDims = selectedOrder.items.some((item: any) => item.width == null || item.height == null || item.length == null || item.weight == null);
+                                                            return (
+                                                                <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-4 space-y-2">
+                                                                    <p className="text-[9px] uppercase tracking-widest text-white/30 font-bold">Se va a enviar a OCA</p>
+                                                                    <div className="flex items-center justify-between text-[12px]">
+                                                                        <span className="text-white/50">Peso declarado</span>
+                                                                        <span className="text-white font-mono font-bold">{pesoKg} kg</span>
+                                                                    </div>
+                                                                    <div className="flex items-center justify-between text-[12px]">
+                                                                        <span className="text-white/50">Bulto (alto x ancho x largo)</span>
+                                                                        <span className="text-white font-mono font-bold">{altoCm} x {anchoCm} x {largoCm} cm</span>
+                                                                    </div>
+                                                                    {anyMissingDims && (
+                                                                        <p className="text-[10px] text-amber-400/80 pt-1">
+                                                                            Algún producto de este pedido no tiene peso o medidas cargadas — se usó un valor por defecto ({DEFAULT_DIM_CM}cm / 1kg).
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        })()}
+                                                        <button
+                                                            onClick={() => handleIngresoOR(selectedOrder.id)}
+                                                            disabled={ocaLoading}
+                                                            className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-white/5 hover:bg-primary/10 border border-white/10 hover:border-primary/20 text-white/60 hover:text-primary rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all"
+                                                        >
+                                                            {ocaLoading ? (
+                                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                                            ) : (
+                                                                <>
+                                                                    <Truck className="h-4 w-4" />
+                                                                    REGISTRAR EN OCA
+                                                                </>
+                                                            )}
+                                                        </button>
+                                                    </>
                                                 )}
+                                            </div>
+                                        )}
+
+                                        {/* Acordar por WhatsApp Section */}
+                                        {selectedOrder.shippingMethod === 'acordar' && (
+                                            <div className="pt-8 mt-8 border-t border-white/5 space-y-4">
+                                                <div className="flex items-center gap-2">
+                                                    <MessageCircle className="h-3.5 w-3.5 text-primary/60" />
+                                                    <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Envío a coordinar</p>
+                                                </div>
+                                                <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4">
+                                                    <p className="text-white/50 text-[11px] leading-relaxed">
+                                                        Este pedido eligió "envío a acordar". Contactá al cliente por WhatsApp para definir el medio y el costo de envío.
+                                                    </p>
+                                                </div>
+                                                <a
+                                                    href={`https://wa.me/${(selectedOrder.contactPhone || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${selectedOrder.contactName}! Te escribimos de Araí para coordinar el envío de tu pedido #${String(selectedOrder.orderNumber).padStart(4, "0")}.`)}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-primary hover:bg-primary/90 text-white rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all shadow-lg shadow-primary/20"
+                                                >
+                                                    <MessageCircle className="h-4 w-4" />
+                                                    Contactar por WhatsApp
+                                                </a>
                                             </div>
                                         )}
 
