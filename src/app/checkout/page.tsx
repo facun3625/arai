@@ -229,7 +229,7 @@ export default function CheckoutPage() {
     const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
 
     // Category promotion ("2x1 por categoría") state
-    const [categoryPromo, setCategoryPromo] = useState<{ discount: number; details: { categoryId: string; categoryName: string; freeUnits: number }[] }>({ discount: 0, details: [] });
+    const [categoryPromo, setCategoryPromo] = useState<{ discount: number; details: ({ categoryId: string; categoryName: string; freeUnits: number; percentage?: undefined } | { categoryId: string; categoryName: string; percentage: number; units: number; discount: number })[] }>({ discount: 0, details: [] });
 
     useEffect(() => {
         if (!items.length) {
@@ -1621,7 +1621,9 @@ export default function CheckoutPage() {
                                             {[
                                                 selectedPayment === 'transferencia' ? `Transferencia (${bankTransferInfo.discount}%)` : null,
                                                 isCategoryPromoBetter
-                                                    ? categoryPromo.details.map(d => `2x1 ${d.categoryName}`).join(' + ')
+                                                    ? categoryPromo.details.map(d =>
+                                                        'percentage' in d ? `${d.percentage}% ${d.categoryName}` : `2x1 ${d.categoryName}`
+                                                    ).join(' + ')
                                                     : [
                                                         appliedCoupon ? `Cupón ${appliedCoupon.code}` : null,
                                                         zipDiscount ? (zipDiscount.label || `Descuento CP ${shippingAddress.zipCode}`) : null

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { resend, EMAIL_FROM } from '@/lib/mail';
 import { OrderTemplate } from '@/components/emails/OrderTemplate';
-import { computeCategoryPromoDiscount } from '@/lib/categoryPromotions';
+import { computeCategoryPromoDiscount, computeCategoryPercentDiscount } from '@/lib/categoryPromotions';
 
 export async function POST(request: Request) {
     try {
@@ -118,17 +118,19 @@ export async function POST(request: Request) {
                 }
             }
 
-            // "2x1 por categoría" is recalculated authoritatively here — never trust the client's
-            // discount for this part, since it directly determines what gets charged.
-            const categoryPromo = await computeCategoryPromoDiscount(
-                tx,
-                items.map((item: any) => ({
-                    productId: item.productId || item.id,
-                    variantId: item.variantId || null,
-                    quantity: item.quantity
-                }))
-            );
-            const finalDiscount = Math.max(Number(discount) || 0, categoryPromo.discount);
+            // "2x1 por categoría" and "% por categoría" are recalculated authoritatively here —
+            // never trust the client's discount for this part, since it directly determines what gets charged.
+            const mappedItems = items.map((item: any) => ({
+                productId: item.productId || item.id,
+                variantId: item.variantId || null,
+                quantity: item.quantity
+            }));
+            const [categoryPromo, categoryPercent] = await Promise.all([
+                computeCategoryPromoDiscount(tx, mappedItems),
+                computeCategoryPercentDiscount(tx, mappedItems)
+            ]);
+            const categoryDiscountTotal = categoryPromo.discount + categoryPercent.discount;
+            const finalDiscount = Math.max(Number(discount) || 0, categoryDiscountTotal);
             const finalSubtotal = Number(subtotal);
             const finalShippingCost = Number(shippingCost);
             const finalTotal = Math.max(0, finalSubtotal + finalShippingCost - finalDiscount);
