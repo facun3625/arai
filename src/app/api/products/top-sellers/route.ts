@@ -24,7 +24,8 @@ export async function GET() {
             where: {
                 id: {
                     in: productIds
-                }
+                },
+                isActive: true
             },
             include: {
                 categories: true,
@@ -41,7 +42,8 @@ export async function GET() {
                 where: {
                     id: {
                         notIn: productIds
-                    }
+                    },
+                    isActive: true
                 },
                 include: {
                     categories: true,
