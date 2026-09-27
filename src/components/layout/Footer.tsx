@@ -58,6 +58,7 @@ export const Footer = () => {
                         <li><a href="/" className="hover:text-white transition-colors flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-px bg-white transition-all"></span>Inicio</a></li>
                         <li><a href="/tienda" className="hover:text-white transition-colors flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-px bg-white transition-all"></span>Tienda</a></li>
                         <li><a href="/proceso" className="hover:text-white transition-colors flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-px bg-white transition-all"></span>Proceso Productivo</a></li>
+                        <li><a href="/faq" className="hover:text-white transition-colors flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-px bg-white transition-all"></span>Preguntas Frecuentes</a></li>
                     </ul>
                 </div>
                 <div>

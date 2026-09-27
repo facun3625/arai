@@ -26,7 +26,8 @@ import {
     Phone,
     MessagesSquare,
     Percent,
-    Star
+    Star,
+    HelpCircle
 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import Image from "next/image";
@@ -75,6 +76,7 @@ const menuItems: MenuNode[] = [
     },
     { name: "pedidos", href: "/admin/pedidos", icon: ShoppingCart },
     { name: "reseñas", href: "/admin/resenas", icon: Star },
+    { name: "faq", href: "/admin/faq", icon: HelpCircle },
     { name: "contactos", href: "/admin/contactos", icon: Phone },
     { name: "conversaciones", href: "/admin/conversaciones", icon: MessagesSquare },
     { name: "usuarios", href: "/admin/usuarios", icon: User },
