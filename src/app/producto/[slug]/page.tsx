@@ -11,6 +11,7 @@ import {
     Play,
     Truck,
     ShieldCheck,
+    CreditCard,
     Star,
     Heart,
     Repeat,
@@ -39,6 +40,21 @@ export default function ProductoDetallePage() {
     const [addonMeta, setAddonMeta] = useState<Record<string, { maxSelections?: number; blocksAttributeId?: string; required?: boolean }>>({});
     const addItem = useCartStore((state) => state.addItem);
     const cartItems = useCartStore((state) => state.items);
+    const [storeInfo, setStoreInfo] = useState<{ bankTransferDiscount: number; freeShippingThreshold: number }>({ bankTransferDiscount: 0, freeShippingThreshold: 0 });
+
+    useEffect(() => {
+        fetch("/api/settings")
+            .then((res) => res.ok ? res.json() : null)
+            .then((data) => {
+                if (data) {
+                    setStoreInfo({
+                        bankTransferDiscount: Number(data.bankTransferDiscount) || 0,
+                        freeShippingThreshold: Number(data.freeShippingThreshold) || 0,
+                    });
+                }
+            })
+            .catch(() => {});
+    }, []);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -377,6 +393,37 @@ export default function ProductoDetallePage() {
                                         </>
                                     )}
                                 </div>
+                            </div>
+                        </div>
+
+                        {/* Trust / shipping info next to the CTA */}
+                        <div className="space-y-3 bg-gray-50/60 border border-gray-100 rounded-2xl p-5">
+                            <div className="flex items-start gap-3">
+                                <Truck className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                                <p className="text-[12.5px] text-gray-600 leading-relaxed">
+                                    Envío a todo el país
+                                    {storeInfo.freeShippingThreshold > 0 && (
+                                        <> · gratis desde ${storeInfo.freeShippingThreshold.toLocaleString('es-AR')}</>
+                                    )}. El costo exacto se calcula con tu código postal en el checkout.
+                                </p>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <CreditCard className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                                <p className="text-[12.5px] text-gray-600 leading-relaxed">
+                                    Mercado Pago
+                                    {storeInfo.bankTransferDiscount > 0 && (
+                                        <> o transferencia bancaria con {storeInfo.bankTransferDiscount}% de descuento</>
+                                    )}.
+                                </p>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <ShieldCheck className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                                <p className="text-[12.5px] text-gray-600 leading-relaxed">
+                                    10 días para arrepentirte de tu compra.{" "}
+                                    <Link href="/legales/devoluciones" className="text-primary underline">
+                                        Ver cambios y devoluciones
+                                    </Link>.
+                                </p>
                             </div>
                         </div>
 
