@@ -112,6 +112,39 @@ export default function CheckoutPage() {
         zipCode: ""
     });
 
+    // Shipping cost preview: lets the customer see an estimated cost from just a ZIP code,
+    // before filling in the rest of the checkout form (name, DNI, street, etc.).
+    const [previewZip, setPreviewZip] = useState("");
+    const [previewQuote, setPreviewQuote] = useState<{ price: number; deliveryDays: number } | null>(null);
+    const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+    const [previewError, setPreviewError] = useState<string | null>(null);
+
+    const handlePreviewShipping = async () => {
+        if (previewZip.length !== 4) return;
+        setIsPreviewLoading(true);
+        setPreviewError(null);
+        setPreviewQuote(null);
+        try {
+            const totalWeight = items.reduce((sum, item) => sum + (Number(item.weight) || 1) * item.quantity, 0);
+            const res = await fetch("/api/oca/quote", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ destinationZipCode: previewZip, weight: totalWeight, volume: 0.02, packagesCount: 1 }),
+            });
+            const data = await res.json();
+            if (data.price) {
+                setPreviewQuote({ price: data.price, deliveryDays: data.deliveryDays });
+                setShippingAddress(prev => ({ ...prev, zipCode: previewZip }));
+            } else {
+                setPreviewError(data.error || "No pudimos cotizar el envío para ese código postal.");
+            }
+        } catch {
+            setPreviewError("No pudimos conectar con OCA. Intentá de nuevo.");
+        } finally {
+            setIsPreviewLoading(false);
+        }
+    };
+
     const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
     const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
     const [selectedSavedAddressId, setSelectedSavedAddressId] = useState<string | null>(null);
@@ -824,6 +857,38 @@ export default function CheckoutPage() {
                             {/* STEP 1: CONTACT & ADDRESS */}
                             {currentStep === 1 && (
                                 <div className="space-y-10 animate-fade-in">
+
+                                    {/* Shipping cost preview - just the ZIP code, before asking for the rest of the form */}
+                                    {ocaEnabled && (
+                                        <section className="bg-primary/5 border border-primary/10 rounded-2xl p-5">
+                                            <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">¿Cuánto cuesta el envío a tu casa?</p>
+                                            <div className="flex gap-3">
+                                                <input
+                                                    type="text"
+                                                    inputMode="numeric"
+                                                    maxLength={4}
+                                                    placeholder="Código Postal"
+                                                    value={previewZip}
+                                                    onChange={(e) => setPreviewZip(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                                                    className="flex-1 px-5 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={handlePreviewShipping}
+                                                    disabled={previewZip.length !== 4 || isPreviewLoading}
+                                                    className="px-6 py-3 bg-[#0c120e] text-white rounded-xl text-xs font-bold uppercase disabled:opacity-50 flex items-center gap-2 shrink-0"
+                                                >
+                                                    {isPreviewLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : "Cotizar"}
+                                                </button>
+                                            </div>
+                                            {previewQuote && (
+                                                <p className="text-sm text-primary font-semibold mt-3">
+                                                    Envío a domicilio: ${previewQuote.price.toLocaleString('es-AR')} · llega en {previewQuote.deliveryDays} días hábiles
+                                                </p>
+                                            )}
+                                            {previewError && <p className="text-sm text-red-500 mt-3">{previewError}</p>}
+                                        </section>
+                                    )}
 
                                     {/* Contact Section */}
                                     <section>
