@@ -44,6 +44,14 @@ export default async function ProductoDetallePage({ params }: { params: Promise<
     const { slug } = await params;
     const product = await getProduct(slug);
 
+    const approvedReviews = product
+        ? await prisma.review.findMany({ where: { productId: product.id, isApproved: true }, select: { rating: true } })
+        : [];
+    const reviewCount = approvedReviews.length;
+    const averageRating = reviewCount > 0
+        ? approvedReviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
+        : 0;
+
     const jsonLd = product ? {
         "@context": "https://schema.org",
         "@type": "Product",
@@ -58,6 +66,13 @@ export default async function ProductoDetallePage({ params }: { params: Promise<
                 ? "https://schema.org/InStock"
                 : "https://schema.org/OutOfStock",
         },
+        ...(reviewCount > 0 && {
+            aggregateRating: {
+                "@type": "AggregateRating",
+                ratingValue: averageRating.toFixed(1),
+                reviewCount,
+            },
+        }),
     } : null;
 
     return (

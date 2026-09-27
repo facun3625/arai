@@ -24,6 +24,7 @@ import {
     CheckCircle2
 } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
+import { useAuthStore } from "@/store/useAuthStore";
 import { trackPixelEvent } from "@/lib/fbPixel";
 import Link from "next/link";
 
@@ -40,7 +41,51 @@ export default function ProductDetailClient() {
     const [addonMeta, setAddonMeta] = useState<Record<string, { maxSelections?: number; blocksAttributeId?: string; required?: boolean }>>({});
     const addItem = useCartStore((state) => state.addItem);
     const cartItems = useCartStore((state) => state.items);
+    const { user, isAuthenticated } = useAuthStore();
     const [storeInfo, setStoreInfo] = useState<{ bankTransferDiscount: number; freeShippingThreshold: number }>({ bankTransferDiscount: 0, freeShippingThreshold: 0 });
+    const [reviews, setReviews] = useState<any[]>([]);
+    const [reviewsAverage, setReviewsAverage] = useState(0);
+    const [reviewsCount, setReviewsCount] = useState(0);
+    const [reviewForm, setReviewForm] = useState({ rating: 5, comment: "" });
+    const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+    const [reviewMessage, setReviewMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
+
+    const fetchReviews = async (productId: string) => {
+        try {
+            const res = await fetch(`/api/reviews?productId=${productId}`);
+            if (res.ok) {
+                const data = await res.json();
+                setReviews(data.reviews || []);
+                setReviewsAverage(data.average || 0);
+                setReviewsCount(data.count || 0);
+            }
+        } catch { /* ignore */ }
+    };
+
+    const handleSubmitReview = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!product) return;
+        setIsSubmittingReview(true);
+        setReviewMessage(null);
+        try {
+            const res = await fetch("/api/reviews", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ productId: product.id, rating: reviewForm.rating, comment: reviewForm.comment }),
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setReviewMessage({ text: data.message || "¡Gracias por tu reseña!", type: "success" });
+                setReviewForm({ rating: 5, comment: "" });
+            } else {
+                setReviewMessage({ text: data.error || "No pudimos guardar tu reseña.", type: "error" });
+            }
+        } catch {
+            setReviewMessage({ text: "Error de conexión. Intentá de nuevo.", type: "error" });
+        } finally {
+            setIsSubmittingReview(false);
+        }
+    };
 
     useEffect(() => {
         fetch("/api/settings")
@@ -107,6 +152,10 @@ export default function ProductDetailClient() {
         };
         fetchProduct();
     }, [slug, router]);
+
+    useEffect(() => {
+        if (product?.id) fetchReviews(product.id);
+    }, [product?.id]);
 
     // Update variant matching when attributes change
     useEffect(() => {
@@ -342,6 +391,16 @@ export default function ProductDetailClient() {
                                 <span className="text-[#23553d] font-medium">
                                     En Stock
                                 </span>
+                                {reviewsCount > 0 && (
+                                    <>
+                                        <span className="text-gray-200">|</span>
+                                        <a href="#reseñas" className="flex items-center gap-1.5 text-gray-500 hover:text-primary transition-colors">
+                                            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                                            <span className="font-medium">{reviewsAverage.toFixed(1)}</span>
+                                            <span className="text-gray-400">({reviewsCount})</span>
+                                        </a>
+                                    </>
+                                )}
                             </div>
 
                             <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-8 py-2">
@@ -585,6 +644,92 @@ export default function ProductDetailClient() {
                                 </p>
                             </div>
                         )}
+
+                        {/* Reviews */}
+                        <div id="reseñas" className="pt-8 border-t border-gray-50 space-y-8 scroll-mt-24">
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-lg font-medium text-gray-900">Reseñas de clientes</h2>
+                                {reviewsCount > 0 && (
+                                    <div className="flex items-center gap-2 text-sm">
+                                        <div className="flex items-center gap-0.5">
+                                            {Array.from({ length: 5 }).map((_, i) => (
+                                                <Star key={i} className={`h-4 w-4 ${i < Math.round(reviewsAverage) ? "fill-yellow-400 text-yellow-400" : "text-gray-200"}`} />
+                                            ))}
+                                        </div>
+                                        <span className="text-gray-500">{reviewsAverage.toFixed(1)} · {reviewsCount} {reviewsCount === 1 ? "reseña" : "reseñas"}</span>
+                                    </div>
+                                )}
+                            </div>
+
+                            {reviews.length > 0 ? (
+                                <div className="space-y-6">
+                                    {reviews.map((review) => (
+                                        <div key={review.id} className="border-b border-gray-50 pb-6 last:border-0">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-medium text-gray-900 text-[13px]">{review.authorName}</span>
+                                                    {review.isVerified && (
+                                                        <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-primary/70">
+                                                            <ShieldCheck className="h-3 w-3" /> Compra verificada
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center gap-0.5">
+                                                    {Array.from({ length: 5 }).map((_, i) => (
+                                                        <Star key={i} className={`h-3 w-3 ${i < review.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-200"}`} />
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            <p className="text-gray-600 text-[14px] leading-relaxed">{review.comment}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-gray-400 text-[13px]">Este producto todavía no tiene reseñas.</p>
+                            )}
+
+                            {isAuthenticated ? (
+                                <form onSubmit={handleSubmitReview} className="bg-gray-50/60 border border-gray-100 rounded-2xl p-6 space-y-4">
+                                    <p className="text-[13px] font-medium text-gray-900">Dejá tu reseña</p>
+                                    <div className="flex items-center gap-1">
+                                        {Array.from({ length: 5 }).map((_, i) => (
+                                            <button
+                                                key={i}
+                                                type="button"
+                                                onClick={() => setReviewForm(prev => ({ ...prev, rating: i + 1 }))}
+                                                className="p-0.5"
+                                            >
+                                                <Star className={`h-5 w-5 transition-colors ${i < reviewForm.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-200"}`} />
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <textarea
+                                        required
+                                        rows={3}
+                                        value={reviewForm.comment}
+                                        onChange={(e) => setReviewForm(prev => ({ ...prev, comment: e.target.value }))}
+                                        placeholder="Contanos qué te pareció el producto..."
+                                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
+                                    />
+                                    {reviewMessage && (
+                                        <p className={`text-[12px] font-medium ${reviewMessage.type === "success" ? "text-primary" : "text-red-500"}`}>
+                                            {reviewMessage.text}
+                                        </p>
+                                    )}
+                                    <button
+                                        type="submit"
+                                        disabled={isSubmittingReview || !reviewForm.comment.trim()}
+                                        className="px-6 py-2.5 bg-primary text-white rounded-xl text-[12px] font-medium uppercase tracking-widest disabled:opacity-50 transition-all"
+                                    >
+                                        {isSubmittingReview ? "Enviando..." : "Publicar reseña"}
+                                    </button>
+                                </form>
+                            ) : (
+                                <p className="text-[13px] text-gray-400">
+                                    <Link href="/mi-cuenta" className="text-primary underline">Iniciá sesión</Link> para dejar tu reseña.
+                                </p>
+                            )}
+                        </div>
 
                         <div className="flex flex-col sm:flex-row gap-6 pt-8 border-t border-gray-50 items-start sm:items-center justify-between">
                             <div className="flex gap-4">

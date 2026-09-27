@@ -24,6 +24,7 @@ model User {
   coupons           Coupon[]
   orders            Order[]
   pointTransactions PointTransaction[]
+  reviews           Review[]
 }
 
 model Address {
@@ -80,6 +81,7 @@ model Product {
   addons         String     @default("[]")
   isActive       Boolean    @default(true)
   variants       Variant[]
+  reviews        Review[]
   categories     Category[] @relation("CategoryToProduct")
 }
 
@@ -111,6 +113,23 @@ model Attribute {
   blocksAttributeId String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  productId  String
+  userId     String?
+  authorName String
+  rating     Int
+  comment    String   @db.Text
+  isVerified Boolean  @default(false)
+  isApproved Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([productId])
 }
 
 model StoreSettings {
