@@ -32,7 +32,10 @@ export default function PlataformasPage() {
         mayoristasUrl: "",
         footerDescription: "",
         footerEmail: "",
-        footerLocation: ""
+        footerLocation: "",
+        legalBusinessName: "",
+        legalCuit: "",
+        legalAddress: ""
     });
 
     const showToast = (message: string, type: "success" | "error" = "success") => {
@@ -57,7 +60,10 @@ export default function PlataformasPage() {
                         mayoristasUrl: data.mayoristasUrl || "",
                         footerDescription: data.footerDescription || "",
                         footerEmail: data.footerEmail || "",
-                        footerLocation: data.footerLocation || ""
+                        footerLocation: data.footerLocation || "",
+                        legalBusinessName: data.legalBusinessName || "",
+                        legalCuit: data.legalCuit || "",
+                        legalAddress: data.legalAddress || ""
                     });
                 }
             } catch (error) {
@@ -216,6 +222,47 @@ export default function PlataformasPage() {
                                         placeholder="Misiones, Argentina"
                                         value={settings.footerLocation}
                                         onChange={(e) => setSettings({ ...settings, footerLocation: e.target.value })}
+                                        className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Datos Legales */}
+                        <div className="border-t border-white/5 pt-8 space-y-2">
+                            <h3 className="text-white/80 text-sm font-semibold mb-2">Datos Legales de la Empresa</h3>
+                            <p className="text-[11px] text-white/30 mb-6">
+                                Se usan en las páginas de Términos, Privacidad, Cambios/Devoluciones y en el Botón de Arrepentimiento.
+                                Hasta que los completes, esas páginas muestran &quot;[Completar desde el panel]&quot; en su lugar.
+                            </p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+                                <div className="space-y-3">
+                                    <label className="text-white/80 text-sm font-medium">Razón social</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Ej: Araí S.R.L."
+                                        value={settings.legalBusinessName}
+                                        onChange={(e) => setSettings({ ...settings, legalBusinessName: e.target.value })}
+                                        className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10"
+                                    />
+                                </div>
+                                <div className="space-y-3">
+                                    <label className="text-white/80 text-sm font-medium">CUIT</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Ej: 30-12345678-9"
+                                        value={settings.legalCuit}
+                                        onChange={(e) => setSettings({ ...settings, legalCuit: e.target.value })}
+                                        className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10"
+                                    />
+                                </div>
+                                <div className="space-y-3 md:col-span-2">
+                                    <label className="text-white/80 text-sm font-medium">Domicilio legal</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Ej: Av. Siempre Viva 123, Posadas, Misiones"
+                                        value={settings.legalAddress}
+                                        onChange={(e) => setSettings({ ...settings, legalAddress: e.target.value })}
                                         className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10"
                                     />
                                 </div>

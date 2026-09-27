@@ -199,6 +199,11 @@ model StoreSettings {
 
   // Shipping methods
   acordarEnabled        Boolean  @default(true)
+
+  // Legal identity (shown on /legales/* pages and the "botón de arrepentimiento")
+  legalBusinessName     String?
+  legalCuit             String?
+  legalAddress          String?
 }
 
 model Coupon {

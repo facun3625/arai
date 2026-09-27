@@ -39,7 +39,7 @@ export const Footer = () => {
             {/* Sutil textura o gradiente de fondo */}
             <div className="absolute inset-0 bg-gradient-to-b from-black/5 to-transparent pointer-events-none" />
 
-            <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 relative z-10">
+            <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-12 relative z-10">
                 <div className="space-y-6">
                     <a href="/" className="inline-block group relative w-28 h-10">
                         <img
@@ -58,6 +58,19 @@ export const Footer = () => {
                         <li><a href="/" className="hover:text-white transition-colors flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-px bg-white transition-all"></span>Inicio</a></li>
                         <li><a href="/tienda" className="hover:text-white transition-colors flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-px bg-white transition-all"></span>Tienda</a></li>
                         <li><a href="/proceso" className="hover:text-white transition-colors flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-px bg-white transition-all"></span>Proceso Productivo</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 className="text-[11px] font-bold text-white mb-8 uppercase opacity-40">legales</h4>
+                    <ul className="text-xs space-y-4 text-white/70 font-medium">
+                        <li><a href="/legales/terminos" className="hover:text-white transition-colors flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-px bg-white transition-all"></span>Términos y Condiciones</a></li>
+                        <li><a href="/legales/privacidad" className="hover:text-white transition-colors flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-px bg-white transition-all"></span>Política de Privacidad</a></li>
+                        <li><a href="/legales/devoluciones" className="hover:text-white transition-colors flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-px bg-white transition-all"></span>Cambios y Devoluciones</a></li>
+                        <li>
+                            <a href="/legales/arrepentimiento" className="inline-flex items-center gap-1.5 px-3 py-1.5 mt-1 rounded-full border border-white/30 text-white hover:bg-white hover:text-primary transition-colors font-bold uppercase tracking-wide text-[10px]">
+                                Botón de Arrepentimiento
+                            </a>
+                        </li>
                     </ul>
                 </div>
                 <div>
