@@ -21,9 +21,16 @@ export const viewport: Viewport = {
   minimumScale: 1,
 };
 
+const siteUrl = process.env.NEXTAUTH_URL || "https://yerbamatearai.com.ar";
+
 export const metadata: Metadata = {
-  title: "araí yerba mate - tienda oficial",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "araí yerba mate - tienda oficial",
+    template: "%s",
+  },
   description: "plataforma e-commerce multi-franquicia para araí yerba mate.",
+  alternates: { canonical: "/" },
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
