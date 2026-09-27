@@ -20,13 +20,16 @@ import {
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { useAdminUtils } from "@/components/admin/AdminUtilsProvider";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export default function AbandonedCartsPage() {
     const { confirm, showToast } = useAdminUtils();
+    const { user } = useAuthStore();
     const [carts, setCarts] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [filterType, setFilterType] = useState("all"); // all, registered, guest, anonymous
     const [minTotal, setMinTotal] = useState("");
+    const [sendingId, setSendingId] = useState<string | null>(null);
 
     const fetchCarts = async () => {
         setIsLoading(true);
@@ -62,6 +65,59 @@ export default function AbandonedCartsPage() {
 
         navigator.clipboard.writeText(emails);
         showToast("Correos copiados al portapapeles");
+    };
+
+    const sendReminder = async (cart: any) => {
+        const email = cart.email || cart.user?.email;
+        if (!email) {
+            showToast("Este carrito no tiene un email asociado", "error");
+            return;
+        }
+        setSendingId(cart.id);
+        try {
+            const res = await fetch("/api/admin/abandoned-carts", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: cart.id, adminId: user?.id }),
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setCarts(prev => prev.map(c => c.id === cart.id ? { ...c, remindedAt: data.cart.remindedAt } : c));
+                showToast("Recordatorio enviado");
+            } else {
+                showToast(data.error || "Error al enviar el recordatorio", "error");
+            }
+        } catch {
+            showToast("Error de conexión", "error");
+        } finally {
+            setSendingId(null);
+        }
+    };
+
+    const exportCsv = () => {
+        if (carts.length === 0) {
+            showToast("No hay carritos para exportar", "error");
+            return;
+        }
+        const rows = carts.map(cart => {
+            const displayName = cart.user ? `${cart.user.name || ""} ${cart.user.lastName || ""}`.trim() : (cart.name || "");
+            const displayEmail = cart.email || cart.user?.email || "";
+            let parsedItems: any[] = [];
+            try { parsedItems = JSON.parse(cart.items || "[]"); } catch { /* ignore */ }
+            const itemsSummary = parsedItems.map((i: any) => `${i.quantity}x ${i.name}`).join(" | ");
+            return [displayName, displayEmail, cart.phone || "", cart.total, itemsSummary, new Date(cart.lastActive).toISOString()];
+        });
+        const header = ["Nombre", "Email", "Teléfono", "Total", "Productos", "Última actividad"];
+        const csv = [header, ...rows]
+            .map(row => row.map(val => `"${String(val).replace(/"/g, '""')}"`).join(","))
+            .join("\n");
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `carritos-abandonados-${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
     };
 
     const deleteCart = async (id: string) => {
@@ -108,7 +164,10 @@ export default function AbandonedCartsPage() {
                             <Mail className="h-4 w-4" />
                             Copiar Emails
                         </button>
-                        <button className="bg-white/5 hover:bg-white/10 text-white/70 px-4 py-2 rounded-xl text-[11px] font-medium flex items-center gap-2 transition-all border border-white/5">
+                        <button
+                            onClick={exportCsv}
+                            className="bg-white/5 hover:bg-white/10 text-white/70 px-4 py-2 rounded-xl text-[11px] font-medium flex items-center gap-2 transition-all border border-white/5"
+                        >
                             <Download className="h-4 w-4" />
                             Exportar CSV
                         </button>
@@ -232,10 +291,26 @@ export default function AbandonedCartsPage() {
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-5 text-right">
-                                                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <div className="flex items-center justify-end gap-2">
+                                                        {cart.remindedAt ? (
+                                                            <span className="text-[9px] font-bold uppercase tracking-widest text-emerald-400 flex items-center gap-1">
+                                                                <CheckCircle2 className="h-3 w-3" /> Enviado
+                                                            </span>
+                                                        ) : (
+                                                            (cart.email || cart.user?.email) && (
+                                                                <button
+                                                                    disabled={sendingId === cart.id}
+                                                                    onClick={() => sendReminder(cart)}
+                                                                    className="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest bg-primary/10 text-primary hover:bg-primary/20 transition-all disabled:opacity-50 flex items-center gap-1.5"
+                                                                >
+                                                                    <Mail className="h-3 w-3" />
+                                                                    {sendingId === cart.id ? "Enviando..." : "Recordar"}
+                                                                </button>
+                                                            )
+                                                        )}
                                                         <button
                                                             onClick={() => deleteCart(cart.id)}
-                                                            className="p-2 hover:bg-red-500/10 rounded-lg text-white/20 hover:text-red-400 transition-all"
+                                                            className="p-2 hover:bg-red-500/10 rounded-lg text-white/20 hover:text-red-400 transition-all opacity-0 group-hover:opacity-100"
                                                         >
                                                             <Trash2 className="h-4 w-4" />
                                                         </button>
