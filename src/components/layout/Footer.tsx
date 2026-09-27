@@ -57,7 +57,7 @@ export const Footer = () => {
                     <ul className="text-xs space-y-4 text-white/70 font-medium">
                         <li><a href="/" className="hover:text-white transition-colors flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-px bg-white transition-all"></span>Inicio</a></li>
                         <li><a href="/tienda" className="hover:text-white transition-colors flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-px bg-white transition-all"></span>Tienda</a></li>
-                        <li><a href="/proceso-productivo" className="hover:text-white transition-colors flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-px bg-white transition-all"></span>Proceso Productivo</a></li>
+                        <li><a href="/proceso" className="hover:text-white transition-colors flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-px bg-white transition-all"></span>Proceso Productivo</a></li>
                     </ul>
                 </div>
                 <div>
@@ -76,7 +76,7 @@ export const Footer = () => {
                                     rel="noopener noreferrer"
                                     className="hover:text-[#25D366] transition-colors"
                                 >
-                                    +{socialLinks.whatsappNumber}
+                                    +{socialLinks.whatsappNumber.replace(/^\+/, "")}
                                 </a>
                             ) : "+54 9 11 1234 5678"}
                         </li>
