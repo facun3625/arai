@@ -125,11 +125,14 @@ export default function CheckoutPage() {
         setPreviewError(null);
         setPreviewQuote(null);
         try {
-            const totalWeight = items.reduce((sum, item) => sum + (Number(item.weight) || 1) * item.quantity, 0);
             const res = await fetch("/api/oca/quote", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ destinationZipCode: previewZip, weight: totalWeight, volume: 0.02, packagesCount: 1 }),
+                body: JSON.stringify({
+                    destinationZipCode: previewZip,
+                    items: items.map(i => ({ productId: i.productId || i.id, variantId: i.variantId, quantity: i.quantity })),
+                    packagesCount: 1
+                }),
             });
             const data = await res.json();
             if (data.price) {
@@ -381,10 +384,8 @@ export default function CheckoutPage() {
     const calculateOcaShipping = async () => {
         setIsCalculatingShipping(true);
         try {
-            // Calculate total weight (default to 1kg if not specified)
-            const totalWeight = items.reduce((sum, item) => sum + (Number(item.weight) || 1) * item.quantity, 0);
-
-            // 1. Get Quote
+            // 1. Get Quote - weight/volume are resolved server-side from each item's real
+            // product/variant record (mirrors how /api/orders resolves them at order time).
             const quoteRes = await fetch("/api/oca/quote", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -393,8 +394,7 @@ export default function CheckoutPage() {
                         ? { ...shippingAddress, branchName: ocaBranches.find(b => b.id === selectedBranchId)?.name }
                         : shippingAddress,
                     destinationZipCode: shippingAddress.zipCode,
-                    weight: totalWeight,
-                    volume: 0.02, // Placeholder average volume
+                    items: items.map(i => ({ productId: i.productId || i.id, variantId: i.variantId, quantity: i.quantity })),
                     packagesCount: 1
                 }),
             });

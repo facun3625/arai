@@ -2,9 +2,61 @@ import { NextResponse } from "next/server";
 import { parseStringPromise } from "xml2js";
 import { prisma } from "@/lib/prisma";
 
+const DEFAULT_DIM_CM = 20;
+const DEFAULT_WEIGHT_KG = 1;
+
+// Mirrors how /api/orders resolves each item's real weight/dimensions (variant falls back to
+// product) so the quote reflects what's actually in the cart instead of a fixed placeholder box.
+async function resolveWeightAndVolume(items: { productId: string; variantId?: string; quantity: number }[]) {
+    let totalWeight = 0;
+    let totalVolume = 0;
+
+    for (const item of items) {
+        let weight: number | null = null;
+        let width: number | null = null;
+        let height: number | null = null;
+        let length: number | null = null;
+
+        if (item.variantId) {
+            const variant = await prisma.variant.findUnique({ where: { id: item.variantId } });
+            if (variant) {
+                weight = variant.weight;
+                width = variant.width;
+                height = variant.height;
+                length = variant.length;
+            }
+        }
+        if (weight == null || width == null || height == null || length == null) {
+            const product = await prisma.product.findUnique({ where: { id: item.productId } });
+            if (product) {
+                weight = weight ?? product.weight;
+                width = width ?? product.width;
+                height = height ?? product.height;
+                length = length ?? product.length;
+            }
+        }
+
+        const itemWeightKg = weight ?? DEFAULT_WEIGHT_KG;
+        const itemVolumeM3 = ((width ?? DEFAULT_DIM_CM) * (height ?? DEFAULT_DIM_CM) * (length ?? DEFAULT_DIM_CM)) / 1_000_000;
+
+        totalWeight += itemWeightKg * item.quantity;
+        totalVolume += itemVolumeM3 * item.quantity;
+    }
+
+    return { totalWeight, totalVolume };
+}
+
 export async function POST(req: Request) {
     try {
-        const { destinationZipCode, weight, volume, packagesCount, isBranch } = await req.json();
+        const body = await req.json();
+        const { destinationZipCode, packagesCount, isBranch, items } = body;
+        let { weight, volume } = body;
+
+        if (Array.isArray(items) && items.length > 0) {
+            const resolved = await resolveWeightAndVolume(items);
+            weight = resolved.totalWeight;
+            volume = resolved.totalVolume;
+        }
 
         // Get settings from DB
         const settings = await prisma.storeSettings.findUnique({
