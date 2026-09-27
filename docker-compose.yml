@@ -5,7 +5,7 @@ services:
     restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-arai2026}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set, no insecure default}
       POSTGRES_DB: ${POSTGRES_DB:-postgres}
     volumes:
       - arai-db-data:/var/lib/postgresql/data
@@ -23,7 +23,7 @@ services:
     ports:
       - "3002:3000"
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-arai_user}:${POSTGRES_PASSWORD:-arai_password}@arai-db:5432/${POSTGRES_DB:-arai_db}?schema=public
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@arai-db:5432/${POSTGRES_DB:-postgres}?schema=public
       NEXTAUTH_URL: https://yerbamatearai.com.ar
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
