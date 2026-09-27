@@ -15,7 +15,8 @@ import {
     CheckCircle2,
     XCircle,
     Copy,
-    ExternalLink
+    ExternalLink,
+    MessageCircle
 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -67,6 +68,19 @@ export default function AbandonedCartsPage() {
         showToast("Correos copiados al portapapeles");
     };
 
+    const markReminded = async (cartId: string, channel?: "whatsapp") => {
+        const res = await fetch("/api/admin/abandoned-carts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: cartId, adminId: user?.id, ...(channel && { channel }) }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+            setCarts(prev => prev.map(c => c.id === cartId ? { ...c, remindedAt: data.cart.remindedAt } : c));
+        }
+        return { ok: res.ok, data };
+    };
+
     const sendReminder = async (cart: any) => {
         const email = cart.email || cart.user?.email;
         if (!email) {
@@ -75,14 +89,8 @@ export default function AbandonedCartsPage() {
         }
         setSendingId(cart.id);
         try {
-            const res = await fetch("/api/admin/abandoned-carts", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id: cart.id, adminId: user?.id }),
-            });
-            const data = await res.json();
-            if (res.ok) {
-                setCarts(prev => prev.map(c => c.id === cart.id ? { ...c, remindedAt: data.cart.remindedAt } : c));
+            const { ok, data } = await markReminded(cart.id);
+            if (ok) {
                 showToast("Recordatorio enviado");
             } else {
                 showToast(data.error || "Error al enviar el recordatorio", "error");
@@ -92,6 +100,27 @@ export default function AbandonedCartsPage() {
         } finally {
             setSendingId(null);
         }
+    };
+
+    const sendWhatsAppReminder = async (cart: any) => {
+        if (!cart.phone) {
+            showToast("Este carrito no tiene un teléfono asociado", "error");
+            return;
+        }
+        const displayName = cart.user ? `${cart.user.name || ""}`.trim() : (cart.name || "");
+        let parsedItems: any[] = [];
+        try { parsedItems = JSON.parse(cart.items || "[]"); } catch { /* ignore */ }
+        const itemsList = parsedItems.map((i: any) => `${i.quantity}x ${i.name}`).join(", ");
+
+        const message = `Hola${displayName ? ` ${displayName}` : ""}! Vimos que dejaste ${itemsList ? `(${itemsList}) ` : ""}en tu carrito de Araí Yerba Mate. ¿Te ayudamos a completar tu compra? https://yerbamatearai.com.ar/carrito`;
+
+        const cleanPhone = String(cart.phone).replace(/\D/g, "");
+        const fullPhone = cleanPhone.startsWith("54") ? cleanPhone : `54${cleanPhone}`;
+        window.open(`https://wa.me/${fullPhone}?text=${encodeURIComponent(message)}`, "_blank");
+
+        try {
+            await markReminded(cart.id, "whatsapp");
+        } catch { /* the wa.me tab already opened either way */ }
     };
 
     const exportCsv = () => {
@@ -297,16 +326,27 @@ export default function AbandonedCartsPage() {
                                                                 <CheckCircle2 className="h-3 w-3" /> Enviado
                                                             </span>
                                                         ) : (
-                                                            (cart.email || cart.user?.email) && (
-                                                                <button
-                                                                    disabled={sendingId === cart.id}
-                                                                    onClick={() => sendReminder(cart)}
-                                                                    className="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest bg-primary/10 text-primary hover:bg-primary/20 transition-all disabled:opacity-50 flex items-center gap-1.5"
-                                                                >
-                                                                    <Mail className="h-3 w-3" />
-                                                                    {sendingId === cart.id ? "Enviando..." : "Recordar"}
-                                                                </button>
-                                                            )
+                                                            <>
+                                                                {cart.phone && (
+                                                                    <button
+                                                                        onClick={() => sendWhatsAppReminder(cart)}
+                                                                        className="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 transition-all flex items-center gap-1.5"
+                                                                    >
+                                                                        <MessageCircle className="h-3 w-3" />
+                                                                        WhatsApp
+                                                                    </button>
+                                                                )}
+                                                                {(cart.email || cart.user?.email) && (
+                                                                    <button
+                                                                        disabled={sendingId === cart.id}
+                                                                        onClick={() => sendReminder(cart)}
+                                                                        className="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest bg-primary/10 text-primary hover:bg-primary/20 transition-all disabled:opacity-50 flex items-center gap-1.5"
+                                                                    >
+                                                                        <Mail className="h-3 w-3" />
+                                                                        {sendingId === cart.id ? "Enviando..." : "Recordar"}
+                                                                    </button>
+                                                                )}
+                                                            </>
                                                         )}
                                                         <button
                                                             onClick={() => deleteCart(cart.id)}

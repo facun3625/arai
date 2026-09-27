@@ -50,7 +50,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
     try {
-        const { id, adminId } = await req.json();
+        const { id, adminId, channel } = await req.json();
 
         if (!adminId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         const admin = await prisma.user.findUnique({ where: { id: adminId } });
@@ -64,6 +64,16 @@ export async function POST(req: Request) {
             include: { user: { select: { name: true, lastName: true, email: true } } },
         });
         if (!cart) return NextResponse.json({ error: "Carrito no encontrado" }, { status: 404 });
+
+        // "whatsapp" is opened client-side (wa.me) - this call only stamps remindedAt so the
+        // "Enviado" badge covers both channels and an admin doesn't double-remind by accident.
+        if (channel === "whatsapp") {
+            const updated = await prisma.abandonedCart.update({
+                where: { id },
+                data: { remindedAt: new Date() },
+            });
+            return NextResponse.json({ success: true, cart: updated });
+        }
 
         const email = cart.email || cart.user?.email;
         if (!email) return NextResponse.json({ error: "Este carrito no tiene un email asociado" }, { status: 400 });
