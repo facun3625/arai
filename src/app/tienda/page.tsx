@@ -26,6 +26,12 @@ function TiendaContent() {
     const [selectedCategory, setSelectedCategory] = useState(() => searchParams.get("categoria") || "todas");
     const [searchTerm, setSearchTerm] = useState("");
     const [isLoading, setIsLoading] = useState(true);
+    const [sortBy, setSortBy] = useState<"destacados" | "price_asc" | "price_desc">("destacados");
+    const [priceMin, setPriceMin] = useState("");
+    const [priceMax, setPriceMax] = useState("");
+    const [selectedWeights, setSelectedWeights] = useState<number[]>([]);
+    const [selectedAttrs, setSelectedAttrs] = useState<Record<string, string[]>>({});
+    const [showMobileFilters, setShowMobileFilters] = useState(false);
     const addItem = useCartStore((state) => state.addItem);
     const cartItems = useCartStore((state) => state.items);
 
@@ -76,13 +82,112 @@ function TiendaContent() {
         return [slug, ...(cat.children || []).map((c: any) => c.slug)];
     };
 
-    const filteredProducts = (selectedCategory === "todas"
+    // Price/weight/attributes are read from whatever's already on each product - no extra
+    // fetch needed, /api/products already includes variants with their attributes JSON.
+    const getProductPrice = (p: any): number => {
+        const hasVariations = p.type === "VARIABLE" && p.variants?.length > 0;
+        return hasVariations ? Math.min(...p.variants.map((v: any) => v.price)) : p.price;
+    };
+
+    const getProductWeights = (p: any): number[] => {
+        const hasVariations = p.type === "VARIABLE" && p.variants?.length > 0;
+        if (hasVariations) {
+            return Array.from(new Set(p.variants.map((v: any) => v.weight).filter((w: any): w is number => w != null)));
+        }
+        return p.weight != null ? [p.weight] : [];
+    };
+
+    const getProductAttrs = (p: any): Record<string, string[]> => {
+        const hasVariations = p.type === "VARIABLE" && p.variants?.length > 0;
+        const result: Record<string, string[]> = {};
+        if (hasVariations) {
+            p.variants.forEach((v: any) => {
+                let attrs: Record<string, string> = {};
+                try {
+                    attrs = typeof v.attributes === "string" ? JSON.parse(v.attributes) : (v.attributes || {});
+                } catch {
+                    attrs = {};
+                }
+                Object.entries(attrs).forEach(([k, val]) => {
+                    if (!result[k]) result[k] = [];
+                    if (!result[k].includes(val as string)) result[k].push(val as string);
+                });
+            });
+        }
+        return result;
+    };
+
+    const formatWeight = (kg: number) => kg < 1 ? `${Math.round(kg * 1000)}g` : `${kg} kg`;
+
+    const categorySearchFiltered = (selectedCategory === "todas"
         ? products
         : products.filter(p => {
             const slugs = getRelevantSlugs(selectedCategory);
             return p.categories.some((c: any) => slugs.includes(c.slug));
         })
     ).filter(p => !searchTerm.trim() || p.name.toLowerCase().includes(searchTerm.trim().toLowerCase()));
+
+    // Facet options reflect what's available for the selected category/search, so users never
+    // see a "formato" or "molienda" option that would filter the list down to zero results.
+    const availableWeights = Array.from(new Set(categorySearchFiltered.flatMap(getProductWeights))).sort((a, b) => a - b);
+    const availableAttrs: Record<string, string[]> = {};
+    categorySearchFiltered.forEach(p => {
+        const attrs = getProductAttrs(p);
+        Object.entries(attrs).forEach(([name, values]) => {
+            if (!availableAttrs[name]) availableAttrs[name] = [];
+            values.forEach(v => { if (!availableAttrs[name].includes(v)) availableAttrs[name].push(v); });
+        });
+    });
+
+    const priceMinNum = priceMin.trim() ? Number(priceMin) : null;
+    const priceMaxNum = priceMax.trim() ? Number(priceMax) : null;
+
+    const hasActiveFilters = Boolean(priceMinNum || priceMaxNum || selectedWeights.length > 0 || Object.values(selectedAttrs).some(v => v.length > 0));
+
+    const clearFilters = () => {
+        setPriceMin("");
+        setPriceMax("");
+        setSelectedWeights([]);
+        setSelectedAttrs({});
+    };
+
+    const toggleWeight = (w: number) => {
+        setSelectedWeights(prev => prev.includes(w) ? prev.filter(x => x !== w) : [...prev, w]);
+    };
+
+    const toggleAttrValue = (name: string, value: string) => {
+        setSelectedAttrs(prev => {
+            const current = prev[name] || [];
+            const next = current.includes(value) ? current.filter(v => v !== value) : [...current, value];
+            return { ...prev, [name]: next };
+        });
+    };
+
+    let filteredProducts = categorySearchFiltered.filter(p => {
+        const price = getProductPrice(p);
+        if (priceMinNum != null && price < priceMinNum) return false;
+        if (priceMaxNum != null && price > priceMaxNum) return false;
+
+        if (selectedWeights.length > 0) {
+            const weights = getProductWeights(p);
+            if (!weights.some(w => selectedWeights.includes(w))) return false;
+        }
+
+        const attrs = getProductAttrs(p);
+        for (const [attrName, values] of Object.entries(selectedAttrs)) {
+            if (values.length === 0) continue;
+            const productValues = attrs[attrName] || [];
+            if (!values.some(v => productValues.includes(v))) return false;
+        }
+
+        return true;
+    });
+
+    if (sortBy === "price_asc") {
+        filteredProducts = [...filteredProducts].sort((a, b) => getProductPrice(a) - getProductPrice(b));
+    } else if (sortBy === "price_desc") {
+        filteredProducts = [...filteredProducts].sort((a, b) => getProductPrice(b) - getProductPrice(a));
+    }
 
     // Count for a category including its children
     const getCategoryCount = (cat: any): number => {
@@ -113,6 +218,82 @@ function TiendaContent() {
 
     const countClass = (slug: string) =>
         `text-[10px] font-medium ${selectedCategory === slug ? "text-white/70 md:text-primary/50" : "text-gray-500"}`;
+
+    const FiltersPanel = () => (
+        <div className="space-y-8">
+            <div>
+                <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Precio</h3>
+                <div className="flex items-center gap-2">
+                    <input
+                        type="number"
+                        min={0}
+                        value={priceMin}
+                        onChange={(e) => setPriceMin(e.target.value)}
+                        placeholder="Desde"
+                        className="w-full bg-gray-50 border border-gray-100 rounded-lg px-3 py-2 text-[12px] text-gray-700 focus:outline-none focus:border-primary/30"
+                    />
+                    <span className="text-gray-300 text-[11px]">-</span>
+                    <input
+                        type="number"
+                        min={0}
+                        value={priceMax}
+                        onChange={(e) => setPriceMax(e.target.value)}
+                        placeholder="Hasta"
+                        className="w-full bg-gray-50 border border-gray-100 rounded-lg px-3 py-2 text-[12px] text-gray-700 focus:outline-none focus:border-primary/30"
+                    />
+                </div>
+            </div>
+
+            {availableWeights.length > 1 && (
+                <div>
+                    <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Formato</h3>
+                    <div className="flex flex-wrap gap-2">
+                        {availableWeights.map((w) => (
+                            <button
+                                key={w}
+                                onClick={() => toggleWeight(w)}
+                                className={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${selectedWeights.includes(w)
+                                    ? "bg-primary border-primary text-white"
+                                    : "bg-white border-gray-200 text-gray-500 hover:border-primary/30"
+                                    }`}
+                            >
+                                {formatWeight(w)}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {Object.entries(availableAttrs).map(([name, values]) => values.length > 1 && (
+                <div key={name}>
+                    <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 capitalize">{name}</h3>
+                    <div className="flex flex-wrap gap-2">
+                        {values.map((val) => (
+                            <button
+                                key={val}
+                                onClick={() => toggleAttrValue(name, val)}
+                                className={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all capitalize ${(selectedAttrs[name] || []).includes(val)
+                                    ? "bg-primary border-primary text-white"
+                                    : "bg-white border-gray-200 text-gray-500 hover:border-primary/30"
+                                    }`}
+                            >
+                                {val}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            ))}
+
+            {hasActiveFilters && (
+                <button
+                    onClick={clearFilters}
+                    className="text-[11px] font-semibold text-primary underline"
+                >
+                    Limpiar filtros
+                </button>
+            )}
+        </div>
+    );
 
     if (isLoading) {
         return (
@@ -160,6 +341,22 @@ function TiendaContent() {
                         </div>
                     </div>
 
+                    {/* Mobile: filters toggle + collapsible panel */}
+                    <div className="md:hidden mt-4">
+                        <button
+                            onClick={() => setShowMobileFilters(prev => !prev)}
+                            className="flex items-center gap-2 text-[11px] font-bold text-gray-500 uppercase tracking-widest"
+                        >
+                            <SlidersHorizontal className="h-3.5 w-3.5 text-primary/60" />
+                            Filtros {hasActiveFilters && <span className="w-1.5 h-1.5 rounded-full bg-primary" />}
+                        </button>
+                        {showMobileFilters && (
+                            <div className="mt-4 p-4 bg-gray-50/60 rounded-2xl">
+                                <FiltersPanel />
+                            </div>
+                        )}
+                    </div>
+
                     {/* Desktop: nested vertical list */}
                     <ul className="hidden md:flex flex-col gap-0.5">
                         <li>
@@ -200,6 +397,10 @@ function TiendaContent() {
                             );
                         })}
                     </ul>
+
+                    <div className="hidden md:block mt-8 pt-8 border-t border-gray-100">
+                        <FiltersPanel />
+                    </div>
                 </aside>
 
                 {/* Grid de Productos */}
@@ -221,10 +422,14 @@ function TiendaContent() {
                         </p>
                         <div className="flex items-center gap-3">
                             <span className="text-[10px] font-bold text-gray-400 capitalize">ordenar por:</span>
-                            <select className="text-[11px] border-none bg-transparent font-bold text-gray-600 focus:ring-0 cursor-pointer capitalize">
-                                <option>destacados</option>
-                                <option>precio: menor a mayor</option>
-                                <option>precio: mayor a menor</option>
+                            <select
+                                value={sortBy}
+                                onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                                className="text-[11px] border-none bg-transparent font-bold text-gray-600 focus:ring-0 cursor-pointer capitalize"
+                            >
+                                <option value="destacados">destacados</option>
+                                <option value="price_asc">precio: menor a mayor</option>
+                                <option value="price_desc">precio: mayor a menor</option>
                             </select>
                         </div>
                     </div>
