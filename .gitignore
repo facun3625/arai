@@ -45,6 +45,8 @@ next-env.d.ts
 # database
 *.db
 *.db-journal
+/*.sql
+backup*.sql
 
 # logs
 dev_logs.txt
