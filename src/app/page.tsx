@@ -428,7 +428,7 @@ export default function Home() {
 
       {/* CTA Section */}
       <section className="py-12 px-6 md:px-12 bg-gray-50">
-        <div className="max-w-7xl mx-auto rounded-[60px] bg-[#0c120e] relative overflow-hidden p-16 md:p-32 flex flex-col items-center text-center space-y-10 group">
+        <div className="max-w-7xl mx-auto rounded-[60px] bg-[#0c120e] relative overflow-hidden p-8 sm:p-16 md:p-32 flex flex-col items-center text-center space-y-10 group">
           {/* Abstract Decor */}
           <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-primary/20 blur-[150px] transition-transform duration-1000 group-hover:scale-125"></div>
           <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-primary/10 blur-[100px] transition-transform duration-1000 group-hover:translate-x-12"></div>
@@ -440,20 +440,20 @@ export default function Home() {
             Yerba mate equilibrada, estacionada y pensada para tu ritual diario. Recibí promociones exclusivas y lanzamientos en tu correo.
           </p>
           <form onSubmit={handleNewsletterSubmit} className="flex flex-col gap-4 z-10 w-full max-w-lg">
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
               <input
                 type="email"
                 required
                 value={newsletterEmail}
                 onChange={(e) => setNewsletterEmail(e.target.value)}
                 placeholder="Tu correo electrónico"
-                className="flex-1 h-16 bg-white/5 border border-white/10 rounded-2xl px-8 text-white focus:outline-none focus:border-primary transition-all"
+                className="flex-1 min-w-0 h-16 bg-white/5 border border-white/10 rounded-2xl px-8 text-white focus:outline-none focus:border-primary transition-all"
                 disabled={isSubscribing || newsletterStatus === "success"}
               />
               <button
                 type="submit"
                 disabled={isSubscribing || newsletterStatus === "success"}
-                className={`h-16 px-10 rounded-2xl text-[12px] font-bold transition-all shadow-2xl relative overflow-hidden ${newsletterStatus === "success"
+                className={`h-16 px-10 rounded-2xl text-[12px] font-bold transition-all shadow-2xl relative overflow-hidden shrink-0 ${newsletterStatus === "success"
                   ? "bg-green-600 text-white cursor-default"
                   : "bg-primary text-white hover:scale-105 shadow-primary/20"
                   }`}
