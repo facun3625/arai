@@ -18,7 +18,9 @@ function SuccessContent() {
     }, [clearCart]);
 
     // Track Purchase from the authoritative order data (the cart is already cleared by now),
-    // guarded so a page refresh doesn't fire a duplicate conversion for the same order.
+    // gated on the webhook having actually flipped the order to PAID (not just the MP redirect
+    // landing here, which can race ahead of the webhook), and guarded against duplicate fires
+    // across tabs/sessions via localStorage.
     useEffect(() => {
         if (!orderId || typeof window === 'undefined') return;
         const trackedKey = `fb_purchase_tracked_${orderId}`;
@@ -34,7 +36,8 @@ function SuccessContent() {
                 setCoordinateShipping({ orderNumber: order.orderNumber, whatsappNumber: settings.whatsappNumber });
             }
 
-            if (sessionStorage.getItem(trackedKey)) return;
+            if (order.status?.toUpperCase() !== 'PAID') return;
+            if (localStorage.getItem(trackedKey)) return;
             trackPixelEvent('Purchase', {
                 content_ids: order.items.map((i: any) => i.productId),
                 content_type: 'product',
@@ -43,7 +46,7 @@ function SuccessContent() {
                 value: order.total,
                 currency: 'ARS'
             });
-            sessionStorage.setItem(trackedKey, '1');
+            localStorage.setItem(trackedKey, '1');
         }).catch(() => {});
     }, [orderId]);
 

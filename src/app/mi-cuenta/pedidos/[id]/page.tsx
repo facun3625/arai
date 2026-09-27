@@ -19,6 +19,7 @@ import {
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { trackPixelEvent } from "@/lib/fbPixel";
 
 interface OrderItem {
     id: string;
@@ -71,6 +72,27 @@ export default function PedidoDetailPage() {
                 .finally(() => setIsLoading(false));
         }
     }, [id]);
+
+    // Fallback Purchase tracking: catches orders confirmed as PAID after the customer already
+    // left checkout (bank transfer confirmed by an admin, or an MP webhook that lagged behind
+    // the success-page redirect). Guarded against duplicates via localStorage.
+    useEffect(() => {
+        if (!order || typeof window === 'undefined') return;
+        if (order.status?.toUpperCase() !== 'PAID') return;
+
+        const trackedKey = `fb_purchase_tracked_${order.id}`;
+        if (localStorage.getItem(trackedKey)) return;
+
+        trackPixelEvent('Purchase', {
+            content_ids: order.items.map((i) => i.productId),
+            content_type: 'product',
+            contents: order.items.map((i) => ({ id: i.productId, quantity: i.quantity, item_price: i.price })),
+            num_items: order.items.reduce((sum, i) => sum + i.quantity, 0),
+            value: order.total,
+            currency: 'ARS'
+        });
+        localStorage.setItem(trackedKey, '1');
+    }, [order]);
 
     const handleReorder = async () => {
         if (!order) return;

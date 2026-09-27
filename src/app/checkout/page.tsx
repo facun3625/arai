@@ -709,16 +709,8 @@ export default function CheckoutPage() {
                 });
                 setTimeout(() => router.push('/mi-cuenta/pedidos'), 3000);
             } else {
-                // Bank transfer never redirects through /checkout/success, so track Purchase here
-                trackPixelEvent('Purchase', {
-                    content_ids: items.map(i => i.productId || i.id),
-                    content_type: 'product',
-                    contents: items.map(i => ({ id: i.productId || i.id, quantity: i.quantity })),
-                    num_items: items.reduce((sum, i) => sum + i.quantity, 0),
-                    value: order.total,
-                    currency: 'ARS'
-                });
-
+                // Bank transfer orders start as PENDING and aren't confirmed yet - Purchase is
+                // tracked later (mi-cuenta/pedidos/[id]) once an admin marks the order PAID.
                 // Redirect immediately to the pending-payment page (it clears the cart itself) —
                 // waiting here with an already-empty cart flashed the "Checkout Incompleto" guard below.
                 router.push(`/checkout/pending?orderId=${order.id}`);
