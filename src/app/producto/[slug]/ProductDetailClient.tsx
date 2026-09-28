@@ -491,9 +491,9 @@ export default function ProductDetailClient() {
                             <div className="flex items-start gap-3">
                                 <CreditCard className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                                 <p className="text-[12.5px] text-gray-600 leading-relaxed">
-                                    Mercado Pago
+                                    Pagás con Mercado Pago
                                     {storeInfo.bankTransferDiscount > 0 && (
-                                        <> o transferencia bancaria con {storeInfo.bankTransferDiscount}% de descuento</>
+                                        <> · <span className="text-primary font-semibold">{storeInfo.bankTransferDiscount}% off</span> pagando por transferencia bancaria</>
                                     )}.
                                 </p>
                             </div>
