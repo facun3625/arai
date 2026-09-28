@@ -125,8 +125,8 @@ export default function ZonasRestringidasPage() {
         r.address?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const inputCls = "w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-primary/50 transition-all placeholder:text-white/20";
-    const labelCls = "text-white/40 text-[10px] uppercase tracking-widest font-bold mb-2 block";
+    const inputCls = "w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm focus:outline-none focus:border-primary/50 transition-all placeholder:text-slate-500";
+    const labelCls = "text-slate-600 text-[10px] uppercase tracking-widest font-bold mb-2 block";
 
     return (
         <div className="space-y-8 animate-in fade-in duration-700">
@@ -134,19 +134,19 @@ export default function ZonasRestringidasPage() {
             <div className="space-y-8">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-3xl font-light text-white tracking-tight flex items-center gap-3">
+                        <h1 className="text-3xl font-light text-slate-900 tracking-tight flex items-center gap-3">
                             <MapPin className="text-primary h-8 w-8" />
                             Zonas Restringidas
                         </h1>
-                        <p className="text-white/40 text-sm mt-2">Gestioná bloqueos de envío y venta por Código Postal (Franquicias).</p>
+                        <p className="text-slate-600 text-sm mt-2">Gestioná bloqueos de envío y venta por Código Postal (Franquicias).</p>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Add Form */}
                     <div className="lg:col-span-1">
-                        <div className="bg-[#0c120e] border border-white/5 rounded-3xl p-6 sticky top-8">
-                            <h2 className="text-lg font-medium text-white mb-6 flex items-center gap-2">
+                        <div className="bg-white border border-slate-200 rounded-3xl p-6 sticky top-8">
+                            <h2 className="text-lg font-medium text-slate-900 mb-6 flex items-center gap-2">
                                 <Plus className="text-primary h-5 w-5" />
                                 Nueva Restricción
                             </h2>
@@ -170,7 +170,7 @@ export default function ZonasRestringidasPage() {
                                         <button
                                             type="button"
                                             onClick={() => setNewType('BLOCK_SALE')}
-                                            className={`py-3 rounded-xl text-[10px] font-bold uppercase transition-all flex flex-col items-center gap-2 border ${newType === 'BLOCK_SALE' ? 'bg-red-500/10 border-red-500/30 text-red-500' : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10'}`}
+                                            className={`py-3 rounded-xl text-[10px] font-bold uppercase transition-all flex flex-col items-center gap-2 border ${newType === 'BLOCK_SALE' ? 'bg-red-500/10 border-red-500/30 text-red-500' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-50'}`}
                                         >
                                             <Ban className="h-4 w-4" />
                                             Bloquear Venta
@@ -178,7 +178,7 @@ export default function ZonasRestringidasPage() {
                                         <button
                                             type="button"
                                             onClick={() => setNewType('BLOCK_SHIPPING')}
-                                            className={`py-3 rounded-xl text-[10px] font-bold uppercase transition-all flex flex-col items-center gap-2 border ${newType === 'BLOCK_SHIPPING' ? 'bg-orange-500/10 border-orange-500/30 text-orange-500' : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10'}`}
+                                            className={`py-3 rounded-xl text-[10px] font-bold uppercase transition-all flex flex-col items-center gap-2 border ${newType === 'BLOCK_SHIPPING' ? 'bg-orange-500/10 border-orange-500/30 text-orange-500' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-50'}`}
                                         >
                                             <Truck className="h-4 w-4" />
                                             Bloquear Envio
@@ -188,8 +188,8 @@ export default function ZonasRestringidasPage() {
 
                                 {newType === 'BLOCK_SALE' && (
                                     <div className="space-y-5 animate-in fade-in slide-in-from-top-2 duration-300">
-                                        <hr className="border-white/5" />
-                                        <p className="text-[10px] text-white/20 italic">En zonas de venta bloqueada (Franquicias), se mostrará la info de contacto local en el checkout.</p>
+                                        <hr className="border-slate-200" />
+                                        <p className="text-[10px] text-slate-500 italic">En zonas de venta bloqueada (Franquicias), se mostrará la info de contacto local en el checkout.</p>
                                         
                                         <div>
                                             <label className={labelCls}>Dirección del Local</label>
@@ -239,11 +239,11 @@ export default function ZonasRestringidasPage() {
                     {/* List */}
                     <div className="lg:col-span-2 space-y-6">
                         <div className="relative group">
-                            <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20 group-focus-within:text-primary transition-colors" />
+                            <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-primary transition-colors" />
                             <input 
                                 type="text"
                                 placeholder="Buscar por CP o dirección..."
-                                className="w-full bg-[#0c120e] border border-white/5 rounded-3xl pl-12 pr-6 py-4 text-white text-sm focus:outline-none focus:border-white/10 transition-all"
+                                className="w-full bg-white border border-slate-200 rounded-3xl pl-12 pr-6 py-4 text-slate-900 text-sm focus:outline-none focus:border-slate-200 transition-all"
                                 value={searchTerm}
                                 onChange={e => setSearchTerm(e.target.value)}
                             />
@@ -252,25 +252,25 @@ export default function ZonasRestringidasPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {isLoading ? (
                                 Array(4).fill(0).map((_, i) => (
-                                    <div key={i} className="h-48 bg-white/5 rounded-3xl animate-pulse border border-white/5"></div>
+                                    <div key={i} className="h-48 bg-slate-50 rounded-3xl animate-pulse border border-slate-200"></div>
                                 ))
                             ) : filtered.length === 0 ? (
-                                <div className="col-span-full py-20 text-center space-y-4 bg-white/5 rounded-[40px] border border-dashed border-white/10">
-                                    <MapPinOff className="h-12 w-12 text-white/10 mx-auto" />
-                                    <p className="text-white/20 text-sm italic">No hay restricciones configuradas.</p>
+                                <div className="col-span-full py-20 text-center space-y-4 bg-slate-50 rounded-[40px] border border-dashed border-slate-200">
+                                    <MapPinOff className="h-12 w-12 text-slate-500 mx-auto" />
+                                    <p className="text-slate-500 text-sm italic">No hay restricciones configuradas.</p>
                                 </div>
                             ) : (
                                 filtered.map(r => (
-                                    <div key={r.id} className="bg-[#0c120e] border border-white/5 rounded-[32px] p-6 group hover:border-white/10 transition-all relative overflow-hidden">
+                                    <div key={r.id} className="bg-white border border-slate-200 rounded-[32px] p-6 group hover:border-slate-200 transition-all relative overflow-hidden">
                                         <div className={`absolute top-0 right-0 px-4 py-1.5 rounded-bl-2xl text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 ${r.type === 'BLOCK_SALE' ? 'bg-red-500/20 text-red-500' : 'bg-orange-500/20 text-orange-500'}`}>
                                             {r.type === 'BLOCK_SALE' ? <Ban className="h-3 w-3" /> : <Truck className="h-3 w-3" />}
                                             {r.type === 'BLOCK_SALE' ? 'Venta Bloqueada' : 'Envio Bloqueado'}
                                         </div>
 
                                         <div className="flex items-start justify-between mb-4">
-                                            <div className="bg-white/5 px-4 py-2 rounded-xl border border-white/5">
-                                                <span className="text-white/40 text-[10px] uppercase font-bold block mb-0.5 tracking-tighter">CP</span>
-                                                <span className="text-2xl font-mono font-bold text-white">{r.zipCode}</span>
+                                            <div className="bg-slate-50 px-4 py-2 rounded-xl border border-slate-200">
+                                                <span className="text-slate-600 text-[10px] uppercase font-bold block mb-0.5 tracking-tighter">CP</span>
+                                                <span className="text-2xl font-mono font-bold text-slate-900">{r.zipCode}</span>
                                             </div>
                                             <button 
                                                 onClick={() => handleDelete(r.id)}
@@ -282,7 +282,7 @@ export default function ZonasRestringidasPage() {
 
                                         <div className="space-y-4">
                                             {r.message && (
-                                                <div className="bg-white/5 p-3 rounded-xl italic text-white/50 text-[11px]">
+                                                <div className="bg-slate-50 p-3 rounded-xl italic text-slate-600 text-[11px]">
                                                     "{r.message}"
                                                 </div>
                                             )}
@@ -290,13 +290,13 @@ export default function ZonasRestringidasPage() {
                                             {r.type === 'BLOCK_SALE' && (r.address || r.phone) && (
                                                 <div className="space-y-3 pt-2">
                                                     {r.address && (
-                                                        <div className="flex items-start gap-3 text-white/60">
+                                                        <div className="flex items-start gap-3 text-slate-600">
                                                             <Store className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                                                             <span className="text-[11px] leading-relaxed">{r.address}</span>
                                                         </div>
                                                     )}
                                                     {r.phone && (
-                                                        <div className="flex items-center gap-3 text-white/60">
+                                                        <div className="flex items-center gap-3 text-slate-600">
                                                             <Phone className="h-4 w-4 text-primary shrink-0" />
                                                             <span className="text-[11px] font-mono">{r.phone}</span>
                                                         </div>

@@ -118,33 +118,33 @@ export default function EnvioPage() {
 
     const hasChanges = JSON.stringify(settings) !== JSON.stringify(initialSettings);
 
-    const inputCls = "w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10";
-    const labelCls = "text-white/80 text-sm font-medium flex items-center gap-2.5";
-    const hintCls = "text-[11px] text-white/20 italic mt-2 ml-1";
+    const inputCls = "w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 text-[15px] focus:outline-none focus:border-slate-200 focus:bg-white transition-all placeholder:text-slate-500";
+    const labelCls = "text-slate-900 text-sm font-medium flex items-center gap-2.5";
+    const hintCls = "text-[11px] text-slate-500 italic mt-2 ml-1";
     const pendingBadge = "mb-8 p-4 bg-yellow-500/5 border border-yellow-500/10 rounded-2xl flex items-center gap-3";
 
     return (
         <>
             <form onSubmit={handleSave}>
-                <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-700">
+                <div className="w-full space-y-8 animate-in fade-in duration-700">
 
                     {/* ── OCA ── */}
-                    <div className="bg-[#0a0a0a] border border-white/5 rounded-[32px] p-10 md:p-12 shadow-2xl relative overflow-hidden">
+                    <div className="bg-white border border-slate-200 rounded-[32px] p-10 md:p-12 shadow-2xl relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-primary/5 blur-[120px] -z-10" />
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
                             <div className="space-y-2">
                                 <div className="flex items-center gap-3 mb-2">
                                     <div className="p-2 bg-primary/10 rounded-xl"><Truck className="h-6 w-6 text-primary" /></div>
-                                    <h1 className="text-white text-3xl font-bold tracking-tight">OCA ePak</h1>
+                                    <h1 className="text-slate-900 text-3xl font-bold tracking-tight">OCA ePak</h1>
                                 </div>
-                                <p className="text-white/40 text-sm tracking-wide">Configurá las credenciales de tu cuenta corporativa de OCA.</p>
+                                <p className="text-slate-600 text-sm tracking-wide">Configurá las credenciales de tu cuenta corporativa de OCA.</p>
                             </div>
-                            <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5">
-                                <span className={`text-[10px] font-bold uppercase tracking-widest ${settings.ocaEnabled ? 'text-primary' : 'text-white/20'}`}>
+                            <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                                <span className={`text-[10px] font-bold uppercase tracking-widest ${settings.ocaEnabled ? 'text-primary' : 'text-slate-500'}`}>
                                     {settings.ocaEnabled ? 'Plataforma Activa' : 'Plataforma Inactiva'}
                                 </span>
                                 <button type="button" onClick={() => setSettings({ ...settings, ocaEnabled: !settings.ocaEnabled })}
-                                    className={`relative w-14 h-7 rounded-full transition-all duration-300 ${settings.ocaEnabled ? 'bg-primary' : 'bg-white/10'}`}>
+                                    className={`relative w-14 h-7 rounded-full transition-all duration-300 ${settings.ocaEnabled ? 'bg-primary' : 'bg-slate-50'}`}>
                                     <div className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-all duration-300 ${settings.ocaEnabled ? 'translate-x-7 shadow-[0_0_10px_rgba(255,255,255,0.5)]' : 'translate-x-0'}`} />
                                 </button>
                             </div>
@@ -152,25 +152,25 @@ export default function EnvioPage() {
 
                         <div className={`grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 transition-all duration-500 ${!settings.ocaEnabled ? 'opacity-30 pointer-events-none grayscale' : ''}`}>
                             <div className="space-y-3">
-                                <label className={labelCls}><Hash className="h-4 w-4 text-white/60" /> CUIT</label>
+                                <label className={labelCls}><Hash className="h-4 w-4 text-slate-600" /> CUIT</label>
                                 <input type="text" placeholder="30-71458923-9" value={settings.ocaCuit}
                                     onChange={(e) => setSettings({ ...settings, ocaCuit: e.target.value })} className={inputCls} />
                                 <p className={hintCls}>CUIT vinculado a tu cuenta de OCA.</p>
                             </div>
                             <div className="space-y-3">
-                                <label className={labelCls}><Settings className="h-4 w-4 text-white/60" /> Operativa (Domicilio)</label>
+                                <label className={labelCls}><Settings className="h-4 w-4 text-slate-600" /> Operativa (Domicilio)</label>
                                 <input type="text" placeholder="Ej: 236458" value={settings.ocaOperativa}
                                     onChange={(e) => setSettings({ ...settings, ocaOperativa: e.target.value })} className={inputCls} />
                                 <p className={hintCls}>Operativa para entrega a domicilio.</p>
                             </div>
                             <div className="space-y-3">
-                                <label className={labelCls}><Hash className="h-4 w-4 text-white/60" /> Operativa (Sucursal)</label>
+                                <label className={labelCls}><Hash className="h-4 w-4 text-slate-600" /> Operativa (Sucursal)</label>
                                 <input type="text" placeholder="Ej: 236458" value={settings.ocaOperativaSucursal}
                                     onChange={(e) => setSettings({ ...settings, ocaOperativaSucursal: e.target.value })} className={inputCls} />
                                 <p className={hintCls}>Operativa para retiro en sucursal OCA.</p>
                             </div>
                             <div className="space-y-3">
-                                <label className={labelCls}><MapPin className="h-4 w-4 text-white/60" /> Código Postal de Origen</label>
+                                <label className={labelCls}><MapPin className="h-4 w-4 text-slate-600" /> Código Postal de Origen</label>
                                 <input type="text" placeholder="Ej: 2000" value={settings.ocaOriginZipCode}
                                     onChange={(e) => setSettings({ ...settings, ocaOriginZipCode: e.target.value })} className={inputCls} />
                                 <p className={hintCls}>CP desde donde despachas tus pedidos.</p>
@@ -178,37 +178,37 @@ export default function EnvioPage() {
                         </div>
 
                         {/* Origin address for IngresoOR */}
-                        <div className="mt-10 pt-8 border-t border-white/5">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-white/30 mb-6">Dirección del remitente (origen del envío)</p>
+                        <div className="mt-10 pt-8 border-t border-slate-200">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-6">Dirección del remitente (origen del envío)</p>
                             <div className={`grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 transition-all duration-500 ${!settings.ocaEnabled ? 'opacity-30 pointer-events-none grayscale' : ''}`}>
                                 <div className="space-y-3">
-                                    <label className={labelCls}><MapPin className="h-4 w-4 text-white/60" /> Calle</label>
+                                    <label className={labelCls}><MapPin className="h-4 w-4 text-slate-600" /> Calle</label>
                                     <input type="text" placeholder="Ej: San Martín" value={settings.ocaOriginStreet}
                                         onChange={(e) => setSettings({ ...settings, ocaOriginStreet: e.target.value })} className={inputCls} />
                                 </div>
                                 <div className="space-y-3">
-                                    <label className={labelCls}><Hash className="h-4 w-4 text-white/60" /> Número</label>
+                                    <label className={labelCls}><Hash className="h-4 w-4 text-slate-600" /> Número</label>
                                     <input type="text" placeholder="Ej: 1234" value={settings.ocaOriginNumber}
                                         onChange={(e) => setSettings({ ...settings, ocaOriginNumber: e.target.value })} className={inputCls} />
                                 </div>
                                 <div className="space-y-3">
-                                    <label className={labelCls}><Hash className="h-4 w-4 text-white/60" /> Piso / Depto (opcional)</label>
+                                    <label className={labelCls}><Hash className="h-4 w-4 text-slate-600" /> Piso / Depto (opcional)</label>
                                     <input type="text" placeholder="Ej: 2" value={settings.ocaOriginFloor}
                                         onChange={(e) => setSettings({ ...settings, ocaOriginFloor: e.target.value })} className={inputCls} />
                                 </div>
                                 <div className="space-y-3">
-                                    <label className={labelCls}><MapPin className="h-4 w-4 text-white/60" /> Localidad</label>
+                                    <label className={labelCls}><MapPin className="h-4 w-4 text-slate-600" /> Localidad</label>
                                     <input type="text" placeholder="Ej: SANTA FE" value={settings.ocaOriginCity}
                                         onChange={(e) => setSettings({ ...settings, ocaOriginCity: e.target.value })} className={inputCls} />
                                     <p className={hintCls}>En mayúsculas, tal como figura en OCA.</p>
                                 </div>
                                 <div className="space-y-3">
-                                    <label className={labelCls}><MapPin className="h-4 w-4 text-white/60" /> Provincia</label>
+                                    <label className={labelCls}><MapPin className="h-4 w-4 text-slate-600" /> Provincia</label>
                                     <input type="text" placeholder="Ej: SANTA FE" value={settings.ocaOriginProvince}
                                         onChange={(e) => setSettings({ ...settings, ocaOriginProvince: e.target.value })} className={inputCls} />
                                 </div>
                                 <div className="space-y-3">
-                                    <label className={labelCls}><Settings className="h-4 w-4 text-white/60" /> Franja Horaria</label>
+                                    <label className={labelCls}><Settings className="h-4 w-4 text-slate-600" /> Franja Horaria</label>
                                     <select value={settings.ocaFranjaHoraria}
                                         onChange={(e) => setSettings({ ...settings, ocaFranjaHoraria: e.target.value })}
                                         className={inputCls}>
@@ -218,12 +218,12 @@ export default function EnvioPage() {
                                     </select>
                                 </div>
                                 <div className="space-y-3">
-                                    <label className={labelCls}><Key className="h-4 w-4 text-white/60" /> Nombre de contacto</label>
+                                    <label className={labelCls}><Key className="h-4 w-4 text-slate-600" /> Nombre de contacto</label>
                                     <input type="text" placeholder="Ej: Araí Yerba Mate" value={settings.ocaOriginContact}
                                         onChange={(e) => setSettings({ ...settings, ocaOriginContact: e.target.value })} className={inputCls} />
                                 </div>
                                 <div className="space-y-3">
-                                    <label className={labelCls}><Globe className="h-4 w-4 text-white/60" /> Email de contacto</label>
+                                    <label className={labelCls}><Globe className="h-4 w-4 text-slate-600" /> Email de contacto</label>
                                     <input type="email" placeholder="info@tutienda.com" value={settings.ocaOriginEmail}
                                         onChange={(e) => setSettings({ ...settings, ocaOriginEmail: e.target.value })} className={inputCls} />
                                 </div>
@@ -231,23 +231,23 @@ export default function EnvioPage() {
                         </div>
 
                         {/* Credentials for IngresoOR / label generation */}
-                        <div className="mt-10 pt-8 border-t border-white/5">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-white/30 mb-6">Credenciales para generación de rótulos</p>
+                        <div className="mt-10 pt-8 border-t border-slate-200">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-6">Credenciales para generación de rótulos</p>
                             <div className={`grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-8 transition-all duration-500 ${!settings.ocaEnabled ? 'opacity-30 pointer-events-none grayscale' : ''}`}>
                                 <div className="space-y-3">
-                                    <label className={labelCls}><Key className="h-4 w-4 text-white/60" /> Usuario OCA (email)</label>
+                                    <label className={labelCls}><Key className="h-4 w-4 text-slate-600" /> Usuario OCA (email)</label>
                                     <input type="text" placeholder="usuario@empresa.com" value={settings.ocaUser}
                                         onChange={(e) => setSettings({ ...settings, ocaUser: e.target.value })} className={inputCls} />
                                     <p className={hintCls}>Email con que accedés al portal OCA.</p>
                                 </div>
                                 <div className="space-y-3">
-                                    <label className={labelCls}><Lock className="h-4 w-4 text-white/60" /> Contraseña OCA</label>
+                                    <label className={labelCls}><Lock className="h-4 w-4 text-slate-600" /> Contraseña OCA</label>
                                     <input type="password" placeholder="••••••••" value={settings.ocaPassword}
                                         onChange={(e) => setSettings({ ...settings, ocaPassword: e.target.value })} className={inputCls} />
                                     <p className={hintCls}>Contraseña del portal OCA.</p>
                                 </div>
                                 <div className="space-y-3">
-                                    <label className={labelCls}><Hash className="h-4 w-4 text-white/60" /> Nro. de Cliente OCA</label>
+                                    <label className={labelCls}><Hash className="h-4 w-4 text-slate-600" /> Nro. de Cliente OCA</label>
                                     <input type="text" placeholder="Ej: 123456/0" value={settings.ocaNroCliente}
                                         onChange={(e) => setSettings({ ...settings, ocaNroCliente: e.target.value })} className={inputCls} />
                                     <p className={hintCls}>Número de cliente corporativo de OCA.</p>
@@ -257,22 +257,22 @@ export default function EnvioPage() {
                     </div>
 
                     {/* ── DHL ── */}
-                    <div className="bg-[#0a0a0a] border border-white/5 rounded-[32px] p-10 md:p-12 shadow-2xl relative overflow-hidden">
+                    <div className="bg-white border border-slate-200 rounded-[32px] p-10 md:p-12 shadow-2xl relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-yellow-500/5 blur-[120px] -z-10" />
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
                             <div className="space-y-2">
                                 <div className="flex items-center gap-3 mb-2">
-                                    <div className="p-2 bg-yellow-500/10 rounded-xl"><Globe className="h-6 w-6 text-yellow-400" /></div>
-                                    <h2 className="text-white text-3xl font-bold tracking-tight">DHL Express</h2>
+                                    <div className="p-2 bg-yellow-500/10 rounded-xl"><Globe className="h-6 w-6 text-yellow-700" /></div>
+                                    <h2 className="text-slate-900 text-3xl font-bold tracking-tight">DHL Express</h2>
                                 </div>
-                                <p className="text-white/40 text-sm tracking-wide">Logística internacional. Configurá cuando recibas las credenciales del cliente.</p>
+                                <p className="text-slate-600 text-sm tracking-wide">Logística internacional. Configurá cuando recibas las credenciales del cliente.</p>
                             </div>
-                            <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5">
-                                <span className={`text-[10px] font-bold uppercase tracking-widest ${settings.dhlEnabled ? 'text-yellow-400' : 'text-white/20'}`}>
+                            <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                                <span className={`text-[10px] font-bold uppercase tracking-widest ${settings.dhlEnabled ? 'text-yellow-700' : 'text-slate-500'}`}>
                                     {settings.dhlEnabled ? 'Plataforma Activa' : 'Plataforma Inactiva'}
                                 </span>
                                 <button type="button" onClick={() => setSettings({ ...settings, dhlEnabled: !settings.dhlEnabled })}
-                                    className={`relative w-14 h-7 rounded-full transition-all duration-300 ${settings.dhlEnabled ? 'bg-yellow-500' : 'bg-white/10'}`}>
+                                    className={`relative w-14 h-7 rounded-full transition-all duration-300 ${settings.dhlEnabled ? 'bg-yellow-500' : 'bg-slate-50'}`}>
                                     <div className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-all duration-300 ${settings.dhlEnabled ? 'translate-x-7 shadow-[0_0_10px_rgba(255,255,255,0.5)]' : 'translate-x-0'}`} />
                                 </button>
                             </div>
@@ -281,25 +281,25 @@ export default function EnvioPage() {
                         {!settings.dhlAccountNumber && !settings.dhlApiKey && !settings.dhlSiteId && (
                             <div className={pendingBadge}>
                                 <div className="w-2 h-2 rounded-full bg-yellow-400/60 animate-pulse flex-shrink-0" />
-                                <p className="text-[12px] text-yellow-400/60 font-medium">En espera de credenciales del cliente (developer.dhl.com).</p>
+                                <p className="text-[12px] text-yellow-700/60 font-medium">En espera de credenciales del cliente (developer.dhl.com).</p>
                             </div>
                         )}
 
                         <div className={`grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 transition-all duration-500 ${!settings.dhlEnabled ? 'opacity-30 pointer-events-none grayscale' : ''}`}>
                             <div className="space-y-3">
-                                <label className={labelCls}><Hash className="h-4 w-4 text-white/60" /> Account Number</label>
+                                <label className={labelCls}><Hash className="h-4 w-4 text-slate-600" /> Account Number</label>
                                 <input type="text" placeholder="Ej: 123456789" value={settings.dhlAccountNumber}
                                     onChange={(e) => setSettings({ ...settings, dhlAccountNumber: e.target.value })} className={inputCls} />
                                 <p className={hintCls}>Número de cuenta DHL Express (9 dígitos).</p>
                             </div>
                             <div className="space-y-3">
-                                <label className={labelCls}><Key className="h-4 w-4 text-white/60" /> Site ID</label>
+                                <label className={labelCls}><Key className="h-4 w-4 text-slate-600" /> Site ID</label>
                                 <input type="text" placeholder="dhl_site_..." value={settings.dhlSiteId}
                                     onChange={(e) => setSettings({ ...settings, dhlSiteId: e.target.value })} className={inputCls} />
                                 <p className={hintCls}>Identificador del sitio en la red DHL.</p>
                             </div>
                             <div className="space-y-3 md:col-span-2">
-                                <label className={labelCls}><Lock className="h-4 w-4 text-white/60" /> API Key / Password</label>
+                                <label className={labelCls}><Lock className="h-4 w-4 text-slate-600" /> API Key / Password</label>
                                 <input type="password" placeholder="dhl_key_..." value={settings.dhlApiKey}
                                     onChange={(e) => setSettings({ ...settings, dhlApiKey: e.target.value })} className={inputCls} />
                                 <p className={hintCls}>Clave de acceso a la API de DHL (Consumer Key).</p>
@@ -308,21 +308,21 @@ export default function EnvioPage() {
                     </div>
 
                     {/* ── Acordar ── */}
-                    <div className="bg-[#0a0a0a] border border-white/5 rounded-[32px] p-10 md:p-12 shadow-2xl">
+                    <div className="bg-white border border-slate-200 rounded-[32px] p-10 md:p-12 shadow-2xl">
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                             <div className="space-y-2">
                                 <div className="flex items-center gap-3 mb-2">
-                                    <div className="p-2 bg-white/5 rounded-xl"><Globe className="h-6 w-6 text-white/60" /></div>
-                                    <h2 className="text-white text-2xl font-bold tracking-tight">Envío a coordinar</h2>
+                                    <div className="p-2 bg-slate-50 rounded-xl"><Globe className="h-6 w-6 text-slate-600" /></div>
+                                    <h2 className="text-slate-900 text-2xl font-bold tracking-tight">Envío a coordinar</h2>
                                 </div>
-                                <p className="text-white/40 text-sm tracking-wide">Muestra la opción "Envío a acordar / Otros medios" en el checkout. Si todo está deshabilitado, el cliente verá un mensaje para contactarse.</p>
+                                <p className="text-slate-600 text-sm tracking-wide">Muestra la opción "Envío a acordar / Otros medios" en el checkout. Si todo está deshabilitado, el cliente verá un mensaje para contactarse.</p>
                             </div>
-                            <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5 flex-shrink-0">
-                                <span className={`text-[10px] font-bold uppercase tracking-widest ${settings.acordarEnabled ? 'text-primary' : 'text-white/20'}`}>
+                            <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200 flex-shrink-0">
+                                <span className={`text-[10px] font-bold uppercase tracking-widest ${settings.acordarEnabled ? 'text-primary' : 'text-slate-500'}`}>
                                     {settings.acordarEnabled ? 'Visible' : 'Oculto'}
                                 </span>
                                 <button type="button" onClick={() => setSettings({ ...settings, acordarEnabled: !settings.acordarEnabled })}
-                                    className={`relative w-14 h-7 rounded-full transition-all duration-300 ${settings.acordarEnabled ? 'bg-primary' : 'bg-white/10'}`}>
+                                    className={`relative w-14 h-7 rounded-full transition-all duration-300 ${settings.acordarEnabled ? 'bg-primary' : 'bg-slate-50'}`}>
                                     <div className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-all duration-300 ${settings.acordarEnabled ? 'translate-x-7 shadow-[0_0_10px_rgba(255,255,255,0.5)]' : 'translate-x-0'}`} />
                                 </button>
                             </div>
@@ -334,9 +334,9 @@ export default function EnvioPage() {
                         <button type="submit" disabled={isSaving || (!hasChanges && !lastSaved)}
                             className={`w-full py-5 rounded-[20px] text-[16px] font-bold tracking-tight transition-all flex items-center justify-center gap-3 shadow-xl active:scale-[0.97] active:brightness-110 disabled:opacity-50 ${
                                 isSaving ? 'bg-primary/20 text-primary border border-primary/20'
-                                : lastSaved ? 'bg-green-500/10 text-green-400 border border-green-500/20'
+                                : lastSaved ? 'bg-green-500/10 text-green-700 border border-green-500/20'
                                 : hasChanges ? 'bg-primary hover:bg-primary-dark text-white shadow-[0_0_30px_rgba(var(--primary-rgb),0.3)]'
-                                : 'bg-white/5 border border-white/10 text-white/20'
+                                : 'bg-slate-50 border border-slate-200 text-slate-500'
                             }`}>
                             {isSaving ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
                             {!isSaving && lastSaved && <CheckCircle2 className="h-5 w-5 animate-in zoom-in duration-300" />}
@@ -350,7 +350,7 @@ export default function EnvioPage() {
 
             {toast && (
                 <div className={`fixed bottom-8 right-8 px-6 py-4 rounded-2xl shadow-2xl border animate-in slide-in-from-right-8 duration-500 z-50 ${
-                    toast.type === 'success' ? 'bg-[#0c120e] border-primary/20 text-primary' : 'bg-red-500/10 border-red-500/20 text-red-500'
+                    toast.type === 'success' ? 'bg-white border-primary/20 text-primary' : 'bg-red-500/10 border-red-500/20 text-red-500'
                 }`}>
                     <div className="flex items-center gap-3">
                         {toast.type === 'success' ? <CheckCircle2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}

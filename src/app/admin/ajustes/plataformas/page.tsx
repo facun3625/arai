@@ -96,201 +96,201 @@ export default function PlataformasPage() {
     };
 
     return (
-            <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-700">
-                <div className="bg-[#0a0a0a] border border-white/5 rounded-[32px] p-10 md:p-12 shadow-2xl">
+            <div className="w-full space-y-8 animate-in fade-in duration-700">
+                <div className="bg-white border border-slate-200 rounded-[32px] p-10 md:p-12 shadow-2xl">
                     <div className="space-y-2 mb-10">
-                        <h1 className="text-white text-3xl font-bold tracking-tight">Redes Sociales y WhatsApp</h1>
-                        <p className="text-white/40 text-sm tracking-wide">Configurá los enlaces que aparecerán en el Header y Footer del sitio.</p>
+                        <h1 className="text-slate-900 text-3xl font-bold tracking-tight">Redes Sociales y WhatsApp</h1>
+                        <p className="text-slate-600 text-sm tracking-wide">Configurá los enlaces que aparecerán en el Header y Footer del sitio.</p>
                     </div>
 
                     <form onSubmit={handleSave} className="space-y-10">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
                             {/* Instagram */}
                             <div className="space-y-3">
-                                <label className="text-white/80 text-sm font-medium flex items-center gap-2.5">
-                                    <Instagram className="h-4 w-4 text-white/60" /> Instagram
+                                <label className="text-slate-900 text-sm font-medium flex items-center gap-2.5">
+                                    <Instagram className="h-4 w-4 text-slate-600" /> Instagram
                                 </label>
                                 <input
                                     type="text"
                                     placeholder="https://instagram.com/tu-usuario"
                                     value={settings.instagramUrl}
                                     onChange={(e) => setSettings({ ...settings, instagramUrl: e.target.value })}
-                                    className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10"
+                                    className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 text-[15px] focus:outline-none focus:border-slate-200 focus:bg-white transition-all placeholder:text-slate-500"
                                 />
                             </div>
 
                             {/* Facebook */}
                             <div className="space-y-3">
-                                <label className="text-white/80 text-sm font-medium flex items-center gap-2.5">
-                                    <Facebook className="h-4 w-4 text-white/60" /> Facebook
+                                <label className="text-slate-900 text-sm font-medium flex items-center gap-2.5">
+                                    <Facebook className="h-4 w-4 text-slate-600" /> Facebook
                                 </label>
                                 <input
                                     type="text"
                                     placeholder="https://facebook.com/tu-pagina"
                                     value={settings.facebookUrl}
                                     onChange={(e) => setSettings({ ...settings, facebookUrl: e.target.value })}
-                                    className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10"
+                                    className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 text-[15px] focus:outline-none focus:border-slate-200 focus:bg-white transition-all placeholder:text-slate-500"
                                 />
                             </div>
 
                             {/* X */}
                             <div className="space-y-3">
-                                <label className="text-white/80 text-sm font-medium flex items-center gap-2.5">
-                                    <Twitter className="h-4 w-4 text-white/60" /> X (Ex Twitter)
+                                <label className="text-slate-900 text-sm font-medium flex items-center gap-2.5">
+                                    <Twitter className="h-4 w-4 text-slate-600" /> X (Ex Twitter)
                                 </label>
                                 <input
                                     type="text"
                                     placeholder="https://x.com/tu-usuario"
                                     value={settings.xUrl}
                                     onChange={(e) => setSettings({ ...settings, xUrl: e.target.value })}
-                                    className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10"
+                                    className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 text-[15px] focus:outline-none focus:border-slate-200 focus:bg-white transition-all placeholder:text-slate-500"
                                 />
                             </div>
 
                             {/* YouTube */}
                             <div className="space-y-3">
-                                <label className="text-white/80 text-sm font-medium flex items-center gap-2.5">
-                                    <Youtube className="h-4 w-4 text-white/60" /> YouTube
+                                <label className="text-slate-900 text-sm font-medium flex items-center gap-2.5">
+                                    <Youtube className="h-4 w-4 text-slate-600" /> YouTube
                                 </label>
                                 <input
                                     type="text"
                                     placeholder="https://youtube.com/@tu-canal"
                                     value={settings.youtubeUrl}
                                     onChange={(e) => setSettings({ ...settings, youtubeUrl: e.target.value })}
-                                    className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10"
+                                    className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 text-[15px] focus:outline-none focus:border-slate-200 focus:bg-white transition-all placeholder:text-slate-500"
                                 />
                             </div>
 
                             {/* TikTok */}
                             <div className="space-y-3">
-                                <label className="text-white/80 text-sm font-medium flex items-center gap-2.5">
-                                    <TikTokIcon className="h-4 w-4 text-white/60" /> TikTok
+                                <label className="text-slate-900 text-sm font-medium flex items-center gap-2.5">
+                                    <TikTokIcon className="h-4 w-4 text-slate-600" /> TikTok
                                 </label>
                                 <input
                                     type="text"
                                     placeholder="https://tiktok.com/@tu-usuario"
                                     value={settings.tiktokUrl}
                                     onChange={(e) => setSettings({ ...settings, tiktokUrl: e.target.value })}
-                                    className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10"
+                                    className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 text-[15px] focus:outline-none focus:border-slate-200 focus:bg-white transition-all placeholder:text-slate-500"
                                 />
                             </div>
 
                             {/* WhatsApp */}
                             <div className="space-y-3">
-                                <label className="text-white/80 text-sm font-medium flex items-center gap-2.5">
-                                    <Plus className="h-4 w-4 text-white/60" /> WhatsApp (Número completo)
+                                <label className="text-slate-900 text-sm font-medium flex items-center gap-2.5">
+                                    <Plus className="h-4 w-4 text-slate-600" /> WhatsApp (Número completo)
                                 </label>
                                 <input
                                     type="text"
                                     placeholder="Ej: 5493411234567"
                                     value={settings.whatsappNumber}
                                     onChange={(e) => setSettings({ ...settings, whatsappNumber: e.target.value })}
-                                    className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10"
+                                    className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 text-[15px] focus:outline-none focus:border-slate-200 focus:bg-white transition-all placeholder:text-slate-500"
                                 />
-                                <p className="text-[11px] text-white/20 italic mt-2 ml-1">Sin espacios, sin el +, incluyendo código de país y área.</p>
+                                <p className="text-[11px] text-slate-500 italic mt-2 ml-1">Sin espacios, sin el +, incluyendo código de país y área.</p>
                             </div>
                         </div>
 
                         {/* Footer */}
-                        <div className="border-t border-white/5 pt-8 space-y-2">
-                            <h3 className="text-white/80 text-sm font-semibold mb-6">Contenido del Footer</h3>
+                        <div className="border-t border-slate-200 pt-8 space-y-2">
+                            <h3 className="text-slate-900 text-sm font-semibold mb-6">Contenido del Footer</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
                                 <div className="space-y-3 md:col-span-2">
-                                    <label className="text-white/80 text-sm font-medium">Descripción (texto bajo el logo)</label>
+                                    <label className="text-slate-900 text-sm font-medium">Descripción (texto bajo el logo)</label>
                                     <textarea
                                         rows={2}
                                         placeholder="Llevamos lo mejor de nuestra tierra a tu mesa..."
                                         value={settings.footerDescription}
                                         onChange={(e) => setSettings({ ...settings, footerDescription: e.target.value })}
-                                        className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10 resize-none"
+                                        className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 text-[15px] focus:outline-none focus:border-slate-200 focus:bg-white transition-all placeholder:text-slate-500 resize-none"
                                     />
                                 </div>
                                 <div className="space-y-3">
-                                    <label className="text-white/80 text-sm font-medium">Email de contacto</label>
+                                    <label className="text-slate-900 text-sm font-medium">Email de contacto</label>
                                     <input
                                         type="text"
                                         placeholder="info@arayerba.com"
                                         value={settings.footerEmail}
                                         onChange={(e) => setSettings({ ...settings, footerEmail: e.target.value })}
-                                        className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10"
+                                        className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 text-[15px] focus:outline-none focus:border-slate-200 focus:bg-white transition-all placeholder:text-slate-500"
                                     />
                                 </div>
                                 <div className="space-y-3">
-                                    <label className="text-white/80 text-sm font-medium">Ubicación</label>
+                                    <label className="text-slate-900 text-sm font-medium">Ubicación</label>
                                     <input
                                         type="text"
                                         placeholder="Misiones, Argentina"
                                         value={settings.footerLocation}
                                         onChange={(e) => setSettings({ ...settings, footerLocation: e.target.value })}
-                                        className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10"
+                                        className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 text-[15px] focus:outline-none focus:border-slate-200 focus:bg-white transition-all placeholder:text-slate-500"
                                     />
                                 </div>
                             </div>
                         </div>
 
                         {/* Datos Legales */}
-                        <div className="border-t border-white/5 pt-8 space-y-2">
-                            <h3 className="text-white/80 text-sm font-semibold mb-2">Datos Legales de la Empresa</h3>
-                            <p className="text-[11px] text-white/30 mb-6">
+                        <div className="border-t border-slate-200 pt-8 space-y-2">
+                            <h3 className="text-slate-900 text-sm font-semibold mb-2">Datos Legales de la Empresa</h3>
+                            <p className="text-[11px] text-slate-500 mb-6">
                                 Se usan en las páginas de Términos, Privacidad, Cambios/Devoluciones y en el Botón de Arrepentimiento.
                                 Hasta que los completes, esas páginas muestran &quot;[Completar desde el panel]&quot; en su lugar.
                             </p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
                                 <div className="space-y-3">
-                                    <label className="text-white/80 text-sm font-medium">Razón social</label>
+                                    <label className="text-slate-900 text-sm font-medium">Razón social</label>
                                     <input
                                         type="text"
                                         placeholder="Ej: Araí S.R.L."
                                         value={settings.legalBusinessName}
                                         onChange={(e) => setSettings({ ...settings, legalBusinessName: e.target.value })}
-                                        className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10"
+                                        className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 text-[15px] focus:outline-none focus:border-slate-200 focus:bg-white transition-all placeholder:text-slate-500"
                                     />
                                 </div>
                                 <div className="space-y-3">
-                                    <label className="text-white/80 text-sm font-medium">CUIT</label>
+                                    <label className="text-slate-900 text-sm font-medium">CUIT</label>
                                     <input
                                         type="text"
                                         placeholder="Ej: 30-12345678-9"
                                         value={settings.legalCuit}
                                         onChange={(e) => setSettings({ ...settings, legalCuit: e.target.value })}
-                                        className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10"
+                                        className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 text-[15px] focus:outline-none focus:border-slate-200 focus:bg-white transition-all placeholder:text-slate-500"
                                     />
                                 </div>
                                 <div className="space-y-3 md:col-span-2">
-                                    <label className="text-white/80 text-sm font-medium">Domicilio legal</label>
+                                    <label className="text-slate-900 text-sm font-medium">Domicilio legal</label>
                                     <input
                                         type="text"
                                         placeholder="Ej: Av. Siempre Viva 123, Posadas, Misiones"
                                         value={settings.legalAddress}
                                         onChange={(e) => setSettings({ ...settings, legalAddress: e.target.value })}
-                                        className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10"
+                                        className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 text-[15px] focus:outline-none focus:border-slate-200 focus:bg-white transition-all placeholder:text-slate-500"
                                     />
                                 </div>
                             </div>
                         </div>
 
                         {/* Franquicias & Mayoristas */}
-                        <div className="border-t border-white/5 pt-8 space-y-2">
-                            <h3 className="text-white/80 text-sm font-semibold mb-6">Botones del Home</h3>
+                        <div className="border-t border-slate-200 pt-8 space-y-2">
+                            <h3 className="text-slate-900 text-sm font-semibold mb-6">Botones del Home</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
                                 <div className="space-y-3">
-                                    <label className="text-white/80 text-sm font-medium">Franquicias — URL del botón</label>
+                                    <label className="text-slate-900 text-sm font-medium">Franquicias — URL del botón</label>
                                     <input
                                         type="text"
                                         placeholder="https://..."
                                         value={settings.franquiciasUrl}
                                         onChange={(e) => setSettings({ ...settings, franquiciasUrl: e.target.value })}
-                                        className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10"
+                                        className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 text-[15px] focus:outline-none focus:border-slate-200 focus:bg-white transition-all placeholder:text-slate-500"
                                     />
                                 </div>
                                 <div className="space-y-3">
-                                    <label className="text-white/80 text-sm font-medium">Mayoristas — URL del botón</label>
+                                    <label className="text-slate-900 text-sm font-medium">Mayoristas — URL del botón</label>
                                     <input
                                         type="text"
                                         placeholder="https://..."
                                         value={settings.mayoristasUrl}
                                         onChange={(e) => setSettings({ ...settings, mayoristasUrl: e.target.value })}
-                                        className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10"
+                                        className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 text-[15px] focus:outline-none focus:border-slate-200 focus:bg-white transition-all placeholder:text-slate-500"
                                     />
                                 </div>
                             </div>
@@ -313,27 +313,27 @@ export default function PlataformasPage() {
                 {toast && (
                     <div className={`fixed bottom-8 right-8 z-50 animate-in slide-in-from-bottom-4 duration-500 ${
                         toast.type === 'success'
-                            ? 'text-white'
-                            : 'text-white'
+                            ? 'text-slate-900'
+                            : 'text-slate-900'
                     }`}>
                         <div className={`flex items-start gap-4 px-6 py-5 rounded-2xl shadow-[0_20px_60px_-10px_rgba(0,0,0,0.6)] border min-w-[280px] ${
                             toast.type === 'success'
-                                ? 'bg-[#0c1a10] border-primary/30'
-                                : 'bg-[#1a0c0c] border-red-500/30'
+                                ? 'bg-green-50 border-primary/30'
+                                : 'bg-red-50 border-red-500/30'
                         }`}>
                             <div className={`mt-0.5 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                                 toast.type === 'success' ? 'bg-primary/20' : 'bg-red-500/20'
                             }`}>
                                 {toast.type === 'success'
                                     ? <CheckCircle2 className="h-4 w-4 text-primary" />
-                                    : <XCircle className="h-4 w-4 text-red-400" />
+                                    : <XCircle className="h-4 w-4 text-red-700" />
                                 }
                             </div>
                             <div>
-                                <p className={`text-[13px] font-semibold ${toast.type === 'success' ? 'text-white' : 'text-red-300'}`}>
+                                <p className={`text-[13px] font-semibold ${toast.type === 'success' ? 'text-slate-900' : 'text-red-700'}`}>
                                     {toast.type === 'success' ? '¡Guardado!' : 'Error'}
                                 </p>
-                                <p className="text-[12px] text-white/40 mt-0.5">{toast.message}</p>
+                                <p className="text-[12px] text-slate-600 mt-0.5">{toast.message}</p>
                             </div>
                         </div>
                     </div>

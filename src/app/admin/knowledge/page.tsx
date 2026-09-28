@@ -120,37 +120,37 @@ export default function KnowledgePage() {
     <div className="space-y-8 animate-in fade-in duration-700">
       {/* Header */}
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-light text-white font-montserrat tracking-tight">base de conocimiento</h1>
-        <p className="text-white/40 text-[11px] uppercase tracking-widest">documentos que usa la IA vendedora</p>
+        <h1 className="text-2xl font-light text-slate-900 font-montserrat tracking-tight">base de conocimiento</h1>
+        <p className="text-slate-600 text-[11px] uppercase tracking-widest">documentos que usa la IA vendedora</p>
       </div>
 
       <div className="space-y-8">
         {/* Formulario full width */}
-        <form onSubmit={handleSubmit} className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 space-y-4">
-            <h2 className="text-[14px] text-white font-medium">
+        <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-3xl p-6 space-y-4">
+            <h2 className="text-[14px] text-slate-900 font-medium">
               {editingId ? "Editar documento" : "Agregar documento"}
             </h2>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Título</label>
+              <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Título</label>
               <input
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors"
                 placeholder="Ej: Manual de Cultura y Ventas"
                 required
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Contenido</label>
-              <p className="text-[9px] text-white/20 ml-1 italic">Pegá el texto del documento Word acá</p>
+              <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Contenido</label>
+              <p className="text-[9px] text-slate-500 ml-1 italic">Pegá el texto del documento Word acá</p>
               <textarea
                 rows={20}
                 value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors resize-y"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors resize-y"
                 placeholder="Pegá el texto completo del documento aquí..."
                 required
               />
@@ -174,7 +174,7 @@ export default function KnowledgePage() {
                 <button
                   type="button"
                   onClick={handleCancelEdit}
-                  className="w-full bg-white/5 hover:bg-white/10 text-white/60 py-3 rounded-xl text-[12px] font-medium transition-all"
+                  className="w-full bg-slate-50 hover:bg-slate-50 text-slate-600 py-3 rounded-xl text-[12px] font-medium transition-all"
                 >
                   Cancelar edición
                 </button>
@@ -183,37 +183,37 @@ export default function KnowledgePage() {
         </form>
 
         {/* Lista de documentos */}
-        <div className="bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden">
+        <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden">
             {isLoading ? (
               <div className="flex items-center justify-center py-16">
-                <Loader2 className="h-6 w-6 text-white/20 animate-spin" />
+                <Loader2 className="h-6 w-6 text-slate-500 animate-spin" />
               </div>
             ) : docs.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 gap-3">
-                <BookOpen className="h-10 w-10 text-white/10" />
-                <p className="text-white/20 text-[11px] uppercase tracking-widest">No hay documentos todavía</p>
-                <p className="text-white/10 text-[10px]">Agregá el primer documento para que la IA aprenda sobre Araí</p>
+                <BookOpen className="h-10 w-10 text-slate-500" />
+                <p className="text-slate-500 text-[11px] uppercase tracking-widest">No hay documentos todavía</p>
+                <p className="text-slate-500 text-[10px]">Agregá el primer documento para que la IA aprenda sobre Araí</p>
               </div>
             ) : (
-              <div className="divide-y divide-white/5">
+              <div className="divide-y divide-slate-200">
                 {docs.map((doc) => (
-                  <div key={doc.id} className="p-5 hover:bg-white/[0.02] transition-colors group">
+                  <div key={doc.id} className="p-5 hover:bg-slate-50 transition-colors group">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-[13px] font-medium text-white/90 truncate">{doc.title}</span>
+                          <span className="text-[13px] font-medium text-slate-900 truncate">{doc.title}</span>
                           <span className={`text-[9px] px-2 py-0.5 rounded-full uppercase tracking-widest flex-shrink-0 ${
                             doc.isActive
-                              ? "bg-green-500/10 text-green-400"
-                              : "bg-white/5 text-white/30"
+                              ? "bg-green-500/10 text-green-700"
+                              : "bg-slate-50 text-slate-500"
                           }`}>
                             {doc.isActive ? "activo" : "inactivo"}
                           </span>
                         </div>
-                        <p className="text-[11px] text-white/30 line-clamp-2 leading-relaxed">
+                        <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
                           {doc.content.slice(0, 200)}...
                         </p>
-                        <p className="text-[10px] text-white/20 mt-2">
+                        <p className="text-[10px] text-slate-500 mt-2">
                           {doc.content.length.toLocaleString()} caracteres · Actualizado {new Date(doc.updatedAt).toLocaleDateString("es-AR")}
                         </p>
                       </div>
@@ -221,21 +221,21 @@ export default function KnowledgePage() {
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                         <button
                           onClick={() => handleToggleActive(doc)}
-                          className="p-2 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-colors"
+                          className="p-2 rounded-lg hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-colors"
                           title={doc.isActive ? "Desactivar" : "Activar"}
                         >
                           {doc.isActive ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
                         <button
                           onClick={() => handleEdit(doc)}
-                          className="p-2 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-colors"
+                          className="p-2 rounded-lg hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-colors"
                           title="Editar"
                         >
                           <Edit2 className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(doc.id, doc.title)}
-                          className="p-2 rounded-lg hover:bg-red-500/10 text-white/40 hover:text-red-400 transition-colors"
+                          className="p-2 rounded-lg hover:bg-red-500/10 text-slate-600 hover:text-red-700 transition-colors"
                           title="Eliminar"
                         >
                           <Trash2 className="h-4 w-4" />

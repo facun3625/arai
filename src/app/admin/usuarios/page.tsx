@@ -132,24 +132,24 @@ export default function AdminUsuariosPage() {
                 {isDeleteModalOpen && userToDelete && (
                     <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 overflow-hidden">
                         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setIsDeleteModalOpen(false)} />
-                        <div className="bg-[#1A1F1C] border border-white/10 w-full max-w-md rounded-[32px] p-8 relative z-10 shadow-2xl animate-in zoom-in duration-300">
+                        <div className="bg-white border border-slate-200 w-full max-w-md rounded-[32px] p-8 relative z-10 shadow-2xl animate-in zoom-in duration-300">
                             <div className="flex flex-col items-center gap-6 text-center">
                                 <div className="h-16 w-16 rounded-full bg-red-500/10 flex items-center justify-center border border-red-500/20">
                                     <Users className="h-8 w-8 text-red-500" />
                                 </div>
                                 <div className="space-y-2">
-                                    <h3 className="text-xl font-medium text-white font-montserrat tracking-tight">¿Eliminar usuario en cascada?</h3>
-                                    <p className="text-white/40 text-[13px] leading-relaxed">
-                                        Estás por eliminar a <span className="text-white font-medium">{userToDelete.name} {userToDelete.lastName}</span> ({userToDelete.email}).
+                                    <h3 className="text-xl font-medium text-slate-900 font-montserrat tracking-tight">¿Eliminar usuario en cascada?</h3>
+                                    <p className="text-slate-600 text-[13px] leading-relaxed">
+                                        Estás por eliminar a <span className="text-slate-900 font-medium">{userToDelete.name} {userToDelete.lastName}</span> ({userToDelete.email}).
                                         Esta acción borrará permanentemente todos sus pedidos, direcciones, cupones y transacciones de puntos.
                                         <br /><br />
-                                        <span className="text-red-400 font-bold uppercase text-[10px] tracking-widest">Esta acción no se puede deshacer.</span>
+                                        <span className="text-red-700 font-bold uppercase text-[10px] tracking-widest">Esta acción no se puede deshacer.</span>
                                     </p>
                                 </div>
                                 <div className="flex gap-3 w-full pt-2">
                                     <button
                                         onClick={() => setIsDeleteModalOpen(false)}
-                                        className="flex-1 px-6 py-3.5 rounded-2xl bg-white/5 border border-white/5 text-white/60 text-[13px] font-medium hover:bg-white/10 transition-all"
+                                        className="flex-1 px-6 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-600 text-[13px] font-medium hover:bg-slate-50 transition-all"
                                     >
                                         Cancelar
                                     </button>
@@ -159,7 +159,7 @@ export default function AdminUsuariosPage() {
                                         className="flex-1 px-6 py-3.5 rounded-2xl bg-red-500 text-white text-[13px] font-medium hover:bg-red-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                                     >
                                         {isDeleting === userToDelete.id ? (
-                                            <div className="h-4 w-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                                            <div className="h-4 w-4 border-2 border-slate-200 border-t-white rounded-full animate-spin" />
                                         ) : (
                                             "Eliminar Todo"
                                         )}
@@ -174,11 +174,11 @@ export default function AdminUsuariosPage() {
                 {isPasswordModalOpen && userForPassword && (
                     <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 overflow-hidden">
                         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => !isUpdatingPassword && setIsPasswordModalOpen(false)} />
-                        <div className="bg-[#1A1F1C] border border-white/10 w-full max-w-md rounded-[32px] p-8 relative z-10 shadow-2xl animate-in zoom-in duration-300">
+                        <div className="bg-white border border-slate-200 w-full max-w-md rounded-[32px] p-8 relative z-10 shadow-2xl animate-in zoom-in duration-300">
                             <div className="flex flex-col items-center gap-6 text-center">
                                 <div className={`h-16 w-16 rounded-full flex items-center justify-center border transition-colors ${
-                                    passwordStatus === 'success' ? 'bg-green-500/10 border-green-500/20' : 
-                                    passwordStatus === 'error' ? 'bg-red-500/10 border-red-500/20' : 
+                                    passwordStatus === 'success' ? 'bg-green-500/10 border-green-500/20' :
+                                    passwordStatus === 'error' ? 'bg-red-500/10 border-red-500/20' :
                                     'bg-primary/10 border-primary/20'
                                 }`}>
                                     {passwordStatus === 'success' ? (
@@ -190,19 +190,19 @@ export default function AdminUsuariosPage() {
                                     )}
                                 </div>
                                 <div className="space-y-2">
-                                    <h3 className="text-xl font-medium text-white font-montserrat tracking-tight">Cambiar Contraseña</h3>
-                                    <p className="text-white/40 text-[13px] leading-relaxed">
-                                        Ingresa una nueva contraseña para <span className="text-white font-medium">{userForPassword.name} {userForPassword.lastName}</span>.
+                                    <h3 className="text-xl font-medium text-slate-900 font-montserrat tracking-tight">Cambiar Contraseña</h3>
+                                    <p className="text-slate-600 text-[13px] leading-relaxed">
+                                        Ingresa una nueva contraseña para <span className="text-slate-900 font-medium">{userForPassword.name} {userForPassword.lastName}</span>.
                                     </p>
                                 </div>
-                                
+
                                 <div className="w-full space-y-4">
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         placeholder="Nueva contraseña (min 6 carac.)"
                                         value={newPassword}
                                         onChange={(e) => setNewPassword(e.target.value)}
-                                        className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-5 py-4 text-[13px] text-white focus:outline-none focus:border-primary transition-all placeholder:text-white/20"
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-all placeholder:text-slate-500"
                                         autoFocus
                                     />
 
@@ -210,7 +210,7 @@ export default function AdminUsuariosPage() {
                                         <button
                                             onClick={() => setIsPasswordModalOpen(false)}
                                             disabled={isUpdatingPassword}
-                                            className="flex-1 px-6 py-3.5 rounded-2xl bg-white/5 border border-white/5 text-white/60 text-[13px] font-medium hover:bg-white/10 transition-all disabled:opacity-50"
+                                            className="flex-1 px-6 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-600 text-[13px] font-medium hover:bg-slate-50 transition-all disabled:opacity-50"
                                         >
                                             Cancelar
                                         </button>
@@ -220,7 +220,7 @@ export default function AdminUsuariosPage() {
                                             className="flex-1 px-6 py-3.5 rounded-2xl bg-primary text-white text-[13px] font-medium hover:bg-primary/90 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                                         >
                                             {isUpdatingPassword ? (
-                                                <div className="h-4 w-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                                                <div className="h-4 w-4 border-2 border-slate-200 border-t-white rounded-full animate-spin" />
                                             ) : (
                                                 "Actualizar"
                                             )}
@@ -235,48 +235,48 @@ export default function AdminUsuariosPage() {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-1">
-                        <h1 className="text-2xl font-light text-white font-montserrat tracking-tight">usuarios</h1>
-                        <p className="text-white/40 text-[11px] uppercase tracking-widest">gestiona los clientes registrados</p>
+                        <h1 className="text-2xl font-light text-slate-900 font-montserrat tracking-tight">usuarios</h1>
+                        <p className="text-slate-600 text-[11px] uppercase tracking-widest">gestiona los clientes registrados</p>
                     </div>
                 </div>
 
                 {/* Search and Filters */}
                 <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-8">
                     <div className="relative w-full md:w-96">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                         <input
                             type="text"
                             placeholder="Buscar por nombre o email..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-white/[0.03] border border-white/5 rounded-2xl pl-11 pr-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-11 pr-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors"
                         />
                     </div>
                     <div className="flex items-center gap-3">
-                        <div className="px-4 py-2 bg-white/[0.02] border border-white/5 rounded-2xl text-[11px] text-white/40 flex items-center gap-2">
+                        <div className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-2xl text-[11px] text-slate-600 flex items-center gap-2">
                             <span className="text-primary font-bold">{users.length}</span> Usuarios Totales
                         </div>
                     </div>
                 </div>
 
                 {/* Table */}
-                <div className="bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden mt-8">
+                <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden mt-8">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b border-white/5 bg-white/[0.02]">
-                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Usuario</th>
-                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Email</th>
-                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Rol</th>
-                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Pedidos</th>
-                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Unido</th>
+                                <tr className="border-b border-slate-200 bg-slate-50">
+                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Usuario</th>
+                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Email</th>
+                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Rol</th>
+                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Pedidos</th>
+                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Unido</th>
                                     <th className="px-6 py-4 text-right"></th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-white/5">
+                            <tbody className="divide-y divide-slate-200">
                                 {isLoading ? (
                                     <tr>
-                                        <td colSpan={6} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
+                                        <td colSpan={6} className="px-6 py-12 text-center text-slate-500 text-[11px] uppercase tracking-widest">
                                             Cargando usuarios...
                                         </td>
                                     </tr>
@@ -284,22 +284,22 @@ export default function AdminUsuariosPage() {
                                     <tr>
                                         <td colSpan={6} className="px-6 py-12 text-center">
                                             <div className="flex flex-col items-center gap-2 py-8">
-                                                <SearchX className="h-8 w-8 text-white/10" />
-                                                <p className="text-white/20 text-[11px] uppercase tracking-widest">
+                                                <SearchX className="h-8 w-8 text-slate-500" />
+                                                <p className="text-slate-500 text-[11px] uppercase tracking-widest">
                                                     No se encontraron usuarios que coincidan con la búsqueda.
                                                 </p>
                                             </div>
                                         </td>
                                     </tr>
                                 ) : filteredUsers.map((u) => (
-                                    <tr key={u.id} className="hover:bg-white/[0.01] transition-colors group">
+                                    <tr key={u.id} className="hover:bg-slate-50 transition-colors group">
                                         <td className="px-6 py-6">
                                             <div className="flex items-center gap-4">
-                                                <div className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center border border-white/5 text-primary">
+                                                <div className="h-10 w-10 rounded-full bg-slate-50 flex items-center justify-center border border-slate-200 text-primary">
                                                     <User className="h-5 w-5" />
                                                 </div>
                                                 <div className="flex flex-col gap-0.5">
-                                                    <span className="text-[13px] font-medium text-white group-hover:text-primary transition-colors">
+                                                    <span className="text-[13px] font-medium text-slate-900 group-hover:text-primary transition-colors">
                                                         {u.name} {u.lastName}
                                                     </span>
                                                     {u.role === 'ADMIN' && (
@@ -309,36 +309,36 @@ export default function AdminUsuariosPage() {
                                             </div>
                                         </td>
                                         <td className="px-6 py-6">
-                                            <div className="flex items-center gap-2 text-[12px] text-white/60">
+                                            <div className="flex items-center gap-2 text-[12px] text-slate-600">
                                                 <Mail className="h-3.5 w-3.5 opacity-30" />
                                                 {u.email}
                                             </div>
                                         </td>
                                         <td className="px-6 py-6">
-                                            <select 
+                                            <select
                                                 value={u.role}
                                                 onChange={(e) => handleUpdateRole(u.id, e.target.value)}
                                                 className={`
-                                                    bg-white/[0.03] border border-white/5 rounded-lg px-2 py-1 text-[11px] font-medium outline-none transition-all
-                                                    ${u.role === 'ADMIN' ? 'text-primary border-primary/20' : 
-                                                      u.role === 'TEST' ? 'text-amber-400 border-amber-400/20' : 
-                                                      'text-white/40 border-white/10'}
+                                                    bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-[11px] font-medium outline-none transition-all
+                                                    ${u.role === 'ADMIN' ? 'text-primary border-primary/20' :
+                                                      u.role === 'TEST' ? 'text-amber-700 border-amber-400/20' :
+                                                      'text-slate-600 border-slate-200'}
                                                 `}
                                             >
-                                                <option value="USER" className="bg-[#1A1F1C] text-white/60">CLIENTE</option>
-                                                <option value="ADMIN" className="bg-[#1A1F1C] text-primary">ADMIN</option>
-                                                <option value="TEST" className="bg-[#1A1F1C] text-amber-400">TESTER</option>
+                                                <option value="USER" className="bg-white text-slate-600">CLIENTE</option>
+                                                <option value="ADMIN" className="bg-white text-primary">ADMIN</option>
+                                                <option value="TEST" className="bg-white text-amber-700">TESTER</option>
                                             </select>
                                         </td>
                                         <td className="px-6 py-6">
                                             <div className="flex items-center gap-2">
                                                 <ShoppingBag className="h-3.5 w-3.5 text-primary opacity-50" />
-                                                <span className="text-[13px] font-bold text-white/80">{u._count.orders}</span>
+                                                <span className="text-[13px] font-bold text-slate-900">{u._count.orders}</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-6">
                                             <div className="flex flex-col gap-0.5 text-[11px]">
-                                                <span className="text-white/40">
+                                                <span className="text-slate-600">
                                                     {new Date(u.createdAt).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' })}
                                                 </span>
                                             </div>
@@ -351,7 +351,7 @@ export default function AdminUsuariosPage() {
                                                         setIsPasswordModalOpen(true);
                                                         setPasswordStatus('idle');
                                                     }}
-                                                    className="p-2 hover:bg-primary/10 rounded-lg transition-colors text-white/20 hover:text-primary"
+                                                    className="p-2 hover:bg-primary/10 rounded-lg transition-colors text-slate-500 hover:text-primary"
                                                     title="Blanquear contraseña"
                                                 >
                                                     <Key className="h-4 w-4" />
@@ -361,7 +361,7 @@ export default function AdminUsuariosPage() {
                                                         setUserToDelete(u);
                                                         setIsDeleteModalOpen(true);
                                                     }}
-                                                    className="p-2 hover:bg-red-500/10 rounded-lg transition-colors text-white/20 hover:text-red-500 group/delete"
+                                                    className="p-2 hover:bg-red-500/10 rounded-lg transition-colors text-slate-500 hover:text-red-500 group/delete"
                                                     title="Eliminar usuario y toda su actividad"
                                                 >
                                                     <MoreVertical className="h-4 w-4" />
@@ -376,13 +376,13 @@ export default function AdminUsuariosPage() {
                 </div>
 
                 {/* Information Card */}
-                <div className="p-6 bg-white/[0.03] border border-white/5 rounded-[32px] flex gap-4 items-start">
+                <div className="p-6 bg-slate-50 border border-slate-200 rounded-[32px] flex gap-4 items-start">
                     <div className="p-2 bg-primary/10 rounded-xl">
                         <Shield className="h-5 w-5 text-primary" />
                     </div>
                     <div className="flex flex-col gap-1">
-                        <p className="text-[12px] text-white font-medium">Gestión de Usuarios</p>
-                        <p className="text-[11px] text-white/40 leading-relaxed max-w-3xl">
+                        <p className="text-[12px] text-slate-900 font-medium">Gestión de Usuarios</p>
+                        <p className="text-[11px] text-slate-600 leading-relaxed max-w-3xl">
                             Visualiza la actividad de tus clientes registrados. Puedes buscar usuarios por nombre o correo electrónico
                             y ver rápidamente cuántos pedidos han realizado en la tienda. Próximamente podrás gestionar roles y permisos.
                         </p>

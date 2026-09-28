@@ -104,8 +104,8 @@ export default function ProductosPage() {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-1">
-                        <h1 className="text-2xl font-light text-white font-montserrat tracking-tight">productos</h1>
-                        <p className="text-white/40 text-[11px] uppercase tracking-widest">gestiona el catálogo de tu tienda</p>
+                        <h1 className="text-2xl font-light text-slate-900 font-montserrat tracking-tight">productos</h1>
+                        <p className="text-slate-600 text-[11px] uppercase tracking-widest">gestiona el catálogo de tu tienda</p>
                     </div>
                     <Link
                         href="/admin/productos/nuevo"
@@ -119,71 +119,71 @@ export default function ProductosPage() {
                 {/* Filtros y Búsqueda */}
                 <div className="flex flex-col md:flex-row gap-3 items-center">
                     <div className="relative w-full md:w-96">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                         <input
                             type="text"
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             placeholder="Buscar por nombre o slug..."
-                            className="w-full bg-white/[0.03] border border-white/5 rounded-2xl pl-11 pr-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-11 pr-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors"
                         />
                     </div>
                     <div className="relative">
-                        <Filter className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20 pointer-events-none" />
+                        <Filter className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none" />
                         <select
                             value={selectedCategory}
                             onChange={e => setSelectedCategory(e.target.value)}
-                            className="bg-white/[0.03] border border-white/5 rounded-2xl pl-11 pr-8 py-3 text-[13px] text-white/60 focus:outline-none focus:border-primary transition-colors appearance-none cursor-pointer min-w-[180px]"
+                            className="bg-slate-50 border border-slate-200 rounded-2xl pl-11 pr-8 py-3 text-[13px] text-slate-600 focus:outline-none focus:border-primary transition-colors appearance-none cursor-pointer min-w-[180px]"
                         >
-                            <option value="" className="bg-gray-900">Todas las categorías</option>
+                            <option value="" className="bg-white">Todas las categorías</option>
                             {categorias.map(cat => (
-                                <option key={cat.id} value={cat.id} className="bg-gray-900">{cat.name}</option>
+                                <option key={cat.id} value={cat.id} className="bg-white">{cat.name}</option>
                             ))}
                         </select>
                     </div>
                     {(search || selectedCategory) && (
                         <button
                             onClick={() => { setSearch(""); setSelectedCategory(""); }}
-                            className="text-[11px] text-white/30 hover:text-white/60 transition-colors whitespace-nowrap"
+                            className="text-[11px] text-slate-500 hover:text-slate-600 transition-colors whitespace-nowrap"
                         >
                             Limpiar filtros
                         </button>
                     )}
-                    <span className="text-[11px] text-white/20 ml-auto">
+                    <span className="text-[11px] text-slate-500 ml-auto">
                         {filtered.length} de {productos.length} productos
                     </span>
                 </div>
 
                 {/* Tabla de Productos */}
-                <div className="bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden mt-8">
+                <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden mt-8">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b border-white/5 bg-white/[0.02]">
-                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Producto</th>
-                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Categoría</th>
-                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Precio</th>
-                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Stock</th>
-                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Tipo</th>
+                                <tr className="border-b border-slate-200 bg-slate-50">
+                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Producto</th>
+                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Categoría</th>
+                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Precio</th>
+                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Stock</th>
+                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Tipo</th>
                                     <th className="px-6 py-4 text-right"></th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-white/5">
+                            <tbody className="divide-y divide-slate-200">
                                 {isLoading ? (
                                     <tr>
-                                        <td colSpan={6} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
+                                        <td colSpan={6} className="px-6 py-12 text-center text-slate-500 text-[11px] uppercase tracking-widest">
                                             Cargando productos...
                                         </td>
                                     </tr>
                                 ) : productos.length === 0 ? (
                                     <tr>
-                                        <td colSpan={6} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
+                                        <td colSpan={6} className="px-6 py-12 text-center text-slate-500 text-[11px] uppercase tracking-widest">
                                             No hay productos en el catálogo.
                                         </td>
                                     </tr>
                                 ) : filtered.length === 0 ? (
                                     <tr>
-                                        <td colSpan={6} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
+                                        <td colSpan={6} className="px-6 py-12 text-center text-slate-500 text-[11px] uppercase tracking-widest">
                                             No hay productos que coincidan con los filtros.
                                         </td>
                                     </tr>
@@ -192,10 +192,10 @@ export default function ProductosPage() {
                                     const mainImage = images[0] || null;
 
                                     return (
-                                        <tr key={prod.id} className="hover:bg-white/[0.02] transition-colors group">
+                                        <tr key={prod.id} className="hover:bg-slate-50 transition-colors group">
                                             <td className="px-6 py-6">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="h-12 w-12 rounded-xl bg-white/5 overflow-hidden flex items-center justify-center border border-white/5 relative">
+                                                    <div className="h-12 w-12 rounded-xl bg-slate-50 overflow-hidden flex items-center justify-center border border-slate-200 relative">
                                                         {mainImage ? (
                                                             <Image
                                                                 src={mainImage}
@@ -205,29 +205,29 @@ export default function ProductosPage() {
                                                                 sizes="48px"
                                                             />
                                                         ) : (
-                                                            <ImageIcon className="h-5 w-5 text-white/10" />
+                                                            <ImageIcon className="h-5 w-5 text-slate-500" />
                                                         )}
                                                     </div>
                                                     <div className="flex flex-col gap-0.5">
-                                                        <span className="text-[13px] font-medium text-white group-hover:text-primary transition-colors">
+                                                        <span className="text-[13px] font-medium text-slate-900 group-hover:text-primary transition-colors">
                                                             {prod.name}
                                                         </span>
-                                                        <span className="text-[10px] text-white/20 font-mono">{prod.slug}</span>
+                                                        <span className="text-[10px] text-slate-500 font-mono">{prod.slug}</span>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-6">
                                                 <div className="flex flex-wrap gap-1">
                                                     {prod.categories.map((cat: any) => (
-                                                        <span key={cat.id} className="text-[10px] text-white/40 bg-white/5 px-2 py-0.5 rounded-md border border-white/5">
+                                                        <span key={cat.id} className="text-[10px] text-slate-600 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200">
                                                             {cat.name}
                                                         </span>
                                                     ))}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-6 text-[13px] text-white/80">
+                                            <td className="px-6 py-6 text-[13px] text-slate-900">
                                                 {prod.type === "VARIABLE" ? (
-                                                    <span className="text-white/40 italic">Variable...</span>
+                                                    <span className="text-slate-600 italic">Variable...</span>
                                                 ) : (
                                                     `$${prod.price.toLocaleString()}`
                                                 )}
@@ -235,13 +235,13 @@ export default function ProductosPage() {
                                             <td className="px-6 py-6">
                                                 <div className="flex items-center gap-2">
                                                     <div className={`h-1.5 w-1.5 rounded-full ${prod.stock > 0 ? 'bg-green-500' : 'bg-red-500'}`} />
-                                                    <span className="text-[13px] text-white/60">{prod.stock}</span>
+                                                    <span className="text-[13px] text-slate-600">{prod.stock}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-6">
                                                 <span className={`text-[9px] uppercase tracking-widest px-2 py-1 rounded-full border ${prod.type === 'VARIABLE'
-                                                        ? 'border-purple-500/20 text-purple-400 bg-purple-500/5'
-                                                        : 'border-blue-500/20 text-blue-400 bg-blue-500/5'
+                                                        ? 'border-purple-500/20 text-purple-700 bg-purple-500/5'
+                                                        : 'border-blue-500/20 text-blue-700 bg-blue-500/5'
                                                     }`}>
                                                     {prod.type}
                                                 </span>
@@ -251,19 +251,19 @@ export default function ProductosPage() {
                                                     <button
                                                         onClick={() => handleToggleActive(prod.id, prod.isActive !== false)}
                                                         title={prod.isActive === false ? "Publicar en tienda" : "Ocultar de tienda"}
-                                                        className={`p-2 rounded-lg transition-colors ${prod.isActive === false ? "text-yellow-400 hover:bg-yellow-400/10" : "text-white/40 hover:text-yellow-400 hover:bg-yellow-400/5"}`}
+                                                        className={`p-2 rounded-lg transition-colors ${prod.isActive === false ? "text-yellow-700 hover:bg-yellow-400/10" : "text-slate-600 hover:text-yellow-700 hover:bg-yellow-400/5"}`}
                                                     >
                                                         {prod.isActive === false ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                                                     </button>
                                                     <Link
                                                         href={`/admin/productos/editar/${prod.id}`}
-                                                        className="p-2 hover:bg-white/5 rounded-lg transition-colors text-white/40 hover:text-white"
+                                                        className="p-2 hover:bg-slate-50 rounded-lg transition-colors text-slate-600 hover:text-slate-900"
                                                     >
                                                         <Edit2 className="h-4 w-4" />
                                                     </Link>
                                                     <button
                                                         onClick={() => handleDelete(prod.id)}
-                                                        className="p-2 hover:bg-red-400/5 rounded-lg transition-colors text-red-400/60 hover:text-red-400"
+                                                        className="p-2 hover:bg-red-400/5 rounded-lg transition-colors text-red-700/60 hover:text-red-700"
                                                     >
                                                         <Trash2 className="h-4 w-4" />
                                                     </button>
@@ -286,8 +286,8 @@ export default function ProductosPage() {
                         <Package className="h-5 w-5 text-primary" />
                     </div>
                     <div className="flex flex-col gap-1">
-                        <p className="text-[12px] text-white/90">Inventario y Catálogo</p>
-                        <p className="text-[11px] text-white/40 leading-relaxed max-w-2xl">
+                        <p className="text-[12px] text-slate-900">Inventario y Catálogo</p>
+                        <p className="text-[11px] text-slate-600 leading-relaxed max-w-2xl">
                             Aquí puedes ver todos tus productos. Haz clic en "Añadir nuevo" para crear uno,
                             o usa las acciones de edición para modificar precios, stock o variaciones.
                         </p>

@@ -83,7 +83,7 @@ export default function HeroAjustesPage() {
   };
 
   return (
-    <div className="p-6 md:p-10 max-w-4xl">
+    <div className="w-full">
       {toast && (
         <div className={`fixed top-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-xl text-sm font-medium ${toast.type === "success" ? "bg-green-50 text-green-800 border border-green-200" : "bg-red-50 text-red-800 border border-red-200"}`}>
           {toast.type === "success" ? <CheckCircle2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}

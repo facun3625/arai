@@ -73,21 +73,21 @@ export default function ConfirmModal({
                         initial={{ opacity: 0, scale: 0.95, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                        className="relative w-full max-w-md bg-[#0c120e] border border-white/10 rounded-[32px] overflow-hidden shadow-2xl"
+                        className="relative w-full max-w-md bg-white border border-slate-200 rounded-[32px] overflow-hidden shadow-2xl"
                     >
                         {/* Header with Icon */}
                         <div className="p-8 pb-4 flex items-center gap-4">
-                            <div className={`p-3 rounded-2xl bg-white/5 border border-white/5`}>
+                            <div className={`p-3 rounded-2xl bg-slate-50 border border-slate-200`}>
                                 {getIcon()}
                             </div>
                             <div className="flex-1">
-                                <h3 className="text-xl font-light text-white font-montserrat tracking-tight leading-tight">
+                                <h3 className="text-xl font-light text-slate-900 font-montserrat tracking-tight leading-tight">
                                     {title}
                                 </h3>
                             </div>
                             <button 
                                 onClick={onClose}
-                                className="p-2 hover:bg-white/5 rounded-full text-white/20 hover:text-white transition-all"
+                                className="p-2 hover:bg-slate-50 rounded-full text-slate-500 hover:text-slate-900 transition-all"
                             >
                                 <X className="h-5 w-5" />
                             </button>
@@ -95,17 +95,17 @@ export default function ConfirmModal({
 
                         {/* Body */}
                         <div className="px-8 pb-8">
-                            <p className="text-white/40 text-[13px] leading-relaxed">
+                            <p className="text-slate-600 text-[13px] leading-relaxed">
                                 {message}
                             </p>
                         </div>
 
                         {/* Footer */}
-                        <div className="p-4 bg-white/5 border-t border-white/5 flex gap-3">
+                        <div className="p-4 bg-slate-50 border-t border-slate-200 flex gap-3">
                             <button
                                 onClick={onClose}
                                 disabled={isLoading}
-                                className="flex-1 px-4 py-3 rounded-2xl text-[11px] font-bold uppercase tracking-widest text-white/40 hover:text-white hover:bg-white/5 transition-all disabled:opacity-50"
+                                className="flex-1 px-4 py-3 rounded-2xl text-[11px] font-bold uppercase tracking-widest text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all disabled:opacity-50"
                             >
                                 {cancelText}
                             </button>
@@ -115,7 +115,7 @@ export default function ConfirmModal({
                                 className={`flex-1 px-4 py-3 rounded-2xl text-[11px] font-bold uppercase tracking-widest text-white shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 ${getButtonClass()}`}
                             >
                                 {isLoading ? (
-                                    <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    <div className="h-4 w-4 border-2 border-slate-200 border-t-white rounded-full animate-spin" />
                                 ) : confirmText}
                             </button>
                         </div>

@@ -62,53 +62,53 @@ export default function AdminContactosPage() {
     return (
         <div className="space-y-8 animate-in fade-in duration-700 pb-20">
             <div className="flex flex-col gap-1">
-                <h1 className="text-2xl font-light text-white font-montserrat tracking-tight">contactos</h1>
-                <p className="text-white/40 text-[11px] uppercase tracking-widest">leads del chat · contactar por whatsapp</p>
+                <h1 className="text-2xl font-light text-slate-900 font-montserrat tracking-tight">contactos</h1>
+                <p className="text-slate-600 text-[11px] uppercase tracking-widest">leads del chat · contactar por whatsapp</p>
             </div>
 
             {/* Stats */}
             <div className="grid grid-cols-2 gap-4">
                 <div className="bg-orange-500/10 border border-orange-500/20 rounded-3xl p-6">
                     <div className="flex items-center gap-3 mb-3">
-                        <Clock className="h-4 w-4 text-orange-400" />
-                        <span className="text-[10px] uppercase tracking-widest font-bold text-orange-400">Pendientes</span>
+                        <Clock className="h-4 w-4 text-orange-700" />
+                        <span className="text-[10px] uppercase tracking-widest font-bold text-orange-700">Pendientes</span>
                     </div>
-                    <p className="text-3xl font-light font-montserrat text-white">{pending.length}</p>
+                    <p className="text-3xl font-light font-montserrat text-slate-900">{pending.length}</p>
                 </div>
                 <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-3xl p-6">
                     <div className="flex items-center gap-3 mb-3">
-                        <CheckCircle className="h-4 w-4 text-emerald-400" />
-                        <span className="text-[10px] uppercase tracking-widest font-bold text-emerald-400">Contactados</span>
+                        <CheckCircle className="h-4 w-4 text-emerald-700" />
+                        <span className="text-[10px] uppercase tracking-widest font-bold text-emerald-700">Contactados</span>
                     </div>
-                    <p className="text-3xl font-light font-montserrat text-white">{contacted.length}</p>
+                    <p className="text-3xl font-light font-montserrat text-slate-900">{contacted.length}</p>
                 </div>
             </div>
 
             {/* Table */}
-            <div className="bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden">
+            <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-white/5 bg-white/[0.02]">
-                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Nombre</th>
-                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Teléfono</th>
-                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Fecha</th>
-                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium text-center">Estado</th>
-                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium text-right">Acciones</th>
+                            <tr className="border-b border-slate-200 bg-slate-50">
+                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Nombre</th>
+                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Teléfono</th>
+                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Fecha</th>
+                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium text-center">Estado</th>
+                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium text-right">Acciones</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5 text-[13px]">
+                        <tbody className="divide-y divide-slate-200 text-[13px]">
                             {isLoading ? (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
+                                    <td colSpan={5} className="px-6 py-12 text-center text-slate-500 text-[11px] uppercase tracking-widest">
                                         Cargando contactos...
                                     </td>
                                 </tr>
                             ) : contacts.length === 0 ? (
                                 <tr>
                                     <td colSpan={5} className="px-6 py-24 text-center">
-                                        <MessageCircle className="h-8 w-8 text-white/5 mx-auto mb-4" />
-                                        <p className="text-white/20 text-[11px] uppercase tracking-widest">
+                                        <MessageCircle className="h-8 w-8 text-slate-500 mx-auto mb-4" />
+                                        <p className="text-slate-500 text-[11px] uppercase tracking-widest">
                                             Aún no hay solicitudes de contacto.
                                         </p>
                                     </td>
@@ -118,16 +118,16 @@ export default function AdminContactosPage() {
                                     key={contact.id}
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
-                                    className="hover:bg-white/[0.03] transition-all"
+                                    className="hover:bg-slate-50 transition-all"
                                 >
                                     <td className="px-6 py-5">
-                                        <span className="font-medium text-white">{contact.name}</span>
+                                        <span className="font-medium text-slate-900">{contact.name}</span>
                                     </td>
                                     <td className="px-6 py-5">
-                                        <span className="text-white/60 font-mono text-[12px]">{contact.phone}</span>
+                                        <span className="text-slate-600 font-mono text-[12px]">{contact.phone}</span>
                                     </td>
                                     <td className="px-6 py-5">
-                                        <span className="text-white/40 text-[11px]">
+                                        <span className="text-slate-600 text-[11px]">
                                             {new Date(contact.createdAt).toLocaleDateString("es-AR", {
                                                 day: "2-digit", month: "2-digit", year: "numeric",
                                                 hour: "2-digit", minute: "2-digit"
@@ -136,12 +136,12 @@ export default function AdminContactosPage() {
                                     </td>
                                     <td className="px-6 py-5 text-center">
                                         {contact.status === "PENDING" ? (
-                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-orange-500/10 border border-orange-500/20 text-orange-400">
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-orange-500/10 border border-orange-500/20 text-orange-700">
                                                 <Clock className="h-2.5 w-2.5" />
                                                 Pendiente
                                             </span>
                                         ) : (
-                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-emerald-500/10 border border-emerald-500/20 text-emerald-700">
                                                 <CheckCircle className="h-2.5 w-2.5" />
                                                 Contactado
                                             </span>
@@ -160,7 +160,7 @@ export default function AdminContactosPage() {
                                                 <button
                                                     onClick={() => markContacted(contact.id)}
                                                     disabled={updating === contact.id}
-                                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-widest transition-all disabled:opacity-40"
+                                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-700 text-[10px] font-bold uppercase tracking-widest transition-all disabled:opacity-40"
                                                 >
                                                     {updating === contact.id ? (
                                                         <Loader2 className="h-3 w-3 animate-spin" />

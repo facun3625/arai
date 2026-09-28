@@ -83,36 +83,36 @@ export default function AdminResenasPage() {
     return (
         <div className="space-y-8 animate-in fade-in duration-700 pb-20">
             <div className="flex flex-col gap-1">
-                <h1 className="text-2xl font-light text-white font-montserrat tracking-tight">reseñas</h1>
-                <p className="text-white/40 text-[11px] uppercase tracking-widest">moderación · calificaciones de clientes</p>
+                <h1 className="text-2xl font-light text-slate-900 font-montserrat tracking-tight">reseñas</h1>
+                <p className="text-slate-600 text-[11px] uppercase tracking-widest">moderación · calificaciones de clientes</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
                 <div className="bg-orange-500/10 border border-orange-500/20 rounded-3xl p-6">
                     <div className="flex items-center gap-3 mb-3">
-                        <Clock className="h-4 w-4 text-orange-400" />
-                        <span className="text-[10px] uppercase tracking-widest font-bold text-orange-400">Pendientes</span>
+                        <Clock className="h-4 w-4 text-orange-700" />
+                        <span className="text-[10px] uppercase tracking-widest font-bold text-orange-700">Pendientes</span>
                     </div>
-                    <p className="text-3xl font-light font-montserrat text-white">{pending.length}</p>
+                    <p className="text-3xl font-light font-montserrat text-slate-900">{pending.length}</p>
                 </div>
                 <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-3xl p-6">
                     <div className="flex items-center gap-3 mb-3">
-                        <CheckCircle className="h-4 w-4 text-emerald-400" />
-                        <span className="text-[10px] uppercase tracking-widest font-bold text-emerald-400">Publicadas</span>
+                        <CheckCircle className="h-4 w-4 text-emerald-700" />
+                        <span className="text-[10px] uppercase tracking-widest font-bold text-emerald-700">Publicadas</span>
                     </div>
-                    <p className="text-3xl font-light font-montserrat text-white">{approved.length}</p>
+                    <p className="text-3xl font-light font-montserrat text-slate-900">{approved.length}</p>
                 </div>
             </div>
 
-            <div className="bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden divide-y divide-white/5">
+            <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden divide-y divide-slate-200">
                 {isLoading ? (
-                    <div className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
+                    <div className="px-6 py-12 text-center text-slate-500 text-[11px] uppercase tracking-widest">
                         Cargando reseñas...
                     </div>
                 ) : reviews.length === 0 ? (
                     <div className="px-6 py-24 text-center">
-                        <MessageSquare className="h-8 w-8 text-white/5 mx-auto mb-4" />
-                        <p className="text-white/20 text-[11px] uppercase tracking-widest">
+                        <MessageSquare className="h-8 w-8 text-slate-500 mx-auto mb-4" />
+                        <p className="text-slate-500 text-[11px] uppercase tracking-widest">
                             Todavía no hay reseñas.
                         </p>
                     </div>
@@ -126,9 +126,9 @@ export default function AdminResenasPage() {
                         <div className="flex items-start justify-between gap-4 flex-wrap">
                             <div>
                                 <div className="flex items-center gap-2 mb-1">
-                                    <span className="font-medium text-white text-[13px]">{review.authorName}</span>
+                                    <span className="font-medium text-slate-900 text-[13px]">{review.authorName}</span>
                                     {review.isVerified && (
-                                        <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-emerald-400">
+                                        <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-emerald-700">
                                             <ShieldCheck className="h-3 w-3" /> Compra verificada
                                         </span>
                                     )}
@@ -139,13 +139,13 @@ export default function AdminResenasPage() {
                             </div>
                             <div className="flex items-center gap-0.5">
                                 {Array.from({ length: 5 }).map((_, i) => (
-                                    <Star key={i} className={`h-3.5 w-3.5 ${i < review.rating ? "fill-yellow-400 text-yellow-400" : "text-white/10"}`} />
+                                    <Star key={i} className={`h-3.5 w-3.5 ${i < review.rating ? "fill-yellow-400 text-yellow-700" : "text-slate-500"}`} />
                                 ))}
                             </div>
                         </div>
-                        <p className="text-white/70 text-[13px] leading-relaxed">{review.comment}</p>
+                        <p className="text-slate-600 text-[13px] leading-relaxed">{review.comment}</p>
                         <div className="flex items-center justify-between">
-                            <span className="text-white/30 text-[10px]">
+                            <span className="text-slate-500 text-[10px]">
                                 {new Date(review.createdAt).toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" })}
                             </span>
                             <div className="flex items-center gap-2">
@@ -153,7 +153,7 @@ export default function AdminResenasPage() {
                                     <button
                                         disabled={updating === review.id}
                                         onClick={() => setApproval(review.id, false)}
-                                        className="px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-white/5 text-white/60 hover:bg-white/10 transition-all disabled:opacity-50"
+                                        className="px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-slate-50 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-50"
                                     >
                                         Ocultar
                                     </button>
@@ -161,7 +161,7 @@ export default function AdminResenasPage() {
                                     <button
                                         disabled={updating === review.id}
                                         onClick={() => setApproval(review.id, true)}
-                                        className="px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all disabled:opacity-50"
+                                        className="px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all disabled:opacity-50"
                                     >
                                         Publicar
                                     </button>
@@ -169,7 +169,7 @@ export default function AdminResenasPage() {
                                 <button
                                     disabled={updating === review.id}
                                     onClick={() => deleteReview(review.id)}
-                                    className="p-1.5 rounded-full text-red-400/70 hover:bg-red-500/10 hover:text-red-400 transition-all disabled:opacity-50"
+                                    className="p-1.5 rounded-full text-red-700/70 hover:bg-red-500/10 hover:text-red-700 transition-all disabled:opacity-50"
                                 >
                                     <Trash2 className="h-3.5 w-3.5" />
                                 </button>

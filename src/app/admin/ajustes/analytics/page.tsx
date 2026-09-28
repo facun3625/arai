@@ -56,11 +56,11 @@ export default function AnalyticsPage() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-700">
-            <div className="bg-[#0a0a0a] border border-white/5 rounded-[32px] p-10 md:p-12 shadow-2xl">
+        <div className="w-full space-y-8 animate-in fade-in duration-700">
+            <div className="bg-white border border-slate-200 rounded-[32px] p-10 md:p-12 shadow-2xl">
                 <div className="space-y-2 mb-10">
-                    <h1 className="text-white text-3xl font-bold tracking-tight">Analytics & Tracking</h1>
-                    <p className="text-white/40 text-sm tracking-wide">
+                    <h1 className="text-slate-900 text-3xl font-bold tracking-tight">Analytics & Tracking</h1>
+                    <p className="text-slate-600 text-sm tracking-wide">
                         Pegá tus IDs y los scripts se activan automáticamente en toda la tienda.
                     </p>
                 </div>
@@ -73,8 +73,8 @@ export default function AnalyticsPage() {
                                 <Facebook className="h-4 w-4 text-[#1877F2]" />
                             </div>
                             <div>
-                                <p className="text-white text-sm font-semibold">Meta Pixel</p>
-                                <p className="text-white/30 text-xs">Facebook & Instagram Ads · Remarketing y conversiones</p>
+                                <p className="text-slate-900 text-sm font-semibold">Meta Pixel</p>
+                                <p className="text-slate-500 text-xs">Facebook & Instagram Ads · Remarketing y conversiones</p>
                             </div>
                         </div>
                         <input
@@ -82,14 +82,14 @@ export default function AnalyticsPage() {
                             placeholder="Ej: 1234567890123456"
                             value={settings.metaPixelId}
                             onChange={(e) => setSettings({ ...settings, metaPixelId: e.target.value })}
-                            className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10 font-mono"
+                            className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 text-[15px] focus:outline-none focus:border-slate-200 focus:bg-white transition-all placeholder:text-slate-500 font-mono"
                         />
-                        <p className="text-[11px] text-white/20 italic ml-1">
+                        <p className="text-[11px] text-slate-500 italic ml-1">
                             Encontralo en Meta Business Suite → Administrador de eventos → Tu Pixel → ID del Pixel
                         </p>
                     </div>
 
-                    <div className="border-t border-white/5" />
+                    <div className="border-t border-slate-200" />
 
                     {/* Google Analytics 4 */}
                     <div className="space-y-4">
@@ -98,8 +98,8 @@ export default function AnalyticsPage() {
                                 <BarChart2 className="h-4 w-4 text-[#E37400]" />
                             </div>
                             <div>
-                                <p className="text-white text-sm font-semibold">Google Analytics 4</p>
-                                <p className="text-white/30 text-xs">Tráfico, sesiones y comportamiento de usuarios · Gratis</p>
+                                <p className="text-slate-900 text-sm font-semibold">Google Analytics 4</p>
+                                <p className="text-slate-500 text-xs">Tráfico, sesiones y comportamiento de usuarios · Gratis</p>
                             </div>
                         </div>
                         <input
@@ -107,9 +107,9 @@ export default function AnalyticsPage() {
                             placeholder="Ej: G-XXXXXXXXXX"
                             value={settings.ga4MeasurementId}
                             onChange={(e) => setSettings({ ...settings, ga4MeasurementId: e.target.value })}
-                            className="w-full bg-[#141414] border border-white/10 rounded-2xl px-5 py-4 text-white text-[15px] focus:outline-none focus:border-white/20 focus:bg-[#1a1a1a] transition-all placeholder:text-white/10 font-mono"
+                            className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 text-[15px] focus:outline-none focus:border-slate-200 focus:bg-white transition-all placeholder:text-slate-500 font-mono"
                         />
-                        <p className="text-[11px] text-white/20 italic ml-1">
+                        <p className="text-[11px] text-slate-500 italic ml-1">
                             Encontralo en analytics.google.com → Administrar → Flujos de datos → tu flujo → ID de medición
                         </p>
                     </div>
@@ -130,7 +130,7 @@ export default function AnalyticsPage() {
             {toast && (
                 <div className={`fixed bottom-8 right-8 px-6 py-4 rounded-2xl shadow-2xl border animate-in slide-in-from-right-8 duration-500 z-50 ${
                     toast.type === "success"
-                        ? "bg-[#0c120e] border-primary/20 text-primary"
+                        ? "bg-white border-primary/20 text-primary"
                         : "bg-red-500/10 border-red-500/20 text-red-500"
                 }`}>
                     <div className="flex items-center gap-3">

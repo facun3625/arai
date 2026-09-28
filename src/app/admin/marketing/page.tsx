@@ -397,46 +397,46 @@ export default function MarketingPage() {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-1">
-                        <h1 className="text-2xl font-light text-white font-montserrat tracking-tight">marketing & configs</h1>
-                        <p className="text-white/40 text-[11px] uppercase tracking-widest">envío gratis, cupones y pop-ups</p>
+                        <h1 className="text-2xl font-light text-slate-900 font-montserrat tracking-tight">marketing & configs</h1>
+                        <p className="text-slate-600 text-[11px] uppercase tracking-widest">envío gratis, cupones y pop-ups</p>
                     </div>
                 </div>
 
                 {/* TABS */}
-                <div className="flex items-center gap-4 border-b border-white/10 pb-4">
+                <div className="flex items-center gap-4 border-b border-slate-200 pb-4">
                     <button
                         onClick={() => setActiveTab("settings")}
-                        className={`text-[12px] font-medium tracking-wide pb-2 px-1 border-b-2 transition-all ${activeTab === 'settings' ? 'text-primary border-primary' : 'text-white/40 border-transparent hover:text-white/70'}`}
+                        className={`text-[12px] font-medium tracking-wide pb-2 px-1 border-b-2 transition-all ${activeTab === 'settings' ? 'text-primary border-primary' : 'text-slate-600 border-transparent hover:text-slate-600'}`}
                     >
                         Configuración Global
                     </button>
                     <button
                         onClick={() => setActiveTab("popups")}
-                        className={`text-[12px] font-medium tracking-wide pb-2 px-1 border-b-2 transition-all ${activeTab === 'popups' ? 'text-primary border-primary' : 'text-white/40 border-transparent hover:text-white/70'}`}
+                        className={`text-[12px] font-medium tracking-wide pb-2 px-1 border-b-2 transition-all ${activeTab === 'popups' ? 'text-primary border-primary' : 'text-slate-600 border-transparent hover:text-slate-600'}`}
                     >
                         Pop-ups Publicitarios
                     </button>
                     <button
                         onClick={() => setActiveTab("points")}
-                        className={`text-[12px] font-medium tracking-wide pb-2 px-1 border-b-2 transition-all ${activeTab === 'points' ? 'text-primary border-primary' : 'text-white/40 border-transparent hover:text-white/70'}`}
+                        className={`text-[12px] font-medium tracking-wide pb-2 px-1 border-b-2 transition-all ${activeTab === 'points' ? 'text-primary border-primary' : 'text-slate-600 border-transparent hover:text-slate-600'}`}
                     >
                         Sistema de Puntos
                     </button>
                     <button
                         onClick={() => setActiveTab("coupons")}
-                        className={`text-[12px] font-medium tracking-wide pb-2 px-1 border-b-2 transition-all ${activeTab === 'coupons' ? 'text-primary border-primary' : 'text-white/40 border-transparent hover:text-white/70'}`}
+                        className={`text-[12px] font-medium tracking-wide pb-2 px-1 border-b-2 transition-all ${activeTab === 'coupons' ? 'text-primary border-primary' : 'text-slate-600 border-transparent hover:text-slate-600'}`}
                     >
                         Cupones de Descuento
                     </button>
                     <button
                         onClick={() => setActiveTab("user-coupons")}
-                        className={`text-[12px] font-medium tracking-wide pb-2 px-1 border-b-2 transition-all ${activeTab === 'user-coupons' ? 'text-primary border-primary' : 'text-white/40 border-transparent hover:text-white/70'}`}
+                        className={`text-[12px] font-medium tracking-wide pb-2 px-1 border-b-2 transition-all ${activeTab === 'user-coupons' ? 'text-primary border-primary' : 'text-slate-600 border-transparent hover:text-slate-600'}`}
                     >
                         Canjes de Usuarios
                     </button>
                     <button
                         onClick={() => setActiveTab("email-marketing")}
-                        className={`text-[12px] font-medium tracking-wide pb-2 px-1 border-b-2 transition-all ${activeTab === 'email-marketing' ? 'text-primary border-primary' : 'text-white/40 border-transparent hover:text-white/70'}`}
+                        className={`text-[12px] font-medium tracking-wide pb-2 px-1 border-b-2 transition-all ${activeTab === 'email-marketing' ? 'text-primary border-primary' : 'text-slate-600 border-transparent hover:text-slate-600'}`}
                     >
                         Email Marketing
                     </button>
@@ -444,54 +444,54 @@ export default function MarketingPage() {
 
                 {/* TAB 1: SETTINGS */}
                 {activeTab === "settings" && (
-                    <div className="max-w-2xl bg-white/[0.02] border border-white/5 rounded-3xl p-8">
+                    <div className="w-full bg-white border border-slate-200 rounded-3xl p-8">
                         <form onSubmit={handleSaveSettings} className="space-y-8">
 
                             <div className="space-y-4">
                                 <div>
-                                    <h2 className="text-white text-lg font-medium tracking-tight mb-1 flex items-center gap-2">
+                                    <h2 className="text-slate-900 text-lg font-medium tracking-tight mb-1 flex items-center gap-2">
                                         <Truck className="h-5 w-5 text-primary" /> Umbral de Envío Gratis
                                     </h2>
-                                    <p className="text-[12px] text-white/40">Si el subtotal del cliente supera este monto, el envío se vuelve gratuito. Ingresa 0 para desactivarlo.</p>
+                                    <p className="text-[12px] text-slate-600">Si el subtotal del cliente supera este monto, el envío se vuelve gratuito. Ingresa 0 para desactivarlo.</p>
                                 </div>
                                 <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40">$</span>
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600">$</span>
                                     <input
                                         type="number"
                                         value={settings.freeShippingThreshold}
                                         onChange={(e) => setSettings({ ...settings, freeShippingThreshold: Number(e.target.value) })}
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl pl-8 pr-4 py-4 text-[14px] text-white focus:outline-none focus:border-primary transition-colors font-mono"
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-4 py-4 text-[14px] text-slate-900 focus:outline-none focus:border-primary transition-colors font-mono"
                                     />
                                 </div>
                             </div>
 
-                            <hr className="border-white/10" />
+                            <hr className="border-slate-200" />
 
 
 
-                            <hr className="border-white/10" />
+                            <hr className="border-slate-200" />
 
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <h2 className="text-white text-lg font-medium tracking-tight mb-1 flex items-center gap-2">
+                                        <h2 className="text-slate-900 text-lg font-medium tracking-tight mb-1 flex items-center gap-2">
                                             <Monitor className="h-5 w-5 text-red-500" /> Modo Mantenimiento
                                         </h2>
-                                        <p className="text-[12px] text-white/40 italic">Bloquea el acceso al sitio para todos excepto administradores y testers.</p>
+                                        <p className="text-[12px] text-slate-600 italic">Bloquea el acceso al sitio para todos excepto administradores y testers.</p>
                                     </div>
                                     <button
                                         type="button"
                                         onClick={() => setSettings({ ...settings, maintenanceMode: !settings.maintenanceMode })}
                                         className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${settings.maintenanceMode 
                                             ? 'bg-red-500/20 text-red-500 border border-red-500/30' 
-                                            : 'bg-white/5 text-white/40 border border-white/10 hover:border-white/20'}`}
+                                            : 'bg-slate-50 text-slate-600 border border-slate-200 hover:border-slate-200'}`}
                                     >
                                         {settings.maintenanceMode ? 'ACTIVO (SITIO CERRADO)' : 'DESACTIVADO (SITIO PÚBLICO)'}
                                     </button>
                                 </div>
                                 {settings.maintenanceMode && (
                                     <div className="p-4 bg-red-500/5 border border-red-500/10 rounded-2xl animate-in fade-in slide-in-from-top-2 duration-300">
-                                        <p className="text-[11px] text-red-400 leading-relaxed italic">
+                                        <p className="text-[11px] text-red-700 leading-relaxed italic">
                                             ⚠️ <strong>Atención:</strong> El sitio mostrará un cartel de "En Mantenimiento" a todos los visitantes. 
                                             Como administrador, tu acceso sigue habilitado para que puedas realizar pruebas.
                                         </p>
@@ -513,19 +513,19 @@ export default function MarketingPage() {
 
                 {/* TAB: EMAIL MARKETING */}
                 {activeTab === "email-marketing" && (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div className="bg-primary/5 border border-primary/20 rounded-3xl p-6 flex items-center gap-6">
                                 <div className="h-14 w-14 rounded-2xl bg-primary/20 flex items-center justify-center">
                                     <Users className="h-7 w-7 text-primary" />
                                 </div>
                                 <div>
-                                    <h2 className="text-white text-lg font-medium tracking-tight">Audiencia Alcanzada</h2>
+                                    <h2 className="text-slate-900 text-lg font-medium tracking-tight">Audiencia Alcanzada</h2>
                                     <p className="text-2xl font-bold text-primary">
                                         {emailForm.audience === 'CUSTOM_LIST'
                                             ? ((emailForm as any).customEmails || []).length
                                             : (audienceStats[emailForm.audience] || 0)}
-                                        <span className="text-[10px] text-white/40 uppercase font-light tracking-widest ml-2">
+                                        <span className="text-[10px] text-slate-600 uppercase font-light tracking-widest ml-2">
                                             {emailForm.audience === 'ALL' && 'Total de Reach'}
                                             {emailForm.audience === 'ABANDONED_CART' && 'Carritos Abandonados'}
                                             {emailForm.audience === 'CUSTOMERS' && 'Clientes que Compraron'}
@@ -536,15 +536,15 @@ export default function MarketingPage() {
                                 </div>
                             </div>
 
-                            <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 space-y-6">
+                            <div className="bg-white border border-slate-200 rounded-3xl p-8 space-y-6">
                                 <div className="flex items-center gap-3 mb-2">
                                     <Mail className="h-5 w-5 text-primary" />
-                                    <h2 className="text-white font-medium tracking-tight">Redactar Nueva Campaña</h2>
+                                    <h2 className="text-slate-900 font-medium tracking-tight">Redactar Nueva Campaña</h2>
                                 </div>
 
                                 <form onSubmit={handleSendEmail} className="space-y-6">
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Seleccionar Audiencia</label>
+                                        <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Seleccionar Audiencia</label>
                                         <div className="grid grid-cols-2 gap-3">
                                             {[
                                                 { id: 'ALL', label: 'Todos', info: 'Susc. + Clientes' },
@@ -559,7 +559,7 @@ export default function MarketingPage() {
                                                     onClick={() => setEmailForm({ ...emailForm, audience: group.id })}
                                                     className={`p-3 rounded-xl border text-left transition-all ${emailForm.audience === group.id
                                                         ? 'bg-primary/20 border-primary text-primary'
-                                                        : 'bg-white/5 border-white/10 text-white/60 hover:border-white/20'}`}
+                                                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-200'}`}
                                                 >
                                                     <p className="text-[12px] font-bold">{group.label}</p>
                                                     <p className="text-[9px] uppercase tracking-wider opacity-60">
@@ -574,7 +574,7 @@ export default function MarketingPage() {
 
                                     {emailForm.audience === 'CUSTOM_LIST' && (
                                         <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
-                                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Correos (uno por línea o separados por coma)</label>
+                                            <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Correos (uno por línea o separados por coma)</label>
                                             <textarea
                                                 value={(emailForm as any).customEmailsRaw || ""}
                                                 onChange={(e) => {
@@ -585,7 +585,7 @@ export default function MarketingPage() {
                                                         ...({ customEmailsRaw: raw, customEmails: emails } as any)
                                                     });
                                                 }}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors min-h-[100px] font-mono"
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors min-h-[100px] font-mono"
                                                 placeholder="mate@tienda.com&#10;yerba@tienda.com"
                                             />
                                             <p className="text-[10px] text-primary mt-1">
@@ -595,23 +595,23 @@ export default function MarketingPage() {
                                     )}
 
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Asunto del Correo</label>
+                                        <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Asunto del Correo</label>
                                         <input
                                             type="text"
                                             value={emailForm.subject}
                                             onChange={(e) => setEmailForm({ ...emailForm, subject: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[14px] text-white focus:outline-none focus:border-primary transition-colors"
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] text-slate-900 focus:outline-none focus:border-primary transition-colors"
                                             placeholder="Ej: ¡Nuevos ingresos de mates premium! 🧉"
                                             required
                                         />
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Cuerpo del Mensaje</label>
+                                        <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Cuerpo del Mensaje</label>
                                         <textarea
                                             value={emailForm.content}
                                             onChange={(e) => setEmailForm({ ...emailForm, content: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[14px] text-white focus:outline-none focus:border-primary transition-colors min-h-[200px] resize-none"
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] text-slate-900 focus:outline-none focus:border-primary transition-colors min-h-[200px] resize-none"
                                             placeholder="Escribí el contenido de tu correo aquí..."
                                             required
                                         />
@@ -619,22 +619,22 @@ export default function MarketingPage() {
 
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-1.5">
-                                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Texto del Botón (Opcional)</label>
+                                            <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Texto del Botón (Opcional)</label>
                                             <input
                                                 type="text"
                                                 value={emailForm.buttonText}
                                                 onChange={(e) => setEmailForm({ ...emailForm, buttonText: e.target.value })}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors"
                                                 placeholder="Ver Tienda"
                                             />
                                         </div>
                                         <div className="space-y-1.5">
-                                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">URL del Botón (Opcional)</label>
+                                            <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">URL del Botón (Opcional)</label>
                                             <input
                                                 type="text"
                                                 value={emailForm.buttonUrl}
                                                 onChange={(e) => setEmailForm({ ...emailForm, buttonUrl: e.target.value })}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors"
                                                 placeholder="https://arai-yerba.com/tienda"
                                             />
                                         </div>
@@ -643,7 +643,7 @@ export default function MarketingPage() {
                                     <button
                                         type="submit"
                                         disabled={isSendingEmail || (emailForm.audience === 'CUSTOM_LIST' ? ((emailForm as any).customEmails || []).length === 0 : (audienceStats[emailForm.audience] || 0) === 0)}
-                                        className="w-full bg-primary hover:bg-primary-dark disabled:bg-white/5 disabled:text-white/20 text-white py-4 rounded-xl text-[13px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-3 shadow-xl shadow-primary/10 hover:-translate-y-0.5"
+                                        className="w-full bg-primary hover:bg-primary-dark disabled:bg-slate-50 disabled:text-slate-500 text-white py-4 rounded-xl text-[13px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-3 shadow-xl shadow-primary/10 hover:-translate-y-0.5"
                                     >
                                         {isSendingEmail ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
                                         {isSendingEmail ? 'Enviando...' : `Preparar Campaña para ${emailForm.audience === 'CUSTOM_LIST' ? ((emailForm as any).customEmails || []).length : (audienceStats[emailForm.audience] || 0)} personas`}
@@ -654,7 +654,7 @@ export default function MarketingPage() {
 
                         {/* Vista Previa Simplificada */}
                         <div className="hidden lg:block space-y-4 animate-in fade-in slide-in-from-right-4 duration-700">
-                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Vista Previa (Sugerida)</label>
+                            <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Vista Previa (Sugerida)</label>
                             <div className="bg-white rounded-3xl overflow-hidden shadow-2xl shadow-black/20 animate-in fade-in slide-in-from-right-4 duration-500">
                                 <div className="bg-[#1a432e] py-8 flex flex-col items-center justify-center">
                                     <img
@@ -676,7 +676,7 @@ export default function MarketingPage() {
 
                                     {emailForm.buttonText && (
                                         <div className="flex justify-center pt-4">
-                                            <div className="bg-[#0c120e] text-white px-8 py-4 rounded-xl text-[13px] font-bold uppercase tracking-widest shadow-lg">
+                                            <div className="bg-white text-slate-900 px-8 py-4 rounded-xl text-[13px] font-bold uppercase tracking-widest shadow-lg">
                                                 {emailForm.buttonText}
                                             </div>
                                         </div>
@@ -695,21 +695,21 @@ export default function MarketingPage() {
                         <div className="lg:col-span-2 space-y-6 mt-12">
                             <div className="flex items-center gap-3">
                                 <Mail className="h-5 w-5 text-primary" />
-                                <h2 className="text-white font-medium tracking-tight">Historial de Campañas</h2>
+                                <h2 className="text-slate-900 font-medium tracking-tight">Historial de Campañas</h2>
                             </div>
 
                             {isLoadingCampaigns ? (
-                                <div className="flex items-center justify-center p-12 bg-white/[0.02] border border-white/5 rounded-3xl">
+                                <div className="flex items-center justify-center p-12 bg-white border border-slate-200 rounded-3xl">
                                     <Loader2 className="h-8 w-8 text-primary animate-spin" />
                                 </div>
                             ) : campaigns.length === 0 ? (
-                                <div className="p-12 text-center bg-white/[0.02] border border-white/5 rounded-3xl">
-                                    <p className="text-white/40 text-[13px] italic">Todavía no enviaste ninguna campaña masiva.</p>
+                                <div className="p-12 text-center bg-white border border-slate-200 rounded-3xl">
+                                    <p className="text-slate-600 text-[13px] italic">Todavía no enviaste ninguna campaña masiva.</p>
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {campaigns.map((camp) => (
-                                        <div key={camp.id} className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 space-y-4 hover:border-white/10 transition-colors">
+                                        <div key={camp.id} className="bg-white border border-slate-200 rounded-3xl p-6 space-y-4 hover:border-slate-200 transition-colors">
                                             <div className="flex justify-between items-start">
                                                 <div className="px-2 py-1 rounded bg-primary/10 text-primary text-[9px] font-bold uppercase tracking-widest">
                                                     {camp.audience === 'ALL' && 'Todos'}
@@ -718,18 +718,18 @@ export default function MarketingPage() {
                                                     {camp.audience === 'REGISTERED' && 'Registrados'}
                                                     {camp.audience === 'CUSTOM_LIST' && 'Lista Manual'}
                                                 </div>
-                                                <span className="text-white/20 text-[10px] font-mono">
+                                                <span className="text-slate-500 text-[10px] font-mono">
                                                     {new Date(camp.createdAt).toLocaleDateString()}
                                                 </span>
                                             </div>
                                             <div>
-                                                <h3 className="text-white text-[14px] font-medium line-clamp-1">{camp.subject}</h3>
-                                                <p className="text-white/40 text-[11px] line-clamp-2 mt-1">{camp.content}</p>
+                                                <h3 className="text-slate-900 text-[14px] font-medium line-clamp-1">{camp.subject}</h3>
+                                                <p className="text-slate-600 text-[11px] line-clamp-2 mt-1">{camp.content}</p>
                                             </div>
-                                            <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                                            <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
                                                 <div className="flex items-center gap-2">
-                                                    <Users className="h-3.5 w-3.5 text-white/40" />
-                                                    <span className="text-white/60 text-[11px] font-bold">{camp.sentCount} <span className="text-[9px] font-light">destinatarios</span></span>
+                                                    <Users className="h-3.5 w-3.5 text-slate-600" />
+                                                    <span className="text-slate-600 text-[11px] font-bold">{camp.sentCount} <span className="text-[9px] font-light">destinatarios</span></span>
                                                 </div>
                                                 <button 
                                                     onClick={() => setEmailForm({
@@ -755,15 +755,15 @@ export default function MarketingPage() {
                 {activeTab === "points" && (
                     <div className="space-y-12">
                         {/* Configuración del Sistema */}
-                        <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 max-w-2xl">
+                        <div className="bg-white border border-slate-200 rounded-3xl p-8 w-full">
                             <div className="flex items-center justify-between mb-8">
                                 <div className="flex items-center gap-3">
                                     <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
                                         <Coins className="h-5 w-5 text-primary" />
                                     </div>
                                     <div>
-                                        <h2 className="text-white font-medium tracking-tight">Configuración del Programa</h2>
-                                        <p className="text-[11px] text-white/40 uppercase tracking-widest">Estado y ratio de puntos</p>
+                                        <h2 className="text-slate-900 font-medium tracking-tight">Configuración del Programa</h2>
+                                        <p className="text-[11px] text-slate-600 uppercase tracking-widest">Estado y ratio de puntos</p>
                                     </div>
                                 </div>
                                 <button
@@ -776,7 +776,7 @@ export default function MarketingPage() {
                                             body: JSON.stringify({ ...settings, pointsEnabled: !settings.pointsEnabled })
                                         }).then(() => fetchSettings());
                                     })}
-                                    className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${settings.pointsEnabled ? 'bg-primary/20 text-primary border border-primary/30' : 'bg-white/5 text-white/40 border border-white/10'}`}
+                                    className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${settings.pointsEnabled ? 'bg-primary/20 text-primary border border-primary/30' : 'bg-slate-50 text-slate-600 border border-slate-200'}`}
                                 >
                                     {settings.pointsEnabled ? 'Sistema Activo' : 'Sistema Inactivo'}
                                 </button>
@@ -785,15 +785,15 @@ export default function MarketingPage() {
                             <div className="space-y-6">
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="text-[12px] text-white/60 font-medium mb-1 block">Ratio de puntos (Puntos por cada $1)</label>
-                                        <p className="text-[11px] text-white/30 mb-3">Ejemplo: 0.01 significa que el cliente recibe 1 punto por cada $100 gastados.</p>
+                                        <label className="text-[12px] text-slate-600 font-medium mb-1 block">Ratio de puntos (Puntos por cada $1)</label>
+                                        <p className="text-[11px] text-slate-500 mb-3">Ejemplo: 0.01 significa que el cliente recibe 1 punto por cada $100 gastados.</p>
                                         <div className="relative">
                                             <input
                                                 type="number"
                                                 step="0.001"
                                                 value={settings.pointsRatio}
                                                 onChange={(e) => setSettings({ ...settings, pointsRatio: Number(e.target.value) })}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-[14px] text-white focus:outline-none focus:border-primary transition-colors font-mono"
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-[14px] text-slate-900 focus:outline-none focus:border-primary transition-colors font-mono"
                                             />
                                         </div>
                                     </div>
@@ -824,52 +824,52 @@ export default function MarketingPage() {
                         {/* Gestión de Recompensas */}
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                             <div className="lg:col-span-1">
-                                <form onSubmit={handleSaveReward} className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 space-y-4">
-                                    <h2 className="text-[14px] text-white font-medium mb-4 flex items-center gap-2">
+                                <form onSubmit={handleSaveReward} className="bg-white border border-slate-200 rounded-3xl p-6 space-y-4">
+                                    <h2 className="text-[14px] text-slate-900 font-medium mb-4 flex items-center gap-2">
                                         <Gift className="h-4 w-4 text-primary" /> {rewardForm.id ? 'Editar Recompensa' : 'Nueva Recompensa'}
                                     </h2>
 
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Título (Ej: Cupón $1000 OFF)</label>
+                                        <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Título (Ej: Cupón $1000 OFF)</label>
                                         <input
                                             type="text"
                                             value={rewardForm.title}
                                             onChange={(e) => setRewardForm({ ...rewardForm, title: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors"
                                             required
                                         />
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Puntos Requeridos</label>
+                                        <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Puntos Requeridos</label>
                                         <input
                                             type="number"
                                             value={rewardForm.pointsRequired}
                                             onChange={(e) => setRewardForm({ ...rewardForm, pointsRequired: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors"
                                             required
                                         />
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-1.5">
-                                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Tipo Descuento</label>
+                                            <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Tipo Descuento</label>
                                             <select
                                                 value={rewardForm.discountType}
                                                 onChange={(e) => setRewardForm({ ...rewardForm, discountType: e.target.value })}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors appearance-none"
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors appearance-none"
                                             >
                                                 <option value="FIXED">Monto Fijo ($)</option>
                                                 <option value="PERCENTAGE">Porcentaje (%)</option>
                                             </select>
                                         </div>
                                         <div className="space-y-1.5">
-                                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Valor</label>
+                                            <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Valor</label>
                                             <input
                                                 type="number"
                                                 value={rewardForm.discountValue}
                                                 onChange={(e) => setRewardForm({ ...rewardForm, discountValue: e.target.value })}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors"
                                                 required
                                             />
                                         </div>
@@ -888,7 +888,7 @@ export default function MarketingPage() {
                                             <button
                                                 type="button"
                                                 onClick={() => setRewardForm({ id: "", title: "", pointsRequired: "", discountValue: "", discountType: "FIXED", isActive: true })}
-                                                className="px-4 bg-white/5 hover:bg-white/10 text-white/60 rounded-xl text-[12px] transition-all"
+                                                className="px-4 bg-slate-50 hover:bg-slate-50 text-slate-600 rounded-xl text-[12px] transition-all"
                                             >
                                                 Cancelar
                                             </button>
@@ -898,35 +898,35 @@ export default function MarketingPage() {
                             </div>
 
                             <div className="lg:col-span-2">
-                                <div className="bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden">
+                                <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden">
                                     <table className="w-full text-left border-collapse">
                                         <thead>
-                                            <tr className="border-b border-white/5 bg-white/[0.02]">
-                                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Recompensa</th>
-                                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium text-center">Puntos</th>
-                                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Beneficio</th>
-                                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium text-right">Acciones</th>
+                                            <tr className="border-b border-slate-200 bg-slate-50">
+                                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Recompensa</th>
+                                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium text-center">Puntos</th>
+                                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Beneficio</th>
+                                                <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium text-right">Acciones</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-white/5">
+                                        <tbody className="divide-y divide-slate-200">
                                             {isLoadingRewards ? (
                                                 <tr>
-                                                    <td colSpan={4} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">Cargando recompensas...</td>
+                                                    <td colSpan={4} className="px-6 py-12 text-center text-slate-500 text-[11px] uppercase tracking-widest">Cargando recompensas...</td>
                                                 </tr>
                                             ) : rewards.length === 0 ? (
                                                 <tr>
-                                                    <td colSpan={4} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">No hay recompensas creadas.</td>
+                                                    <td colSpan={4} className="px-6 py-12 text-center text-slate-500 text-[11px] uppercase tracking-widest">No hay recompensas creadas.</td>
                                                 </tr>
                                             ) : rewards.map((r) => (
-                                                <tr key={r.id} className="hover:bg-white/[0.02] transition-colors group">
+                                                <tr key={r.id} className="hover:bg-slate-50 transition-colors group">
                                                     <td className="px-6 py-4">
-                                                        <p className="text-[13px] font-medium text-white">{r.title}</p>
-                                                        {!r.isActive && <span className="text-[9px] text-red-400 uppercase font-bold tracking-widest">Inactiva</span>}
+                                                        <p className="text-[13px] font-medium text-slate-900">{r.title}</p>
+                                                        {!r.isActive && <span className="text-[9px] text-red-700 uppercase font-bold tracking-widest">Inactiva</span>}
                                                     </td>
                                                     <td className="px-6 py-4 text-center">
                                                         <span className="text-[13px] font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">{r.pointsRequired} pts</span>
                                                     </td>
-                                                    <td className="px-6 py-4 text-[13px] text-white/60">
+                                                    <td className="px-6 py-4 text-[13px] text-slate-600">
                                                         {r.discountType === 'FIXED' ? `$${r.discountValue}` : `${r.discountValue}%`} OFF
                                                     </td>
                                                     <td className="px-6 py-4">
@@ -934,12 +934,12 @@ export default function MarketingPage() {
                                                             {confirmDeleteId === r.id ? (
                                                                 <div className="flex items-center gap-2">
                                                                     <button onClick={() => handleDeleteReward(r.id)} className="text-[10px] bg-red-500 text-white px-2 py-1 rounded">Borrar</button>
-                                                                    <button onClick={() => setConfirmDeleteId(null)} className="text-[10px] text-white/40">No</button>
+                                                                    <button onClick={() => setConfirmDeleteId(null)} className="text-[10px] text-slate-600">No</button>
                                                                 </div>
                                                             ) : (
                                                                 <>
-                                                                    <button onClick={() => setRewardForm({ ...r, pointsRequired: r.pointsRequired.toString(), discountValue: r.discountValue.toString() })} className="text-white/40 hover:text-white"><Edit2 className="h-4 w-4" /></button>
-                                                                    <button onClick={() => setConfirmDeleteId(r.id)} className="text-red-400/60 hover:text-red-400"><Trash2 className="h-4 w-4" /></button>
+                                                                    <button onClick={() => setRewardForm({ ...r, pointsRequired: r.pointsRequired.toString(), discountValue: r.discountValue.toString() })} className="text-slate-600 hover:text-slate-900"><Edit2 className="h-4 w-4" /></button>
+                                                                    <button onClick={() => setConfirmDeleteId(r.id)} className="text-red-700/60 hover:text-red-700"><Trash2 className="h-4 w-4" /></button>
                                                                 </>
                                                             )}
                                                         </div>
@@ -960,29 +960,29 @@ export default function MarketingPage() {
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                             {/* Formulario */}
                             <div className="lg:col-span-1 space-y-6">
-                                <form onSubmit={handleCreateCoupon} className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 space-y-4">
-                                    <h2 className="text-[14px] text-white font-medium mb-4 flex items-center gap-2">
+                                <form onSubmit={handleCreateCoupon} className="bg-white border border-slate-200 rounded-3xl p-6 space-y-4">
+                                    <h2 className="text-[14px] text-slate-900 font-medium mb-4 flex items-center gap-2">
                                         <Tag className="h-4 w-4 text-primary" /> Crear Cupón de Campaña
                                     </h2>
 
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Código (Ej: VERANO20)</label>
+                                        <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Código (Ej: VERANO20)</label>
                                         <input
                                             type="text"
                                             value={couponForm.code}
                                             onChange={(e) => setCouponForm({ ...couponForm, code: e.target.value.toUpperCase() })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors uppercase font-mono"
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors uppercase font-mono"
                                             required
                                         />
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-1.5">
-                                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Tipo</label>
+                                            <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Tipo</label>
                                             <select
                                                 value={couponForm.discountType}
                                                 onChange={(e) => setCouponForm({ ...couponForm, discountType: e.target.value, discountValue: e.target.value === "FREE_SHIPPING" ? "0" : couponForm.discountValue })}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors appearance-none"
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors appearance-none"
                                             >
                                                 <option value="PERCENTAGE">Porcentaje (%)</option>
                                                 <option value="FIXED">Monto Fijo ($)</option>
@@ -990,9 +990,9 @@ export default function MarketingPage() {
                                             </select>
                                         </div>
                                         <div className="space-y-1.5">
-                                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Valor</label>
+                                            <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Valor</label>
                                             {couponForm.discountType === "FREE_SHIPPING" ? (
-                                                <div className="w-full bg-white/[0.02] border border-white/5 rounded-xl px-4 py-3 text-[13px] text-white/30 italic">
+                                                <div className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-500 italic">
                                                     No aplica
                                                 </div>
                                             ) : (
@@ -1000,7 +1000,7 @@ export default function MarketingPage() {
                                                     type="number"
                                                     value={couponForm.discountValue}
                                                     onChange={(e) => setCouponForm({ ...couponForm, discountValue: e.target.value })}
-                                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors"
                                                     required
                                                 />
                                             )}
@@ -1008,52 +1008,52 @@ export default function MarketingPage() {
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Monto de Compra Mínima (Opcional)</label>
+                                        <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Monto de Compra Mínima (Opcional)</label>
                                         <div className="relative">
-                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40">$</span>
+                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600">$</span>
                                             <input
                                                 type="number"
                                                 value={couponForm.minPurchaseAmount}
                                                 onChange={(e) => setCouponForm({ ...couponForm, minPurchaseAmount: e.target.value })}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl pl-7 pr-3 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-7 pr-3 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors"
                                                 placeholder="0"
                                             />
                                         </div>
                                     </div>
 
-                                    <div className="border-t border-white/5 pt-4 space-y-3">
-                                        <p className="text-[10px] uppercase tracking-widest text-white/20 ml-1">Restricciones opcionales</p>
+                                    <div className="border-t border-slate-200 pt-4 space-y-3">
+                                        <p className="text-[10px] uppercase tracking-widest text-slate-500 ml-1">Restricciones opcionales</p>
 
                                         <div className="space-y-1.5">
-                                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Fecha de expiración</label>
+                                            <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Fecha de expiración</label>
                                             <input
                                                 type="date"
                                                 value={couponForm.expiresAt}
                                                 onChange={(e) => setCouponForm({ ...couponForm, expiresAt: e.target.value })}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors"
                                             />
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-3">
                                             <div className="space-y-1.5">
-                                                <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1 leading-tight">Usos totales</label>
+                                                <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1 leading-tight">Usos totales</label>
                                                 <input
                                                     type="number"
                                                     min="1"
                                                     value={couponForm.usageLimit}
                                                     onChange={(e) => setCouponForm({ ...couponForm, usageLimit: e.target.value })}
-                                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors"
                                                     placeholder="∞"
                                                 />
                                             </div>
                                             <div className="space-y-1.5">
-                                                <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1 leading-tight">Por usuario</label>
+                                                <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1 leading-tight">Por usuario</label>
                                                 <input
                                                     type="number"
                                                     min="1"
                                                     value={couponForm.usageLimitPerUser}
                                                     onChange={(e) => setCouponForm({ ...couponForm, usageLimitPerUser: e.target.value })}
-                                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors"
                                                     placeholder="∞"
                                                 />
                                             </div>
@@ -1082,67 +1082,67 @@ export default function MarketingPage() {
                             <div className="lg:col-span-2 space-y-4">
                                 <div className="flex items-center justify-between px-2">
                                     <div>
-                                        <h2 className="text-white font-medium tracking-tight">Cupones de Campaña</h2>
-                                        <p className="text-[11px] text-white/40 uppercase tracking-widest">Creados manualmente</p>
+                                        <h2 className="text-slate-900 font-medium tracking-tight">Cupones de Campaña</h2>
+                                        <p className="text-[11px] text-slate-600 uppercase tracking-widest">Creados manualmente</p>
                                     </div>
-                                    <span className="text-[10px] bg-white/5 border border-white/10 px-3 py-1 rounded-full text-white/40 font-bold uppercase tracking-widest">
+                                    <span className="text-[10px] bg-slate-50 border border-slate-200 px-3 py-1 rounded-full text-slate-600 font-bold uppercase tracking-widest">
                                         {coupons.filter(c => !c.userId).length} Activos
                                     </span>
                                 </div>
 
-                                <div className="bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden">
+                                <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden">
                                     <div className="overflow-x-auto">
                                         <table className="w-full text-left border-collapse">
                                             <thead>
-                                                <tr className="border-b border-white/5 bg-white/[0.02]">
-                                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Código</th>
-                                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Descuento</th>
-                                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Condiciones</th>
-                                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Usos</th>
-                                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Expira</th>
-                                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium text-right">Acciones</th>
+                                                <tr className="border-b border-slate-200 bg-slate-50">
+                                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Código</th>
+                                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Descuento</th>
+                                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Condiciones</th>
+                                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Usos</th>
+                                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Expira</th>
+                                                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium text-right">Acciones</th>
                                                 </tr>
                                             </thead>
-                                            <tbody className="divide-y divide-white/5">
+                                            <tbody className="divide-y divide-slate-200">
                                                 {isLoadingCoupons ? (
                                                     <tr>
-                                                        <td colSpan={6} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
+                                                        <td colSpan={6} className="px-6 py-12 text-center text-slate-500 text-[11px] uppercase tracking-widest">
                                                             Cargando cupones...
                                                         </td>
                                                     </tr>
                                                 ) : coupons.filter(c => !c.userId).length === 0 ? (
                                                     <tr>
-                                                        <td colSpan={6} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
+                                                        <td colSpan={6} className="px-6 py-12 text-center text-slate-500 text-[11px] uppercase tracking-widest">
                                                             No hay cupones de campaña.
                                                         </td>
                                                     </tr>
                                                 ) : coupons.filter(c => !c.userId).map((c) => (
-                                                    <tr key={c.id} className={`hover:bg-white/[0.02] transition-colors group ${!c.isActive ? 'opacity-50 grayscale' : ''}`}>
+                                                    <tr key={c.id} className={`hover:bg-slate-50 transition-colors group ${!c.isActive ? 'opacity-50 grayscale' : ''}`}>
                                                         <td className="px-6 py-4">
                                                             <span className="text-[13px] font-bold text-primary font-mono bg-primary/10 px-2 py-1 rounded">
                                                                 {c.code}
                                                             </span>
-                                                            {!c.isActive && <span className="ml-2 text-[9px] text-red-400 border border-red-400/20 px-1.5 py-0.5 rounded uppercase font-bold tracking-widest">Inactivo</span>}
+                                                            {!c.isActive && <span className="ml-2 text-[9px] text-red-700 border border-red-400/20 px-1.5 py-0.5 rounded uppercase font-bold tracking-widest">Inactivo</span>}
                                                         </td>
-                                                        <td className="px-6 py-4 text-[13px] text-white">
+                                                        <td className="px-6 py-4 text-[13px] text-slate-900">
                                                             {c.discountType === 'PERCENTAGE' ? `${c.discountValue}% OFF` : c.discountType === 'FREE_SHIPPING' ? 'Envío gratis' : `$${c.discountValue.toLocaleString('es-AR')} OFF`}
                                                         </td>
-                                                        <td className="px-6 py-4 text-[11px] text-white/60 space-y-0.5">
+                                                        <td className="px-6 py-4 text-[11px] text-slate-600 space-y-0.5">
                                                             {c.minPurchaseAmount ? <div>Mín. ${c.minPurchaseAmount.toLocaleString('es-AR')}</div> : null}
                                                             {c.usageLimitPerUser ? <div>Máx. {c.usageLimitPerUser} por usuario</div> : null}
-                                                            {!c.minPurchaseAmount && !c.usageLimitPerUser && <span className="text-white/20">—</span>}
+                                                            {!c.minPurchaseAmount && !c.usageLimitPerUser && <span className="text-slate-500">—</span>}
                                                         </td>
-                                                        <td className="px-6 py-4 text-[11px] text-white/60">
-                                                            <span className={c.usageLimit && c.usageCount >= c.usageLimit ? "text-red-400" : ""}>
+                                                        <td className="px-6 py-4 text-[11px] text-slate-600">
+                                                            <span className={c.usageLimit && c.usageCount >= c.usageLimit ? "text-red-700" : ""}>
                                                                 {c.usageCount}{c.usageLimit ? `/${c.usageLimit}` : ""}
                                                             </span>
                                                         </td>
                                                         <td className="px-6 py-4 text-[11px]">
                                                             {c.expiresAt ? (
-                                                                <span className={new Date(c.expiresAt) < new Date() ? "text-red-400" : "text-white/60"}>
+                                                                <span className={new Date(c.expiresAt) < new Date() ? "text-red-700" : "text-slate-600"}>
                                                                     {new Date(c.expiresAt).toLocaleDateString('es-AR')}
                                                                 </span>
-                                                            ) : <span className="text-white/20">—</span>}
+                                                            ) : <span className="text-slate-500">—</span>}
                                                         </td>
                                                         <td className="px-6 py-4">
                                                             <div className="flex items-center justify-end gap-3 transition-opacity">
@@ -1150,13 +1150,13 @@ export default function MarketingPage() {
                                                                     <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-2 duration-300">
                                                                         <button
                                                                             onClick={() => confirmDeleteCoupon(c.id)}
-                                                                            className="text-[10px] bg-red-500/20 text-red-500 border border-red-500/30 px-2 py-1 rounded hover:bg-red-500 hover:text-white transition-all font-bold uppercase tracking-tight"
+                                                                            className="text-[10px] bg-red-500/20 text-red-500 border border-red-500/30 px-2 py-1 rounded hover:bg-red-500 hover:text-slate-900 transition-all font-bold uppercase tracking-tight"
                                                                         >
                                                                             Borrar
                                                                         </button>
                                                                         <button
                                                                             onClick={() => setConfirmDeleteId(null)}
-                                                                            className="text-[10px] text-white/40 hover:text-white transition-colors uppercase font-medium"
+                                                                            className="text-[10px] text-slate-600 hover:text-slate-900 transition-colors uppercase font-medium"
                                                                         >
                                                                             No
                                                                         </button>
@@ -1166,14 +1166,14 @@ export default function MarketingPage() {
                                                                         <button
                                                                             onClick={() => handleToggleCoupon(c.id, c.isActive)}
                                                                             title={c.isActive ? "Desactivar" : "Activar"}
-                                                                            className="text-white/40 hover:text-white"
+                                                                            className="text-slate-600 hover:text-slate-900"
                                                                         >
                                                                             {c.isActive ? <XCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
                                                                         </button>
                                                                         <button
                                                                             onClick={() => handleDeleteClick(c.id)}
                                                                             title="Eliminar"
-                                                                            className="text-red-400/60 hover:text-red-400"
+                                                                            className="text-red-700/60 hover:text-red-700"
                                                                         >
                                                                             <Trash2 className="h-4 w-4" />
                                                                         </button>
@@ -1198,39 +1198,39 @@ export default function MarketingPage() {
                     <div className="space-y-6">
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-2">
                             <div>
-                                <h2 className="text-white font-medium tracking-tight text-lg">Canjes de Usuarios</h2>
-                                <p className="text-[11px] text-white/40 uppercase tracking-widest">Cupones generados automáticamente por el sistema de puntos</p>
+                                <h2 className="text-slate-900 font-medium tracking-tight text-lg">Canjes de Usuarios</h2>
+                                <p className="text-[11px] text-slate-600 uppercase tracking-widest">Cupones generados automáticamente por el sistema de puntos</p>
                             </div>
 
                             <div className="relative w-full md:w-80">
-                                <Tag className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
+                                <Tag className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                                 <input
                                     type="text"
                                     placeholder="Buscar por usuario, email o código..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-11 pr-4 text-[13px] text-white focus:outline-none focus:border-primary transition-all placeholder:text-white/20"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 pl-11 pr-4 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-all placeholder:text-slate-500"
                                 />
                             </div>
                         </div>
 
-                        <div className="bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
+                        <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-2xl">
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
                                     <thead>
-                                        <tr className="border-b border-white/5 bg-white/[0.02]">
-                                            <th className="px-6 py-5 text-[10px] uppercase tracking-widest text-white/40 font-medium">Socio / Usuario</th>
-                                            <th className="px-6 py-5 text-[10px] uppercase tracking-widest text-white/40 font-medium">Código</th>
-                                            <th className="px-6 py-5 text-[10px] uppercase tracking-widest text-white/40 font-medium">Beneficio</th>
-                                            <th className="px-6 py-5 text-[10px] uppercase tracking-widest text-white/40 font-medium">Fecha</th>
-                                            <th className="px-6 py-5 text-[10px] uppercase tracking-widest text-white/40 font-medium">Estado</th>
-                                            <th className="px-6 py-5 text-[10px] uppercase tracking-widest text-white/40 font-medium text-right">Acciones</th>
+                                        <tr className="border-b border-slate-200 bg-slate-50">
+                                            <th className="px-6 py-5 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Socio / Usuario</th>
+                                            <th className="px-6 py-5 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Código</th>
+                                            <th className="px-6 py-5 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Beneficio</th>
+                                            <th className="px-6 py-5 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Fecha</th>
+                                            <th className="px-6 py-5 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Estado</th>
+                                            <th className="px-6 py-5 text-[10px] uppercase tracking-widest text-slate-600 font-medium text-right">Acciones</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-white/5">
+                                    <tbody className="divide-y divide-slate-200">
                                         {isLoadingCoupons ? (
                                             <tr>
-                                                <td colSpan={6} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
+                                                <td colSpan={6} className="px-6 py-12 text-center text-slate-500 text-[11px] uppercase tracking-widest">
                                                     Cargando historial de canjes...
                                                 </td>
                                             </tr>
@@ -1244,7 +1244,7 @@ export default function MarketingPage() {
                                             );
                                         }).length === 0 ? (
                                             <tr>
-                                                <td colSpan={6} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
+                                                <td colSpan={6} className="px-6 py-12 text-center text-slate-500 text-[11px] uppercase tracking-widest">
                                                     {searchQuery ? "No se encontraron canjes para tu búsqueda." : "Aún no hay canjes registrados."}
                                                 </td>
                                             </tr>
@@ -1257,11 +1257,11 @@ export default function MarketingPage() {
                                                 c.code.toLowerCase().includes(query)
                                             );
                                         }).map((c) => (
-                                            <tr key={c.id} className="hover:bg-white/[0.04] transition-all group">
+                                            <tr key={c.id} className="hover:bg-slate-50 transition-all group">
                                                 <td className="px-6 py-4">
                                                     <div className="flex flex-col">
-                                                        <span className="text-[13px] font-medium text-white">{c.user?.name || "Usuario Desconocido"}</span>
-                                                        <span className="text-[11px] text-white/40">{c.user?.email || "Sin email"}</span>
+                                                        <span className="text-[13px] font-medium text-slate-900">{c.user?.name || "Usuario Desconocido"}</span>
+                                                        <span className="text-[11px] text-slate-600">{c.user?.email || "Sin email"}</span>
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4">
@@ -1269,16 +1269,16 @@ export default function MarketingPage() {
                                                         {c.code}
                                                     </code>
                                                 </td>
-                                                <td className="px-6 py-4 text-[13px] text-white">
+                                                <td className="px-6 py-4 text-[13px] text-slate-900">
                                                     {c.discountType === 'PERCENTAGE' ? `${c.discountValue}% OFF` : `$${c.discountValue.toLocaleString('es-AR')} OFF`}
                                                 </td>
-                                                <td className="px-6 py-4 text-[11px] text-white/40">
+                                                <td className="px-6 py-4 text-[11px] text-slate-600">
                                                     {new Date(c.createdAt).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <span className={`inline-flex px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest ${c.isActive
-                                                        ? 'bg-green-500/10 text-green-400 border border-green-500/20'
-                                                        : 'bg-red-500/10 text-red-400 border border-red-500/20 opacity-50'
+                                                        ? 'bg-green-500/10 text-green-700 border border-green-500/20'
+                                                        : 'bg-red-500/10 text-red-700 border border-red-500/20 opacity-50'
                                                         }`}>
                                                         {c.isActive ? 'Disponible' : 'Utilizado'}
                                                     </span>
@@ -1287,12 +1287,12 @@ export default function MarketingPage() {
                                                     {confirmDeleteId === c.id ? (
                                                         <div className="flex items-center justify-end gap-2">
                                                             <button onClick={() => confirmDeleteCoupon(c.id)} className="text-[9px] bg-red-500 text-white px-2 py-1 rounded font-bold uppercase">Borrar</button>
-                                                            <button onClick={() => setConfirmDeleteId(null)} className="text-[9px] text-white/40 uppercase">No</button>
+                                                            <button onClick={() => setConfirmDeleteId(null)} className="text-[9px] text-slate-600 uppercase">No</button>
                                                         </div>
                                                     ) : (
                                                         <button
                                                             onClick={() => setConfirmDeleteId(c.id)}
-                                                            className="text-white/20 hover:text-red-400 transition-colors"
+                                                            className="text-slate-500 hover:text-red-700 transition-colors"
                                                             title="Eliminar canje"
                                                         >
                                                             <Trash2 className="h-4 w-4" />
@@ -1317,25 +1317,25 @@ export default function MarketingPage() {
                             const isSaved = lastSavedPopup === loc;
 
                             return (
-                                <div key={loc} className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 space-y-6 relative group transition-all duration-500 hover:border-white/10">
+                                <div key={loc} className="bg-white border border-slate-200 rounded-3xl p-8 space-y-6 relative group transition-all duration-500 hover:border-slate-200">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-3">
                                             <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
                                                 <Monitor className="h-5 w-5 text-primary" />
                                             </div>
                                             <div>
-                                                <h3 className="text-white font-medium tracking-tight">Pop-up {loc === 'HOME' ? 'Inicio' : 'Tienda'}</h3>
-                                                <p className="text-[11px] text-white/40 uppercase tracking-widest">Configuración visual</p>
+                                                <h3 className="text-slate-900 font-medium tracking-tight">Pop-up {loc === 'HOME' ? 'Inicio' : 'Tienda'}</h3>
+                                                <p className="text-[11px] text-slate-600 uppercase tracking-widest">Configuración visual</p>
                                             </div>
                                         </div>
                                         {/* Status Switch for Popups */}
-                                        <div className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-2xl border border-white/5">
-                                            <span className={`text-[9px] font-bold uppercase tracking-widest ${popup.isActive ? 'text-primary' : 'text-white/20'}`}>
+                                        <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-200">
+                                            <span className={`text-[9px] font-bold uppercase tracking-widest ${popup.isActive ? 'text-primary' : 'text-slate-500'}`}>
                                                 {popup.isActive ? 'Activo' : 'Inactivo'}
                                             </span>
                                             <button
                                                 onClick={() => handleLocalPopupUpdate(loc, { isActive: !popup.isActive })}
-                                                className={`relative w-11 h-5 rounded-full transition-all duration-300 ${popup.isActive ? 'bg-primary' : 'bg-white/10'}`}
+                                                className={`relative w-11 h-5 rounded-full transition-all duration-300 ${popup.isActive ? 'bg-primary' : 'bg-slate-50'}`}
                                             >
                                                 <div className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-all duration-300 ${popup.isActive ? 'translate-x-6' : 'translate-x-0'}`} />
                                             </button>
@@ -1344,18 +1344,18 @@ export default function MarketingPage() {
 
                                     <div className="space-y-4">
                                         {/* Popup type selector */}
-                                        <div className="bg-black/20 rounded-2xl p-4 border border-white/5 space-y-3">
-                                            <label className="text-[11px] text-white/60 font-medium">Tipo de pop-up</label>
+                                        <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-3">
+                                            <label className="text-[11px] text-slate-600 font-medium">Tipo de pop-up</label>
                                             <div className="grid grid-cols-2 gap-2">
                                                 <button
                                                     onClick={() => handleLocalPopupUpdate(loc, { type: "IMAGE" })}
-                                                    className={`py-2 px-3 rounded-lg text-[10px] font-bold uppercase tracking-tight transition-all border ${popup.type !== 'NEWSLETTER' ? 'bg-primary/10 border-primary/40 text-primary' : 'bg-white/5 border-white/10 text-white/40 hover:text-white/60'}`}
+                                                    className={`py-2 px-3 rounded-lg text-[10px] font-bold uppercase tracking-tight transition-all border ${popup.type !== 'NEWSLETTER' ? 'bg-primary/10 border-primary/40 text-primary' : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-600'}`}
                                                 >
                                                     Imagen
                                                 </button>
                                                 <button
                                                     onClick={() => handleLocalPopupUpdate(loc, { type: "NEWSLETTER" })}
-                                                    className={`py-2 px-3 rounded-lg text-[10px] font-bold uppercase tracking-tight transition-all border ${popup.type === 'NEWSLETTER' ? 'bg-primary/10 border-primary/40 text-primary' : 'bg-white/5 border-white/10 text-white/40 hover:text-white/60'}`}
+                                                    className={`py-2 px-3 rounded-lg text-[10px] font-bold uppercase tracking-tight transition-all border ${popup.type === 'NEWSLETTER' ? 'bg-primary/10 border-primary/40 text-primary' : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-600'}`}
                                                 >
                                                     Newsletter
                                                 </button>
@@ -1364,38 +1364,38 @@ export default function MarketingPage() {
 
                                         {/* Newsletter texts */}
                                         {popup.type === 'NEWSLETTER' && (
-                                            <div className="bg-black/20 rounded-2xl p-4 border border-white/5 space-y-3">
+                                            <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-3">
                                                 <div className="space-y-1.5">
-                                                    <label className="text-[11px] text-white/60 font-medium">Título</label>
+                                                    <label className="text-[11px] text-slate-600 font-medium">Título</label>
                                                     <input
                                                         type="text"
                                                         value={popup.title || ""}
                                                         onChange={(e) => handleLocalPopupUpdate(loc, { title: e.target.value })}
                                                         placeholder="Suscribite a nuestro newsletter"
-                                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[13px] text-white focus:outline-none focus:border-primary transition-colors placeholder:text-white/20"
+                                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors placeholder:text-slate-500"
                                                     />
                                                 </div>
                                                 <div className="space-y-1.5">
-                                                    <label className="text-[11px] text-white/60 font-medium">Descripción</label>
+                                                    <label className="text-[11px] text-slate-600 font-medium">Descripción</label>
                                                     <textarea
                                                         rows={2}
                                                         value={popup.description || ""}
                                                         onChange={(e) => handleLocalPopupUpdate(loc, { description: e.target.value })}
                                                         placeholder="Enterate primero de nuestras novedades y promociones."
-                                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[13px] text-white focus:outline-none focus:border-primary transition-colors resize-none placeholder:text-white/20"
+                                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors resize-none placeholder:text-slate-500"
                                                     />
                                                 </div>
                                             </div>
                                         )}
 
-                                        <div className="bg-black/20 rounded-2xl p-4 border border-white/5">
+                                        <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200">
                                             <div className="flex items-center justify-between mb-4">
-                                                <span className="text-[11px] text-white/60 font-medium">{popup.type === 'NEWSLETTER' ? 'Imagen (opcional)' : 'Imagen del Pop-up'}</span>
+                                                <span className="text-[11px] text-slate-600 font-medium">{popup.type === 'NEWSLETTER' ? 'Imagen (opcional)' : 'Imagen del Pop-up'}</span>
                                                 <span className="text-[10px] text-primary/60 font-mono italic">Tamaño flexible</span>
                                             </div>
 
                                             {popup.imageUrl ? (
-                                                <div className="relative min-h-[200px] max-h-[400px] w-full rounded-xl overflow-hidden border border-white/10 group mb-4 bg-black/40 flex items-center justify-center">
+                                                <div className="relative min-h-[200px] max-h-[400px] w-full rounded-xl overflow-hidden border border-slate-200 group mb-4 bg-black/40 flex items-center justify-center">
                                                     <img src={popup.imageUrl} alt="Popup Preview" className="max-w-full max-h-[400px] object-contain" />
                                                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
                                                         <input
@@ -1416,14 +1416,14 @@ export default function MarketingPage() {
                                                         />
                                                         <button
                                                             onClick={() => document.getElementById(`file-${loc}`)?.click()}
-                                                            className="p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all backdrop-blur-md"
+                                                            className="p-3 bg-slate-50 hover:bg-slate-50 rounded-full text-slate-900 transition-all backdrop-blur-md"
                                                         >
                                                             <Edit2 className="h-5 w-5" />
                                                         </button>
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <div className="aspect-[4/5] w-full rounded-xl border-2 border-dashed border-white/10 flex flex-col items-center justify-center gap-3 hover:bg-white/[0.02] transition-all cursor-pointer group"
+                                                <div className="aspect-[4/5] w-full rounded-xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-3 hover:bg-slate-50 transition-all cursor-pointer group"
                                                     onClick={() => document.getElementById(`file-${loc}`)?.click()}>
                                                     <input
                                                         type="file"
@@ -1441,26 +1441,26 @@ export default function MarketingPage() {
                                                             }
                                                         }}
                                                     />
-                                                    <div className="h-12 w-12 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                                        <ImageIcon className="h-6 w-6 text-white/20" />
+                                                    <div className="h-12 w-12 rounded-full bg-slate-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                        <ImageIcon className="h-6 w-6 text-slate-500" />
                                                     </div>
-                                                    <p className="text-[12px] text-white/40">Subir imagen</p>
+                                                    <p className="text-[12px] text-slate-600">Subir imagen</p>
                                                 </div>
                                             )}
                                         </div>
 
-                                        <div className="bg-black/20 rounded-2xl p-4 border border-white/5 space-y-3">
-                                            <label className="text-[11px] text-white/60 font-medium">Frecuencia de aparición</label>
+                                        <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-3">
+                                            <label className="text-[11px] text-slate-600 font-medium">Frecuencia de aparición</label>
                                             <div className="grid grid-cols-2 gap-2">
                                                 <button
                                                     onClick={() => handleLocalPopupUpdate(loc, { displayFrequency: "SESSION" })}
-                                                    className={`py-2 px-3 rounded-lg text-[10px] font-bold uppercase tracking-tight transition-all border ${popup.displayFrequency === 'SESSION' ? 'bg-primary/10 border-primary/40 text-primary' : 'bg-white/5 border-white/10 text-white/40 hover:text-white/60'}`}
+                                                    className={`py-2 px-3 rounded-lg text-[10px] font-bold uppercase tracking-tight transition-all border ${popup.displayFrequency === 'SESSION' ? 'bg-primary/10 border-primary/40 text-primary' : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-600'}`}
                                                 >
                                                     Una vez por sesión
                                                 </button>
                                                 <button
                                                     onClick={() => handleLocalPopupUpdate(loc, { displayFrequency: "ALWAYS" })}
-                                                    className={`py-2 px-3 rounded-lg text-[10px] font-bold uppercase tracking-tight transition-all border ${popup.displayFrequency === 'ALWAYS' ? 'bg-primary/10 border-primary/40 text-primary' : 'bg-white/5 border-white/10 text-white/40 hover:text-white/60'}`}
+                                                    className={`py-2 px-3 rounded-lg text-[10px] font-bold uppercase tracking-tight transition-all border ${popup.displayFrequency === 'ALWAYS' ? 'bg-primary/10 border-primary/40 text-primary' : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-600'}`}
                                                 >
                                                     Siempre que ingresen
                                                 </button>
@@ -1481,10 +1481,10 @@ export default function MarketingPage() {
                                             isSavingPopup === loc 
                                                 ? 'bg-primary/20 text-primary border border-primary/20' 
                                                 : isSaved
-                                                    ? 'bg-green-500/10 text-green-400 border border-green-500/20'
+                                                    ? 'bg-green-500/10 text-green-700 border border-green-500/20'
                                                     : hasChanges
                                                         ? 'bg-primary hover:bg-primary-dark border border-primary text-white shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)]'
-                                                        : 'bg-white/5 border border-white/10 text-white/20'
+                                                        : 'bg-slate-50 border border-slate-200 text-slate-500'
                                         }`}
                                     >
                                         {isSavingPopup === loc ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
@@ -1510,11 +1510,11 @@ export default function MarketingPage() {
                         }`}>
                         {toast.type === 'success' ? (
                             <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
-                                <CheckCircle2 className="h-5 w-5 text-green-400" />
+                                <CheckCircle2 className="h-5 w-5 text-green-700" />
                             </div>
                         ) : (
                             <div className="h-8 w-8 rounded-full bg-red-500/20 flex items-center justify-center">
-                                <XCircle className="h-5 w-5 text-red-400" />
+                                <XCircle className="h-5 w-5 text-red-700" />
                             </div>
                         )}
                         <div>
@@ -1530,13 +1530,13 @@ export default function MarketingPage() {
             {/* CUSTOM CONFIRMATION MODAL */}
             {showConfirmModal && (
                 <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-[#0c120e] border border-white/10 rounded-[32px] p-8 max-w-md w-full shadow-2xl animate-in zoom-in-95 duration-300 space-y-6">
+                    <div className="bg-white border border-slate-200 rounded-[32px] p-8 max-w-md w-full shadow-2xl animate-in zoom-in-95 duration-300 space-y-6">
                         <div className="h-16 w-16 bg-primary/20 rounded-2xl flex items-center justify-center mx-auto mb-2">
                             <Send className="h-8 w-8 text-primary" />
                         </div>
                         <div className="text-center space-y-2">
-                            <h3 className="text-xl font-medium text-white tracking-tight">¿Lanzamos la campaña?</h3>
-                            <p className="text-white/40 text-[13px] leading-relaxed">
+                            <h3 className="text-xl font-medium text-slate-900 tracking-tight">¿Lanzamos la campaña?</h3>
+                            <p className="text-slate-600 text-[13px] leading-relaxed">
                                 Estás por enviar este correo a <span className="text-primary font-bold">
                                     {emailForm.audience === 'CUSTOM_LIST' 
                                         ? ((emailForm as any).customEmails || []).length 
@@ -1553,7 +1553,7 @@ export default function MarketingPage() {
                             </button>
                             <button
                                 onClick={() => setShowConfirmModal(false)}
-                                className="w-full bg-white/5 hover:bg-white/10 text-white/40 py-4 rounded-2xl text-[13px] font-bold uppercase tracking-widest transition-all"
+                                className="w-full bg-slate-50 hover:bg-slate-50 text-slate-600 py-4 rounded-2xl text-[13px] font-bold uppercase tracking-widest transition-all"
                             >
                                 No, revisar de nuevo
                             </button>

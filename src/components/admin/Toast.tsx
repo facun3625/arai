@@ -23,10 +23,10 @@ export default function Toast({ message, type, onClose }: ToastProps) {
 
     const getBgStyle = () => {
         switch (type) {
-            case "success": return "bg-[#0c120e] border-green-500/20";
-            case "error": return "bg-[#0c120e] border-red-500/20";
-            case "warning": return "bg-[#0c120e] border-yellow-500/20";
-            default: return "bg-[#0c120e] border-blue-500/20";
+            case "success": return "bg-white border-green-500/20";
+            case "error": return "bg-white border-red-500/20";
+            case "warning": return "bg-white border-yellow-500/20";
+            default: return "bg-white border-blue-500/20";
         }
     };
 
@@ -39,13 +39,13 @@ export default function Toast({ message, type, onClose }: ToastProps) {
         >
             <div className="flex items-center gap-3">
                 {getIcon()}
-                <span className="text-[11px] font-bold uppercase tracking-widest text-white/90">
+                <span className="text-[11px] font-bold uppercase tracking-widest text-slate-900">
                     {message}
                 </span>
             </div>
             <button 
                 onClick={onClose}
-                className="ml-4 p-1 hover:bg-white/5 rounded-full text-white/20 hover:text-white transition-all"
+                className="ml-4 p-1 hover:bg-slate-50 rounded-full text-slate-500 hover:text-slate-900 transition-all"
             >
                 <X className="h-3 w-3" />
             </button>

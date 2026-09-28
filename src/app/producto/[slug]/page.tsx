@@ -1,3 +1,4 @@
+import { productDescriptionText } from "@/lib/productRichText";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import ProductDetailClient from "./ProductDetailClient";
@@ -25,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
     const image = getFirstImage(product);
     const description = product.description
-        ? product.description.slice(0, 160)
+        ? productDescriptionText(product.description).slice(0, 160)
         : `Comprá ${product.name} - Araí Yerba Mate. Envío a todo el país.`;
 
     return {
@@ -56,7 +57,7 @@ export default async function ProductoDetallePage({ params }: { params: Promise<
         "@context": "https://schema.org",
         "@type": "Product",
         name: product.name,
-        description: product.description || undefined,
+        description: product.description ? productDescriptionText(product.description) : undefined,
         image: getFirstImage(product) || undefined,
         offers: {
             "@type": "Offer",
@@ -80,7 +81,7 @@ export default async function ProductoDetallePage({ params }: { params: Promise<
             {jsonLd && (
                 <script
                     type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
                 />
             )}
             <ProductDetailClient />

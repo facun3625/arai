@@ -1,5 +1,7 @@
 "use client";
 
+import { ProductDescription } from "@/components/product/ProductDescription";
+
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
@@ -326,9 +328,9 @@ export default function ProductDetailClient() {
 
     return (
         <div className="bg-white min-h-screen font-montserrat">
-            <div className="max-w-7xl mx-auto px-4 md:px-8 pt-6 pb-16">
+            <div className="max-w-6xl mx-auto px-4 md:px-8 pt-6 pb-16">
                 {/* Breadcrumbs */}
-                <nav className="mb-12 flex items-center gap-3 text-[10px] xl:text-[11px] font-normal text-gray-500">
+                <nav className="mb-8 flex items-center gap-3 text-[10px] xl:text-[11px] font-normal text-gray-500">
                     <Link href="/" className="hover:text-primary transition-colors capitalize">Inicio</Link>
                     <span className="text-gray-200">/</span>
                     <Link href="/tienda" className="hover:text-primary transition-colors capitalize">Tienda</Link>
@@ -336,15 +338,15 @@ export default function ProductDetailClient() {
                     <span className="text-gray-900 font-medium capitalize">{product.name}</span>
                 </nav>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-start">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-x-12 lg:gap-y-10 items-start">
                     {/* Left Column: Gallery */}
-                    <div className="lg:col-span-5 space-y-8">
+                    <div className="lg:col-span-5 space-y-4 w-full max-w-[360px] mx-auto lg:mx-0">
                         <div className="relative aspect-square bg-[#fcfcfc] rounded-[32px] overflow-hidden group border border-gray-100/50">
                             {activeImage ? (
                                 <img
                                     src={activeImage}
                                     alt={product.name}
-                                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                                    className="w-full h-full object-contain p-3 transition-transform duration-1000 group-hover:scale-105"
                                 />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center text-gray-200 uppercase tracking-widest text-[10px] font-bold">
@@ -360,7 +362,7 @@ export default function ProductDetailClient() {
                         </div>
 
                         {uniqueImages.length > 1 && (
-                            <div className="grid grid-cols-5 gap-5 px-2">
+                            <div className="grid grid-cols-5 gap-3 px-1">
                                 {uniqueImages.map((img, idx) => (
                                     <button
                                         key={idx}
@@ -375,10 +377,10 @@ export default function ProductDetailClient() {
                     </div>
 
                     {/* Right Column: Info */}
-                    <div className="lg:col-span-7 flex flex-col space-y-10 py-2">
+                    <div className="lg:col-span-7 min-w-0 flex flex-col space-y-6 py-2">
                         {/* Header Info */}
                         <div className="space-y-6">
-                            <h1 className="text-3xl md:text-4xl lg:text-5xl font-light text-gray-900 leading-tight tracking-tight capitalize">
+                            <h1 className="text-2xl md:text-3xl font-light text-gray-900 leading-tight tracking-tight capitalize">
                                 {product.name}
                             </h1>
 
@@ -403,11 +405,11 @@ export default function ProductDetailClient() {
                                 )}
                             </div>
 
-                            <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-8 py-2">
-                                <div className="flex items-baseline gap-3 min-w-[140px] md:min-w-[180px]">
-                                    <span className="text-4xl font-light text-gray-900 tracking-tighter">$ {(basePrice * quantity).toLocaleString('es-AR')}</span>
+                            <div className="flex flex-wrap items-center gap-4 py-2">
+                                <div className="flex items-baseline gap-3 ">
+                                    <span className="text-2xl md:text-3xl font-light text-gray-900 tracking-tight">$ {(basePrice * quantity).toLocaleString('es-AR')}</span>
                                     {compareAtPrice > basePrice && (
-                                        <span className="text-[17px] text-gray-400 line-through font-light">$ {(compareAtPrice * quantity).toLocaleString('es-AR')}</span>
+                                        <span className="text-sm text-gray-400 line-through font-light">$ {(compareAtPrice * quantity).toLocaleString('es-AR')}</span>
                                     )}
                                 </div>
 
@@ -636,13 +638,14 @@ export default function ProductDetailClient() {
                             );
                         })()}
 
-                        {/* Description (Text) at the bottom */}
+                    </div>
+
+                    <div className="lg:col-span-12 min-w-0 space-y-10">
                         {(product.description || product.content) && (
-                            <div className="pt-6">
-                                <p className="text-gray-600 text-[15px] leading-relaxed font-light max-w-lg">
-                                    {product.description || product.content}
-                                </p>
-                            </div>
+                            <section aria-labelledby="product-description-heading" className="border-t border-gray-200 pt-8">
+                                <h2 id="product-description-heading" className="mb-5 text-lg font-medium text-gray-900">Descripción del producto</h2>
+                                <ProductDescription value={product.description || product.content} />
+                            </section>
                         )}
 
                         {/* Reviews */}

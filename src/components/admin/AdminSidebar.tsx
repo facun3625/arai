@@ -155,7 +155,7 @@ export const AdminSidebar = ({ mobileOpen = false, onClose }: { mobileOpen?: boo
                     className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] lg:hidden"
                 />
             )}
-            <aside className={`fixed lg:sticky top-0 left-0 h-[100dvh] z-[70] lg:z-auto w-64 bg-[#0c120e] text-white/90 flex flex-col border-r border-white/5 font-montserrat transform transition-transform duration-300 lg:translate-x-0 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <aside className={`fixed lg:sticky top-0 left-0 h-[100dvh] z-[70] lg:z-auto w-64 bg-white text-slate-900 flex flex-col border-r border-slate-200 font-montserrat transform transition-transform duration-300 lg:translate-x-0 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
             {/* Navigation */}
             <nav className="flex-1 p-4 space-y-1 mt-8 overflow-y-auto">
                 {menuItems.map((node, i) => {
@@ -168,11 +168,11 @@ export const AdminSidebar = ({ mobileOpen = false, onClose }: { mobileOpen?: boo
                             <div key={i} className="pt-1 pb-1">
                                 <button
                                     onClick={() => toggleGroup(node.title)}
-                                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-[11px] transition-all group cursor-pointer ${isAnyChildActive ? "bg-white/5 text-white" : "hover:bg-white/5 text-white/60 hover:text-white"
+                                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-[11px] transition-all group cursor-pointer ${isAnyChildActive ? "bg-slate-50 text-slate-900" : "hover:bg-slate-50 text-slate-600 hover:text-slate-900"
                                         }`}
                                 >
                                     <div className="flex items-center gap-3">
-                                        <GroupIcon className={`h-4 w-4 ${isAnyChildActive ? "text-white" : "text-primary group-hover:text-white transition-colors"}`} />
+                                        <GroupIcon className={`h-4 w-4 ${isAnyChildActive ? "text-slate-900" : "text-primary group-hover:text-slate-900 transition-colors"}`} />
                                         <span className="capitalize">{node.title}</span>
                                     </div>
                                     <ChevronDown className={`h-4 w-4 transition-all duration-300 ${isOpen ? 'rotate-180' : ''}`} />
@@ -189,10 +189,10 @@ export const AdminSidebar = ({ mobileOpen = false, onClose }: { mobileOpen?: boo
                                                 onClick={onClose}
                                                 className={`flex items-center gap-3 pl-11 pr-4 py-2.5 rounded-xl text-[10.5px] transition-all group ${isActive
                                                     ? "bg-primary/20 text-primary font-medium"
-                                                    : "hover:bg-white/5 text-white/50 hover:text-white"
+                                                    : "hover:bg-slate-50 text-slate-600 hover:text-slate-900"
                                                     }`}
                                             >
-                                                <Icon className={`h-3.5 w-3.5 ${isActive ? "text-primary" : "text-white/40 group-hover:text-white transition-colors"}`} />
+                                                <Icon className={`h-3.5 w-3.5 ${isActive ? "text-primary" : "text-slate-600 group-hover:text-slate-900 transition-colors"}`} />
                                                 <span className="capitalize">{item.name}</span>
                                             </Link>
                                         );
@@ -215,11 +215,11 @@ export const AdminSidebar = ({ mobileOpen = false, onClose }: { mobileOpen?: boo
                             onClick={onClose}
                             className={`flex items-center justify-between px-4 py-3 rounded-xl text-[11px] transition-all group ${isActive
                                 ? "bg-primary text-white shadow-lg shadow-primary/20"
-                                : "hover:bg-white/5 text-white/60 hover:text-white"
+                                : "hover:bg-slate-50 text-slate-600 hover:text-slate-900"
                                 }`}
                         >
                             <div className="flex items-center gap-3">
-                                <Icon className={`h-4 w-4 ${isActive ? "text-white" : "text-primary group-hover:text-white transition-colors"}`} />
+                                <Icon className={`h-4 w-4 ${isActive ? "text-white" : "text-primary group-hover:text-slate-900 transition-colors"}`} />
                                 <span className="capitalize">{item.name}</span>
                             </div>
 
@@ -248,20 +248,20 @@ export const AdminSidebar = ({ mobileOpen = false, onClose }: { mobileOpen?: boo
             </nav>
 
             {/* User Area */}
-            <div className="p-4 border-t border-white/5 space-y-2">
+            <div className="p-4 border-t border-slate-200 space-y-2">
                 <div className="flex items-center gap-3 px-4 py-3">
-                    <div className="bg-white/10 p-2 rounded-full border border-white/10">
-                        <User className="h-4 w-4 text-white" />
+                    <div className="bg-slate-50 p-2 rounded-full border border-slate-200">
+                        <User className="h-4 w-4 text-slate-900" />
                     </div>
                     <div className="overflow-hidden">
-                        <p className="text-[11px] font-medium text-white truncate">{user?.name}</p>
-                        <p className="text-[9px] text-white/40 uppercase tracking-tighter">administrador</p>
+                        <p className="text-[11px] font-medium text-slate-900 truncate">{user?.name}</p>
+                        <p className="text-[9px] text-slate-600 uppercase tracking-tighter">administrador</p>
                     </div>
                 </div>
 
                 <Link
                     href="/"
-                    className="flex items-center gap-3 px-4 py-2 text-[10px] text-white/60 hover:text-white transition-colors"
+                    className="flex items-center gap-3 px-4 py-2 text-[10px] text-slate-600 hover:text-slate-900 transition-colors"
                 >
                     <ArrowLeft className="h-3.5 w-3.5" />
                     volver a la tienda
@@ -269,7 +269,7 @@ export const AdminSidebar = ({ mobileOpen = false, onClose }: { mobileOpen?: boo
 
                 <button
                     onClick={() => logout()}
-                    className="w-full flex items-center gap-3 px-4 py-2 text-[10px] text-red-400/60 hover:text-red-400 hover:bg-red-400/5 rounded-lg transition-all"
+                    className="w-full flex items-center gap-3 px-4 py-2 text-[10px] text-red-700/60 hover:text-red-700 hover:bg-red-400/5 rounded-lg transition-all"
                 >
                     <LogOut className="h-3.5 w-3.5" />
                     cerrar sesión

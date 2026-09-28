@@ -45,7 +45,7 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
 
     if (isChecking) {
         return (
-            <div className="h-screen w-screen flex items-center justify-center bg-[#0c120e] text-white">
+            <div className="h-screen w-screen flex items-center justify-center bg-white text-slate-900">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
         );
@@ -53,28 +53,28 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
 
     return (
         <AdminUtilsProvider>
-            <div className="flex min-h-screen bg-[#050806]">
+            <div className="admin-day flex min-h-screen bg-slate-50 text-slate-900">
                 <AdminSidebar mobileOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
                 <div className="flex-1 flex flex-col min-w-0">
                     {/* Mobile top bar with menu toggle */}
-                    <div className="lg:hidden sticky top-0 z-50 flex items-center gap-3 bg-[#0c120e] border-b border-white/5 px-4 py-3">
+                    <div className="lg:hidden sticky top-0 z-50 flex items-center gap-3 bg-white border-b border-slate-200 px-4 py-3">
                         <button
                             onClick={() => setIsSidebarOpen(true)}
                             aria-label="Abrir menú"
-                            className="text-white p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+                            className="text-slate-900 p-1.5 hover:bg-slate-50 rounded-lg transition-colors"
                         >
                             <Menu className="h-6 w-6" />
                         </button>
-                        <span className="text-white font-montserrat text-sm font-light tracking-tight">Panel Admin</span>
+                        <span className="text-slate-900 font-montserrat text-sm font-light tracking-tight">Panel Admin</span>
                     </div>
                     <main className="flex-1 overflow-y-auto min-h-screen">
-                        <div className="p-6 md:p-12 max-w-7xl mx-auto">
+                        <div className="w-full min-w-0 px-4 py-6 sm:px-6 lg:px-8">
                             {pathname !== "/admin/dashboard" && (
                                 <button
                                     onClick={handleBack}
-                                    className="flex items-center gap-2 text-white/40 hover:text-white text-[11px] uppercase tracking-widest mb-8 transition-colors group"
+                                    className="flex items-center gap-2 text-slate-600 hover:text-slate-900 text-[11px] uppercase tracking-widest mb-8 transition-colors group"
                                 >
-                                    <div className="bg-white/5 p-1.5 rounded-full group-hover:bg-white/10 transition-colors">
+                                    <div className="bg-slate-50 p-1.5 rounded-full group-hover:bg-slate-50 transition-colors">
                                         <ArrowLeft className="h-3 w-3" />
                                     </div>
                                     volver

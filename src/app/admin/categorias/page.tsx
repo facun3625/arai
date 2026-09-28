@@ -158,38 +158,38 @@ export default function CategoriasPage() {
         <div className="space-y-8 animate-in fade-in duration-700">
             <div className="flex items-center justify-between">
                 <div className="flex flex-col gap-1">
-                    <h1 className="text-2xl font-light text-white font-montserrat tracking-tight">categorías</h1>
-                    <p className="text-white/40 text-[11px] uppercase tracking-widest">organiza tus productos por grupos</p>
+                    <h1 className="text-2xl font-light text-slate-900 font-montserrat tracking-tight">categorías</h1>
+                    <p className="text-slate-600 text-[11px] uppercase tracking-widest">organiza tus productos por grupos</p>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Form */}
                 <div className="lg:col-span-1 space-y-6">
-                    <form onSubmit={handleSubmit} className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 space-y-4">
-                        <h2 className="text-[14px] text-white font-medium mb-4">
+                    <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-3xl p-6 space-y-4">
+                        <h2 className="text-[14px] text-slate-900 font-medium mb-4">
                             {editingId ? "Editar categoría" : "Añadir nueva categoría"}
                         </h2>
 
                         <div className="space-y-1.5">
-                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Nombre</label>
+                            <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Nombre</label>
                             <input
                                 type="text"
                                 value={formData.name}
                                 onChange={handleNameChange}
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors"
                                 placeholder="Ej: Yerba Mate"
                                 required
                             />
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Slug</label>
+                            <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Slug</label>
                             <input
                                 type="text"
                                 value={formData.slug}
                                 onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors disabled:opacity-50"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors disabled:opacity-50"
                                 placeholder="ej-yerba-mate"
                                 required
                                 disabled={formData.slug === "sin-categoria" && editingId !== null}
@@ -197,51 +197,51 @@ export default function CategoriasPage() {
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Categoría padre</label>
+                            <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Categoría padre</label>
                             <select
                                 value={formData.parentId}
                                 onChange={(e) => setFormData({ ...formData, parentId: e.target.value })}
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors"
                             >
-                                <option value="" className="bg-gray-900">Ninguna (categoría raíz)</option>
+                                <option value="" className="bg-white">Ninguna (categoría raíz)</option>
                                 {parentOptions.map(cat => (
-                                    <option key={cat.id} value={cat.id} className="bg-gray-900">{cat.name}</option>
+                                    <option key={cat.id} value={cat.id} className="bg-white">{cat.name}</option>
                                 ))}
                             </select>
-                            <p className="text-[9px] text-white/20 ml-1 italic">Opcional. Solo un nivel de jerarquía.</p>
+                            <p className="text-[9px] text-slate-500 ml-1 italic">Opcional. Solo un nivel de jerarquía.</p>
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Descripción</label>
+                            <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Descripción</label>
                             <textarea
                                 rows={3}
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors resize-none"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors resize-none"
                                 placeholder="Breve descripción de la categoría..."
                             />
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Imagen de categoría</label>
+                            <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Imagen de categoría</label>
                             <div className="space-y-3">
                                 {formData.image ? (
-                                    <div className="relative w-full h-32 rounded-xl overflow-hidden border border-white/10">
+                                    <div className="relative w-full h-32 rounded-xl overflow-hidden border border-slate-200">
                                         <Image src={formData.image} alt="Preview" fill className="object-cover" />
                                         <button
                                             type="button"
                                             onClick={() => setFormData({ ...formData, image: "" })}
                                             className="absolute top-2 right-2 bg-black/50 p-1.5 rounded-full hover:bg-black/70 transition-colors"
                                         >
-                                            <ImageIcon className="h-3.5 w-3.5 text-white" />
+                                            <ImageIcon className="h-3.5 w-3.5 text-slate-900" />
                                         </button>
                                     </div>
                                 ) : (
-                                    <label className="border-2 border-dashed border-white/10 rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-white/[0.02] transition-all group">
-                                        <div className="bg-white/5 p-3 rounded-full mb-3 group-hover:scale-110 transition-transform">
-                                            {isUploading ? <Loader2 className="h-5 w-5 text-white/40 animate-spin" /> : <ImageIcon className="h-5 w-5 text-white/40" />}
+                                    <label className="border-2 border-dashed border-slate-200 rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 transition-all group">
+                                        <div className="bg-slate-50 p-3 rounded-full mb-3 group-hover:scale-110 transition-transform">
+                                            {isUploading ? <Loader2 className="h-5 w-5 text-slate-600 animate-spin" /> : <ImageIcon className="h-5 w-5 text-slate-600" />}
                                         </div>
-                                        <p className="text-[10px] text-white/40 text-center">{isUploading ? "Subiendo..." : "Seleccionar imagen"}</p>
+                                        <p className="text-[10px] text-slate-600 text-center">{isUploading ? "Subiendo..." : "Seleccionar imagen"}</p>
                                         <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} ref={fileInputRef} />
                                     </label>
                                 )}
@@ -261,7 +261,7 @@ export default function CategoriasPage() {
                                 <button
                                     type="button"
                                     onClick={handleCancelEdit}
-                                    className="w-full bg-white/5 hover:bg-white/10 text-white/60 py-3 rounded-xl text-[12px] font-medium transition-all"
+                                    className="w-full bg-slate-50 hover:bg-slate-50 text-slate-600 py-3 rounded-xl text-[12px] font-medium transition-all"
                                 >
                                     Cancelar edición
                                 </button>
@@ -272,46 +272,46 @@ export default function CategoriasPage() {
 
                 {/* Table */}
                 <div className="lg:col-span-2">
-                    <div className="bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden">
+                    <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="border-b border-white/5 bg-white/[0.02]">
-                                        <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Imagen</th>
-                                        <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Nombre</th>
-                                        <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Slug</th>
-                                        <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium text-right">Productos</th>
+                                    <tr className="border-b border-slate-200 bg-slate-50">
+                                        <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Imagen</th>
+                                        <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Nombre</th>
+                                        <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Slug</th>
+                                        <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium text-right">Productos</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-white/5">
+                                <tbody className="divide-y divide-slate-200">
                                     {isLoading ? (
                                         <tr>
-                                            <td colSpan={4} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
+                                            <td colSpan={4} className="px-6 py-12 text-center text-slate-500 text-[11px] uppercase tracking-widest">
                                                 Cargando categorías...
                                             </td>
                                         </tr>
                                     ) : tableRows.length === 0 ? (
                                         <tr>
-                                            <td colSpan={4} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
+                                            <td colSpan={4} className="px-6 py-12 text-center text-slate-500 text-[11px] uppercase tracking-widest">
                                                 No hay categorías creadas.
                                             </td>
                                         </tr>
                                     ) : tableRows.map((cat) => (
-                                        <tr key={cat.id} className={`hover:bg-white/[0.02] transition-colors group ${cat._isChild ? "bg-white/[0.01]" : ""}`}>
+                                        <tr key={cat.id} className={`hover:bg-slate-50 transition-colors group ${cat._isChild ? "bg-slate-50" : ""}`}>
                                             <td className="px-6 py-4">
-                                                <div className={`${cat._isChild ? "ml-5" : ""} w-10 h-10 bg-white/5 rounded-lg border border-white/10 overflow-hidden relative flex-shrink-0`}>
+                                                <div className={`${cat._isChild ? "ml-5" : ""} w-10 h-10 bg-slate-50 rounded-lg border border-slate-200 overflow-hidden relative flex-shrink-0`}>
                                                     {cat.image ? (
                                                         <Image src={cat.image} alt={cat.name} fill className="object-cover" />
                                                     ) : (
-                                                        <ImageIcon className="h-4 w-4 text-white/20 absolute inset-0 m-auto" />
+                                                        <ImageIcon className="h-4 w-4 text-slate-500 absolute inset-0 m-auto" />
                                                     )}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className={`flex flex-col gap-1 ${cat._isChild ? "ml-5" : ""}`}>
                                                     <div className="flex items-center gap-2">
-                                                        {cat._isChild && <ChevronRight className="h-3 w-3 text-white/20 flex-shrink-0" />}
-                                                        <span className="text-[13px] font-medium text-white/90">{cat.name}</span>
+                                                        {cat._isChild && <ChevronRight className="h-3 w-3 text-slate-500 flex-shrink-0" />}
+                                                        <span className="text-[13px] font-medium text-slate-900">{cat.name}</span>
                                                         {!cat._isChild && cat.children?.length > 0 && (
                                                             <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary/60">{cat.children.length} sub</span>
                                                         )}
@@ -319,14 +319,14 @@ export default function CategoriasPage() {
                                                     <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
                                                         <button
                                                             onClick={() => handleEdit(cat)}
-                                                            className="text-[10px] text-white/40 hover:text-white flex items-center gap-1"
+                                                            className="text-[10px] text-slate-600 hover:text-slate-900 flex items-center gap-1"
                                                         >
                                                             <Edit2 className="h-3 w-3" /> Editar
                                                         </button>
                                                         {cat.slug !== "sin-categoria" && (
                                                             <button
                                                                 onClick={() => handleDelete(cat.id, cat.slug)}
-                                                                className="text-[10px] text-red-400/60 hover:text-red-400 flex items-center gap-1"
+                                                                className="text-[10px] text-red-700/60 hover:text-red-700 flex items-center gap-1"
                                                             >
                                                                 <Trash2 className="h-3 w-3" /> Borrar
                                                             </button>
@@ -334,8 +334,8 @@ export default function CategoriasPage() {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-[12px] text-white/60 font-mono tracking-tight">{cat.slug}</td>
-                                            <td className="px-6 py-4 text-right text-[12px] text-white/60">{cat._count?.products || 0}</td>
+                                            <td className="px-6 py-4 text-[12px] text-slate-600 font-mono tracking-tight">{cat.slug}</td>
+                                            <td className="px-6 py-4 text-right text-[12px] text-slate-600">{cat._count?.products || 0}</td>
                                         </tr>
                                     ))}
                                 </tbody>

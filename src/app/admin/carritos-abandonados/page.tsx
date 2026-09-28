@@ -171,9 +171,9 @@ export default function AbandonedCartsPage() {
     };
 
     const getStatusLabel = (cart: any) => {
-        if (cart.userId) return { label: "Registrado", class: "bg-blue-400/10 text-blue-400" };
-        if (cart.email) return { label: "Invitado", class: "bg-purple-400/10 text-purple-400" };
-        return { label: "Anónimo", class: "bg-white/5 text-white/40" };
+        if (cart.userId) return { label: "Registrado", class: "bg-blue-400/10 text-blue-700" };
+        if (cart.email) return { label: "Invitado", class: "bg-purple-400/10 text-purple-700" };
+        return { label: "Anónimo", class: "bg-slate-50 text-slate-600" };
     };
 
     return (
@@ -182,8 +182,8 @@ export default function AbandonedCartsPage() {
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex flex-col gap-1">
-                        <h1 className="text-2xl font-light text-white font-montserrat tracking-tight">carritos abandonados</h1>
-                        <p className="text-white/40 text-[11px] uppercase tracking-widest">seguimiento de ventas potenciales</p>
+                        <h1 className="text-2xl font-light text-slate-900 font-montserrat tracking-tight">carritos abandonados</h1>
+                        <p className="text-slate-600 text-[11px] uppercase tracking-widest">seguimiento de ventas potenciales</p>
                     </div>
                     <div className="flex items-center gap-2">
                         <button
@@ -195,7 +195,7 @@ export default function AbandonedCartsPage() {
                         </button>
                         <button
                             onClick={exportCsv}
-                            className="bg-white/5 hover:bg-white/10 text-white/70 px-4 py-2 rounded-xl text-[11px] font-medium flex items-center gap-2 transition-all border border-white/5"
+                            className="bg-slate-50 hover:bg-slate-50 text-slate-600 px-4 py-2 rounded-xl text-[11px] font-medium flex items-center gap-2 transition-all border border-slate-200"
                         >
                             <Download className="h-4 w-4" />
                             Exportar CSV
@@ -205,13 +205,13 @@ export default function AbandonedCartsPage() {
 
                 {/* Filtros */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-4 flex gap-4">
+                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex gap-4">
                         <div className="flex-1">
-                            <p className="text-[10px] text-white/40 uppercase tracking-widest mb-2 font-bold">Tipo de Usuario</p>
+                            <p className="text-[10px] text-slate-600 uppercase tracking-widest mb-2 font-bold">Tipo de Usuario</p>
                             <select
                                 value={filterType}
                                 onChange={(e) => setFilterType(e.target.value)}
-                                className="w-full bg-transparent text-white text-[12px] border-none focus:ring-0 p-0"
+                                className="w-full bg-transparent text-slate-900 text-[12px] border-none focus:ring-0 p-0"
                             >
                                 <option value="all">Todos los tipos</option>
                                 <option value="registered">Registrados</option>
@@ -220,50 +220,50 @@ export default function AbandonedCartsPage() {
                             </select>
                         </div>
                     </div>
-                    <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-4 flex gap-4">
+                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex gap-4">
                         <div className="flex-1">
-                            <p className="text-[10px] text-white/40 uppercase tracking-widest mb-2 font-bold">Precio Mínimo (AR$)</p>
+                            <p className="text-[10px] text-slate-600 uppercase tracking-widest mb-2 font-bold">Precio Mínimo (AR$)</p>
                             <input
                                 type="number"
                                 placeholder="0"
                                 value={minTotal}
                                 onChange={(e) => setMinTotal(e.target.value)}
-                                className="w-full bg-transparent text-white text-[12px] border-none focus:ring-0 p-0"
+                                className="w-full bg-transparent text-slate-900 text-[12px] border-none focus:ring-0 p-0"
                             />
                         </div>
                     </div>
                     <div className="bg-primary/10 border border-primary/20 rounded-2xl p-4 flex items-center justify-between">
                         <div>
                             <p className="text-[10px] text-primary uppercase tracking-widest font-bold">Total Capturado</p>
-                            <p className="text-xl font-light text-white font-montserrat">$ {(Array.isArray(carts) ? carts : []).reduce((acc, c) => acc + (c.total || 0), 0).toLocaleString('es-AR')}</p>
+                            <p className="text-xl font-light text-slate-900 font-montserrat">$ {(Array.isArray(carts) ? carts : []).reduce((acc, c) => acc + (c.total || 0), 0).toLocaleString('es-AR')}</p>
                         </div>
                         <ShoppingBag className="text-primary h-8 w-8 opacity-50" />
                     </div>
                 </div>
 
                 {/* Tabla */}
-                <div className="bg-white/[0.03] border border-white/5 rounded-3xl overflow-hidden backdrop-blur-sm">
+                <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden backdrop-blur-sm">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b border-white/5">
-                                    <th className="px-6 py-4 text-[10px] font-medium text-white/40 uppercase tracking-widest">Información de Contacto</th>
-                                    <th className="px-6 py-4 text-[10px] font-medium text-white/40 uppercase tracking-widest">Última Actividad</th>
-                                    <th className="px-6 py-4 text-[10px] font-medium text-white/40 uppercase tracking-widest">Productos</th>
-                                    <th className="px-6 py-4 text-[10px] font-medium text-white/40 uppercase tracking-widest">Total</th>
-                                    <th className="px-6 py-4 text-[10px] font-medium text-white/40 uppercase tracking-widest text-right">Acciones</th>
+                                <tr className="border-b border-slate-200">
+                                    <th className="px-6 py-4 text-[10px] font-medium text-slate-600 uppercase tracking-widest">Información de Contacto</th>
+                                    <th className="px-6 py-4 text-[10px] font-medium text-slate-600 uppercase tracking-widest">Última Actividad</th>
+                                    <th className="px-6 py-4 text-[10px] font-medium text-slate-600 uppercase tracking-widest">Productos</th>
+                                    <th className="px-6 py-4 text-[10px] font-medium text-slate-600 uppercase tracking-widest">Total</th>
+                                    <th className="px-6 py-4 text-[10px] font-medium text-slate-600 uppercase tracking-widest text-right">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {isLoading ? (
                                     <tr>
-                                        <td colSpan={5} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest animate-pulse">
+                                        <td colSpan={5} className="px-6 py-12 text-center text-slate-500 text-[11px] uppercase tracking-widest animate-pulse">
                                             Cargando carritos abandonados...
                                         </td>
                                     </tr>
                                 ) : carts.length === 0 ? (
                                     <tr>
-                                        <td colSpan={5} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
+                                        <td colSpan={5} className="px-6 py-12 text-center text-slate-500 text-[11px] uppercase tracking-widest">
                                             No se encontraron carritos abandonados
                                         </td>
                                     </tr>
@@ -276,37 +276,37 @@ export default function AbandonedCartsPage() {
                                         const itemsCount = parsedItems.length;
 
                                         return (
-                                            <tr key={cart.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors group">
+                                            <tr key={cart.id} className="border-b border-slate-200 hover:bg-slate-50 transition-colors group">
                                                 <td className="px-6 py-5">
                                                     <div className="flex flex-col gap-0.5">
                                                         <div className="flex items-center gap-2">
-                                                            <span className="text-[12px] text-white font-medium">{displayName}</span>
+                                                            <span className="text-[12px] text-slate-900 font-medium">{displayName}</span>
                                                             <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-tighter ${status.class}`}>
                                                                 {status.label}
                                                             </span>
                                                         </div>
-                                                        <span className="text-[10px] text-white/40 lowercase">{displayEmail}</span>
-                                                        {cart.phone && <span className="text-[10px] text-white/40">{cart.phone}</span>}
+                                                        <span className="text-[10px] text-slate-600 lowercase">{displayEmail}</span>
+                                                        {cart.phone && <span className="text-[10px] text-slate-600">{cart.phone}</span>}
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-5">
                                                     <div className="flex flex-col">
-                                                        <span className="text-[11px] text-white/60">
+                                                        <span className="text-[11px] text-slate-600">
                                                             {format(new Date(cart.lastActive), "d 'de' MMMM", { locale: es })}
                                                         </span>
-                                                        <span className="text-[10px] text-white/30 lowercase">
+                                                        <span className="text-[10px] text-slate-500 lowercase">
                                                             {format(new Date(cart.lastActive), "HH:mm 'hs'", { locale: es })}
                                                         </span>
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-5">
                                                     <div className="flex items-start gap-2">
-                                                        <div className="p-2 rounded-xl bg-white/5 group-hover:bg-primary/20 transition-colors mt-0.5">
-                                                            <ShoppingBag className="h-3.5 w-3.5 text-white/40 group-hover:text-primary transition-colors" />
+                                                        <div className="p-2 rounded-xl bg-slate-50 group-hover:bg-primary/20 transition-colors mt-0.5">
+                                                            <ShoppingBag className="h-3.5 w-3.5 text-slate-600 group-hover:text-primary transition-colors" />
                                                         </div>
                                                         <div className="flex flex-col gap-0.5">
                                                             {parsedItems.map((item: any, i: number) => (
-                                                                <span key={i} className="text-[11px] text-white/70">
+                                                                <span key={i} className="text-[11px] text-slate-600">
                                                                     {item.quantity > 1 && <span className="text-primary/80 font-medium mr-1">{item.quantity}x</span>}
                                                                     {item.name}
                                                                 </span>
@@ -315,14 +315,14 @@ export default function AbandonedCartsPage() {
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-5">
-                                                    <span className="text-[12px] text-white font-medium font-montserrat">
+                                                    <span className="text-[12px] text-slate-900 font-medium font-montserrat">
                                                         $ {cart.total.toLocaleString('es-AR')}
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-5 text-right">
                                                     <div className="flex items-center justify-end gap-2">
                                                         {cart.remindedAt ? (
-                                                            <span className="text-[9px] font-bold uppercase tracking-widest text-emerald-400 flex items-center gap-1">
+                                                            <span className="text-[9px] font-bold uppercase tracking-widest text-emerald-700 flex items-center gap-1">
                                                                 <CheckCircle2 className="h-3 w-3" /> Enviado
                                                             </span>
                                                         ) : (
@@ -350,7 +350,7 @@ export default function AbandonedCartsPage() {
                                                         )}
                                                         <button
                                                             onClick={() => deleteCart(cart.id)}
-                                                            className="p-2 hover:bg-red-500/10 rounded-lg text-white/20 hover:text-red-400 transition-all opacity-0 group-hover:opacity-100"
+                                                            className="p-2 hover:bg-red-500/10 rounded-lg text-slate-500 hover:text-red-700 transition-all opacity-0 group-hover:opacity-100"
                                                         >
                                                             <Trash2 className="h-4 w-4" />
                                                         </button>

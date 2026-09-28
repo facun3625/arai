@@ -1,3 +1,4 @@
+import { isProductRichText, sanitizeProductHtml } from "@/lib/productRichText";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -36,7 +37,7 @@ export async function POST(req: Request) {
         const productData: any = {
             name,
             slug,
-            description,
+            description: typeof description === "string" && isProductRichText(description) ? sanitizeProductHtml(description) : description,
             type,
             videoUrl,
             price: parseFloat(price) || 0,
@@ -187,7 +188,7 @@ export async function PUT(req: Request) {
         const productData: any = {
             name,
             slug,
-            description,
+            description: typeof description === "string" && isProductRichText(description) ? sanitizeProductHtml(description) : description,
             type,
             videoUrl,
             price: parseFloat(price) || 0,

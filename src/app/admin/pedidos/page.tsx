@@ -171,11 +171,11 @@ export default function AdminPedidosPage() {
     const getPaymentMethodStyle = (method: string) => {
         switch (method?.toLowerCase()) {
             case 'mercadopago': return { label: 'MercadoPago', color: 'text-sky-400' };
-            case 'transferencia': return { label: 'Transferencia', color: 'text-amber-400' };
+            case 'transferencia': return { label: 'Transferencia', color: 'text-amber-700' };
             case 'modo': return { label: 'Modo', color: 'text-violet-400' };
-            case 'paypal': return { label: 'PayPal', color: 'text-blue-400' };
-            case 'efectivo': return { label: 'Efectivo', color: 'text-green-400' };
-            default: return { label: method || '', color: 'text-white/30' };
+            case 'paypal': return { label: 'PayPal', color: 'text-blue-700' };
+            case 'efectivo': return { label: 'Efectivo', color: 'text-green-700' };
+            default: return { label: method || '', color: 'text-slate-500' };
         }
     };
 
@@ -183,23 +183,23 @@ export default function AdminPedidosPage() {
         const s = status.toUpperCase();
         switch (s) {
             case 'PENDING':
-                return { bg: 'bg-orange-500/10', border: 'border-orange-500/20', text: 'text-orange-400', icon: Clock, label: 'Pendiente' };
+                return { bg: 'bg-orange-500/10', border: 'border-orange-500/20', text: 'text-orange-700', icon: Clock, label: 'Pendiente' };
             case 'PAID':
-                return { bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', text: 'text-emerald-400', icon: CheckCircle, label: 'Pagado' };
+                return { bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', text: 'text-emerald-700', icon: CheckCircle, label: 'Pagado' };
             case 'PROCESSING':
-                return { bg: 'bg-blue-500/10', border: 'border-blue-500/20', text: 'text-blue-400', icon: Package, label: 'Procesando' };
+                return { bg: 'bg-blue-500/10', border: 'border-blue-500/20', text: 'text-blue-700', icon: Package, label: 'Procesando' };
             case 'SHIPPED':
-                return { bg: 'bg-purple-500/10', border: 'border-purple-500/20', text: 'text-purple-400', icon: Truck, label: 'Enviado' };
+                return { bg: 'bg-purple-500/10', border: 'border-purple-500/20', text: 'text-purple-700', icon: Truck, label: 'Enviado' };
             case 'COMPLETED':
-                return { bg: 'bg-green-500/10', border: 'border-green-500/20', text: 'text-green-400', icon: CheckCircle, label: 'Completado' };
+                return { bg: 'bg-green-500/10', border: 'border-green-500/20', text: 'text-green-700', icon: CheckCircle, label: 'Completado' };
             case 'CANCELLED':
-                return { bg: 'bg-red-500/10', border: 'border-red-500/20', text: 'text-red-400', icon: Clock, label: 'Cancelado' };
+                return { bg: 'bg-red-500/10', border: 'border-red-500/20', text: 'text-red-700', icon: Clock, label: 'Cancelado' };
             default:
                 // Fallback for older orders that might still have spanish text
-                if (status.toLowerCase().includes('pend')) return { bg: 'bg-orange-500/10', border: 'border-orange-500/20', text: 'text-orange-400', icon: Clock, label: 'Pendiente' };
-                if (status.toLowerCase().includes('proc')) return { bg: 'bg-blue-500/10', border: 'border-blue-500/20', text: 'text-blue-400', icon: Package, label: 'Procesando' };
-                if (status.toLowerCase().includes('env')) return { bg: 'bg-purple-500/10', border: 'border-purple-500/20', text: 'text-purple-400', icon: Truck, label: 'Enviado' };
-                if (status.toLowerCase().includes('comp') || status.toLowerCase().includes('ent')) return { bg: 'bg-green-500/10', border: 'border-green-500/20', text: 'text-green-400', icon: CheckCircle, label: 'Completado' };
+                if (status.toLowerCase().includes('pend')) return { bg: 'bg-orange-500/10', border: 'border-orange-500/20', text: 'text-orange-700', icon: Clock, label: 'Pendiente' };
+                if (status.toLowerCase().includes('proc')) return { bg: 'bg-blue-500/10', border: 'border-blue-500/20', text: 'text-blue-700', icon: Package, label: 'Procesando' };
+                if (status.toLowerCase().includes('env')) return { bg: 'bg-purple-500/10', border: 'border-purple-500/20', text: 'text-purple-700', icon: Truck, label: 'Enviado' };
+                if (status.toLowerCase().includes('comp') || status.toLowerCase().includes('ent')) return { bg: 'bg-green-500/10', border: 'border-green-500/20', text: 'text-green-700', icon: CheckCircle, label: 'Completado' };
                 return { bg: 'bg-gray-500/10', border: 'border-gray-500/20', text: 'text-gray-400', icon: Clock, label: status };
         }
     };
@@ -232,28 +232,28 @@ export default function AdminPedidosPage() {
                 }}
                 className={`p-6 border rounded-3xl group transition-all text-left flex flex-col justify-between h-full relative overflow-hidden ${isActive
                     ? `${colorClass} ${bgColor} border-current shadow-lg ring-1 ring-current/30`
-                    : 'bg-white/[0.03] border-white/5 hover:bg-white/[0.05] hover:border-white/10'
+                    : 'bg-slate-50 border-slate-200 hover:bg-slate-50 hover:border-slate-200'
                     }`}
             >
                 <div className="flex items-center gap-3 mb-4 relative z-10">
-                    <div className={`p-2 rounded-xl ${isActive ? 'bg-white/20' : bgColor}`}>
-                        <Icon className={`h-4 w-4 ${isActive ? 'text-white' : colorClass.replace('border-', 'text-')}`} />
+                    <div className={`p-2 rounded-xl ${isActive ? 'bg-slate-50' : bgColor}`}>
+                        <Icon className={`h-4 w-4 ${isActive ? 'text-slate-900' : colorClass.replace('border-', 'text-')}`} />
                     </div>
-                    <span className={`text-[10px] uppercase tracking-widest font-bold ${isActive ? 'text-white' : 'text-white/40'}`}>
+                    <span className={`text-[10px] uppercase tracking-widest font-bold ${isActive ? 'text-slate-900' : 'text-slate-600'}`}>
                         {label}
                     </span>
                 </div>
                 <div className="relative z-10">
                     <div className="flex items-end justify-between">
-                        <p className={`text-3xl font-light font-montserrat ${isActive ? 'text-white' : 'text-white'}`}>
+                        <p className={`text-3xl font-light font-montserrat ${isActive ? 'text-slate-900' : 'text-slate-900'}`}>
                             {count}
                         </p>
                         {!isActive ? (
-                            <span className="text-[9px] uppercase tracking-widest font-bold text-white/20 group-hover:text-primary transition-colors flex items-center gap-1">
+                            <span className="text-[9px] uppercase tracking-widest font-bold text-slate-500 group-hover:text-primary transition-colors flex items-center gap-1">
                                 Filtrar <ArrowUpRight className="h-2.5 w-2.5" />
                             </span>
                         ) : (
-                            <span className="text-[9px] uppercase tracking-widest font-bold text-white/60 flex items-center gap-1">
+                            <span className="text-[9px] uppercase tracking-widest font-bold text-slate-600 flex items-center gap-1">
                                 Activo <div className="h-1.5 w-1.5 bg-white rounded-full animate-pulse" />
                             </span>
                         )}
@@ -277,21 +277,21 @@ export default function AdminPedidosPage() {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-3">
-                            <h1 className="text-2xl font-light text-white font-montserrat tracking-tight">pedidos</h1>
+                            <h1 className="text-2xl font-light text-slate-900 font-montserrat tracking-tight">pedidos</h1>
                             {filterStatus && (
                                 <div className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest border ${getStatusStyles(filterStatus).bg} ${getStatusStyles(filterStatus).text} ${getStatusStyles(filterStatus).border}`}>
                                     Filtrando: {STATUS_MAP[Object.keys(STATUS_MAP).find(k => k.toLowerCase() === filterStatus.toLowerCase()) || ''] || filterStatus}
                                 </div>
                             )}
                         </div>
-                        <p className="text-white/40 text-[11px] uppercase tracking-widest">
+                        <p className="text-slate-600 text-[11px] uppercase tracking-widest">
                             {filterStatus ? 'Explorando segmento seleccionado' : 'gestiona las ventas de tu tienda'}
                         </p>
                     </div>
                     {filterStatus && (
                         <button
                             onClick={() => setFilterStatus(null)}
-                            className="flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white px-4 py-2 rounded-xl transition-all border border-white/5 text-[10px] uppercase tracking-widest font-bold group"
+                            className="flex items-center gap-2 bg-slate-50 hover:bg-slate-50 text-slate-600 hover:text-slate-900 px-4 py-2 rounded-xl transition-all border border-slate-200 text-[10px] uppercase tracking-widest font-bold group"
                         >
                             <div className="h-1.5 w-1.5 bg-red-500 rounded-full group-hover:animate-ping" />
                             Quitar Filtro
@@ -306,7 +306,7 @@ export default function AdminPedidosPage() {
                         count={orders.filter(o => o.status === 'PENDING').length}
                         statusKey="PENDING"
                         icon={Clock}
-                        colorClass="text-orange-400 border-orange-500/20"
+                        colorClass="text-orange-700 border-orange-500/20"
                         bgColor="bg-orange-500/10"
                     />
                     <StatsCard
@@ -314,7 +314,7 @@ export default function AdminPedidosPage() {
                         count={orders.filter(o => o.status === 'PROCESSING').length}
                         statusKey="PROCESSING"
                         icon={Package}
-                        colorClass="text-blue-400 border-blue-500/20"
+                        colorClass="text-blue-700 border-blue-500/20"
                         bgColor="bg-blue-500/10"
                     />
                     <StatsCard
@@ -322,7 +322,7 @@ export default function AdminPedidosPage() {
                         count={orders.filter(o => o.status === 'SHIPPED').length}
                         statusKey="SHIPPED"
                         icon={Truck}
-                        colorClass="text-purple-400 border-purple-500/20"
+                        colorClass="text-purple-700 border-purple-500/20"
                         bgColor="bg-purple-500/10"
                     />
                     <StatsCard
@@ -330,7 +330,7 @@ export default function AdminPedidosPage() {
                         count={orders.filter(o => o.status === 'COMPLETED').length}
                         statusKey="COMPLETED"
                         icon={CheckCircle}
-                        colorClass="text-green-400 border-green-500/20"
+                        colorClass="text-green-700 border-green-500/20"
                         bgColor="bg-green-500/10"
                     />
                     <StatsCard
@@ -338,7 +338,7 @@ export default function AdminPedidosPage() {
                         count={orders.filter(o => o.status === 'CANCELLED').length}
                         statusKey="CANCELLED"
                         icon={Clock}
-                        colorClass="text-red-400 border-red-500/20"
+                        colorClass="text-red-700 border-red-500/20"
                         bgColor="bg-red-500/10"
                     />
                 </div>
@@ -348,39 +348,39 @@ export default function AdminPedidosPage() {
                     <div className="lg:col-span-2 space-y-6">
                         <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
                             <div className="relative w-full">
-                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
+                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                                 <input
                                     type="text"
                                     placeholder="Buscar por cliente o ID..."
-                                    className="w-full bg-white/[0.03] border border-white/5 rounded-2xl pl-11 pr-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-11 pr-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors"
                                 />
                             </div>
                         </div>
 
-                        <div className="bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden">
+                        <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden">
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
                                     <thead>
-                                        <tr className="border-b border-white/5 bg-white/[0.02]">
-                                            <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium whitespace-nowrap">ID / Fecha</th>
-                                            <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Cliente</th>
-                                            <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Total</th>
-                                            <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium text-center">Estado</th>
+                                        <tr className="border-b border-slate-200 bg-slate-50">
+                                            <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium whitespace-nowrap">ID / Fecha</th>
+                                            <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Cliente</th>
+                                            <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Total</th>
+                                            <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium text-center">Estado</th>
                                             <th className="px-6 py-4 text-right"></th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-white/5 text-[13px]">
+                                    <tbody className="divide-y divide-slate-200 text-[13px]">
                                         {isLoading ? (
                                             <tr>
-                                                <td colSpan={5} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
+                                                <td colSpan={5} className="px-6 py-12 text-center text-slate-500 text-[11px] uppercase tracking-widest">
                                                     Cargando pedidos...
                                                 </td>
                                             </tr>
                                         ) : paginatedOrders.length === 0 ? (
                                             <tr>
                                                 <td colSpan={5} className="px-6 py-24 text-center">
-                                                    <ShoppingCart className="h-8 w-8 text-white/5 mx-auto mb-4" />
-                                                    <p className="text-white/20 text-[11px] uppercase tracking-widest">
+                                                    <ShoppingCart className="h-8 w-8 text-slate-500 mx-auto mb-4" />
+                                                    <p className="text-slate-500 text-[11px] uppercase tracking-widest">
                                                         No hay pedidos {filterStatus ? 'con este estado' : 'registrados'}.
                                                     </p>
                                                     {filterStatus && (
@@ -399,28 +399,28 @@ export default function AdminPedidosPage() {
                                             return (
                                                 <tr
                                                     key={order.id}
-                                                    className={`hover:bg-white/[0.03] transition-all cursor-pointer group ${selectedOrder?.id === order.id ? 'bg-white/[0.04]' : ''}`}
+                                                    className={`hover:bg-slate-50 transition-all cursor-pointer group ${selectedOrder?.id === order.id ? 'bg-slate-50' : ''}`}
                                                     onClick={() => setSelectedOrder(order)}
                                                 >
                                                     <td className="px-6 py-5">
                                                         <div className="flex flex-col gap-0.5">
-                                                            <span className="text-[11px] font-mono text-white/40">#{String(order.orderNumber).padStart(4, "0")}</span>
-                                                            <span className="text-white/60 text-[11px]">
+                                                            <span className="text-[11px] font-mono text-slate-600">#{String(order.orderNumber).padStart(4, "0")}</span>
+                                                            <span className="text-slate-600 text-[11px]">
                                                                 {new Date(order.createdAt).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                                                             </span>
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-5">
                                                         <div className="flex flex-col gap-0.5">
-                                                            <span className="font-medium text-white group-hover:text-primary transition-colors">
+                                                            <span className="font-medium text-slate-900 group-hover:text-primary transition-colors">
                                                                 {order.contactName} {order.contactLastName}
                                                             </span>
-                                                            <span className="text-[11px] text-white/20">{order.contactEmail}</span>
+                                                            <span className="text-[11px] text-slate-500">{order.contactEmail}</span>
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-5">
                                                         <div className="flex flex-col gap-0.5">
-                                                            <span className="font-medium text-white">$ {order.total.toLocaleString('es-AR')}</span>
+                                                            <span className="font-medium text-slate-900">$ {order.total.toLocaleString('es-AR')}</span>
                                                             {order.paymentMethod && (
                                                                 <span className={`text-[10px] font-bold uppercase tracking-widest ${getPaymentMethodStyle(order.paymentMethod).color}`}>
                                                                     {getPaymentMethodStyle(order.paymentMethod).label}
@@ -434,10 +434,10 @@ export default function AdminPedidosPage() {
                                                                 value={order.status}
                                                                 disabled={statusUpdating === order.id}
                                                                 onChange={(e) => updateStatus(order.id, e.target.value)}
-                                                                className={`appearance-none inline-flex items-center gap-1.5 pl-3 pr-8 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase border cursor-pointer hover:bg-white/5 transition-colors focus:outline-none ${status.bg} ${status.border} ${status.text}`}
+                                                                className={`appearance-none inline-flex items-center gap-1.5 pl-3 pr-8 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase border cursor-pointer hover:bg-slate-50 transition-colors focus:outline-none ${status.bg} ${status.border} ${status.text}`}
                                                             >
                                                                 {Object.entries(STATUS_MAP).map(([val, label]) => (
-                                                                    <option key={val} value={val} className="bg-[#0c120e] text-white">
+                                                                    <option key={val} value={val} className="bg-white text-slate-900">
                                                                         {label}
                                                                     </option>
                                                                 ))}
@@ -450,7 +450,7 @@ export default function AdminPedidosPage() {
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-5 text-right">
-                                                        <div className={`p-2 rounded-lg transition-all ${selectedOrder?.id === order.id ? 'text-primary' : 'text-white/20 group-hover:text-white'}`}>
+                                                        <div className={`p-2 rounded-lg transition-all ${selectedOrder?.id === order.id ? 'text-primary' : 'text-slate-500 group-hover:text-slate-900'}`}>
                                                             <Eye className="h-4 w-4" />
                                                         </div>
                                                     </td>
@@ -465,7 +465,7 @@ export default function AdminPedidosPage() {
                         {/* Pagination Controls */}
                         {totalPages > 1 && (
                             <div className="flex items-center justify-between px-2 pt-4">
-                                <p className="text-[11px] text-white/20 uppercase tracking-widest">
+                                <p className="text-[11px] text-slate-500 uppercase tracking-widest">
                                     Página {currentPage} de {totalPages} ({filteredOrders.length} pedidos)
                                 </p>
                                 <div className="flex items-center gap-2">
@@ -475,7 +475,7 @@ export default function AdminPedidosPage() {
                                             setCurrentPage(prev => prev - 1);
                                             window.scrollTo({ top: 0, behavior: 'smooth' });
                                         }}
-                                        className="p-2 rounded-xl bg-white/5 border border-white/5 text-white/40 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-white/5 transition-all outline-none"
+                                        className="p-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-slate-50 transition-all outline-none"
                                     >
                                         <ChevronDown className="h-4 w-4 rotate-90" />
                                     </button>
@@ -489,7 +489,7 @@ export default function AdminPedidosPage() {
                                                 }}
                                                 className={`w-8 h-8 rounded-xl text-[10px] font-bold transition-all outline-none ${currentPage === i + 1
                                                     ? 'bg-primary text-white'
-                                                    : 'bg-white/5 text-white/40 hover:bg-white/10 hover:text-white'
+                                                    : 'bg-slate-50 text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                                                     }`}
                                             >
                                                 {i + 1}
@@ -502,7 +502,7 @@ export default function AdminPedidosPage() {
                                             setCurrentPage(prev => prev + 1);
                                             window.scrollTo({ top: 0, behavior: 'smooth' });
                                         }}
-                                        className="p-2 rounded-xl bg-white/5 border border-white/5 text-white/40 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-white/5 transition-all outline-none"
+                                        className="p-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-slate-50 transition-all outline-none"
                                     >
                                         <ChevronDown className="h-4 w-4 -rotate-90" />
                                     </button>
@@ -521,16 +521,16 @@ export default function AdminPedidosPage() {
                                         initial={{ opacity: 0, scale: 0.95 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         exit={{ opacity: 0, scale: 0.95 }}
-                                        className="bg-white/[0.03] border border-white/5 rounded-[40px] overflow-hidden p-8"
+                                        className="bg-slate-50 border border-slate-200 rounded-[40px] overflow-hidden p-8"
                                     >
-                                        <div className="flex items-center justify-between mb-8 border-b border-white/5 pb-6">
+                                        <div className="flex items-center justify-between mb-8 border-b border-slate-200 pb-6">
                                             <div>
-                                                <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-1">pedido</p>
-                                                <h3 className="text-xl font-light text-white font-montserrat">#{String(selectedOrder.orderNumber).padStart(4, "0")}</h3>
+                                                <p className="text-[10px] uppercase tracking-widest text-slate-600 font-bold mb-1">pedido</p>
+                                                <h3 className="text-xl font-light text-slate-900 font-montserrat">#{String(selectedOrder.orderNumber).padStart(4, "0")}</h3>
                                             </div>
                                             <div className="text-right">
-                                                <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-1">pago</p>
-                                                <span className="text-[11px] text-white/80 uppercase tracking-widest font-mono">{selectedOrder.paymentMethod}</span>
+                                                <p className="text-[10px] uppercase tracking-widest text-slate-600 font-bold mb-1">pago</p>
+                                                <span className="text-[11px] text-slate-900 uppercase tracking-widest font-mono">{selectedOrder.paymentMethod}</span>
                                             </div>
                                         </div>
 
@@ -538,10 +538,10 @@ export default function AdminPedidosPage() {
                                             {selectedOrder.status.toLowerCase() === 'pending' && selectedOrder.paymentMethod === 'transferencia' && (
                                                 <div className="p-4 bg-orange-500/10 border border-orange-500/20 rounded-2xl">
                                                     <div className="flex items-center gap-3 mb-2">
-                                                        <Clock className="h-4 w-4 text-orange-400" />
-                                                        <p className="text-[11px] font-bold text-orange-400 uppercase tracking-widest">Validar Pago</p>
+                                                        <Clock className="h-4 w-4 text-orange-700" />
+                                                        <p className="text-[11px] font-bold text-orange-700 uppercase tracking-widest">Validar Pago</p>
                                                     </div>
-                                                    <p className="text-[10px] text-white/60 leading-relaxed">
+                                                    <p className="text-[10px] text-slate-600 leading-relaxed">
                                                         Este pedido está pendiente de validación por transferencia bancaria.
                                                         Verifica el comprobante antes de procesar.
                                                     </p>
@@ -558,13 +558,13 @@ export default function AdminPedidosPage() {
                                                     <ExternalLink className="h-3 w-3 ml-auto opacity-40" />
                                                 </button>
                                             ) : selectedOrder.paymentMethod === 'transferencia' && (
-                                                <div className="px-2 py-1 bg-white/5 rounded-md text-[9px] text-white/30 italic text-center">
+                                                <div className="px-2 py-1 bg-slate-50 rounded-md text-[9px] text-slate-500 italic text-center">
                                                     Comprobante no adjuntado aún
                                                 </div>
                                             )}
 
                                             <div className="space-y-4">
-                                                <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Resumen de Productos</p>
+                                                <p className="text-[10px] uppercase tracking-widest text-slate-600 font-bold">Resumen de Productos</p>
                                                 <div className="space-y-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                                                     {selectedOrder.items.map((item: any) => {
                                                         let addons: [string, string][] = [];
@@ -579,38 +579,38 @@ export default function AdminPedidosPage() {
                                                         return (
                                                             <div key={item.id} className="flex justify-between items-start gap-4 text-[12px]">
                                                                 <div>
-                                                                    <span className="text-white/80">{item.quantity}x {item.name}</span>
+                                                                    <span className="text-slate-900">{item.quantity}x {item.name}</span>
                                                                     {addons.map(([k, v]) => (
                                                                         <p key={k} className="text-[10px] text-primary/80 mt-0.5">{k}: {v}</p>
                                                                     ))}
                                                                 </div>
-                                                                <span className="text-white font-medium shrink-0">$ {item.price.toLocaleString('es-AR')}</span>
+                                                                <span className="text-slate-900 font-medium shrink-0">$ {item.price.toLocaleString('es-AR')}</span>
                                                             </div>
                                                         );
                                                     })}
                                                 </div>
-                                                <div className="pt-4 border-t border-white/5 space-y-2">
-                                                    <div className="flex justify-between text-[11px] text-white/40">
+                                                <div className="pt-4 border-t border-slate-200 space-y-2">
+                                                    <div className="flex justify-between text-[11px] text-slate-600">
                                                         <span>Subtotal</span>
                                                         <span>$ {selectedOrder.subtotal.toLocaleString('es-AR')}</span>
                                                     </div>
-                                                    <div className="flex justify-between text-[11px] text-white/40">
+                                                    <div className="flex justify-between text-[11px] text-slate-600">
                                                         <span>Envío</span>
                                                         <span>$ {selectedOrder.shippingCost.toLocaleString('es-AR')}</span>
                                                     </div>
                                                     {selectedOrder.discount > 0 && (
-                                                        <div className="flex justify-between text-[11px] text-green-400">
+                                                        <div className="flex justify-between text-[11px] text-green-700">
                                                             <span>Descuento{selectedOrder.couponCode ? ` (${selectedOrder.couponCode})` : ''}</span>
                                                             <span>- $ {selectedOrder.discount.toLocaleString('es-AR')}</span>
                                                         </div>
                                                     )}
                                                     {selectedOrder.couponCode && selectedOrder.discount === 0 && (
-                                                        <div className="flex justify-between text-[11px] text-green-400">
+                                                        <div className="flex justify-between text-[11px] text-green-700">
                                                             <span>Cupón aplicado</span>
                                                             <span>{selectedOrder.couponCode}</span>
                                                         </div>
                                                     )}
-                                                    <div className="flex justify-between text-[13px] text-white font-bold pt-2">
+                                                    <div className="flex justify-between text-[13px] text-slate-900 font-bold pt-2">
                                                         <span>Total</span>
                                                         <span className="text-primary">$ {selectedOrder.total.toLocaleString('es-AR')}</span>
                                                     </div>
@@ -618,20 +618,20 @@ export default function AdminPedidosPage() {
                                             </div>
 
                                             <div className="space-y-3">
-                                                <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Datos de Envío</p>
-                                                <div className="bg-white/5 p-4 rounded-2xl space-y-2 text-[11px]">
-                                                    <p className="text-white font-medium capitalize">{selectedOrder.shippingAddress.street} {selectedOrder.shippingAddress.number}</p>
-                                                    <p className="text-white/40">{selectedOrder.shippingAddress.city}, {selectedOrder.shippingAddress.province}</p>
-                                                    <p className="text-white/40">CP: {selectedOrder.shippingAddress.zipCode}</p>
-                                                    <p className="text-white/40 mt-2 border-t border-white/5 pt-2">DNI: {selectedOrder.contactDni}</p>
-                                                    <p className="text-white/40">TEL: {selectedOrder.contactPhone}</p>
-                                                    <p className="text-white/40">MAIL: {selectedOrder.contactEmail}</p>
+                                                <p className="text-[10px] uppercase tracking-widest text-slate-600 font-bold">Datos de Envío</p>
+                                                <div className="bg-slate-50 p-4 rounded-2xl space-y-2 text-[11px]">
+                                                    <p className="text-slate-900 font-medium capitalize">{selectedOrder.shippingAddress.street} {selectedOrder.shippingAddress.number}</p>
+                                                    <p className="text-slate-600">{selectedOrder.shippingAddress.city}, {selectedOrder.shippingAddress.province}</p>
+                                                    <p className="text-slate-600">CP: {selectedOrder.shippingAddress.zipCode}</p>
+                                                    <p className="text-slate-600 mt-2 border-t border-slate-200 pt-2">DNI: {selectedOrder.contactDni}</p>
+                                                    <p className="text-slate-600">TEL: {selectedOrder.contactPhone}</p>
+                                                    <p className="text-slate-600">MAIL: {selectedOrder.contactEmail}</p>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div className="space-y-4">
-                                            <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Cambiar Estado</p>
+                                            <p className="text-[10px] uppercase tracking-widest text-slate-600 font-bold">Cambiar Estado</p>
                                             <div className="grid grid-cols-2 gap-2">
                                                 {Object.entries(STATUS_MAP).map(([val, label]) => (
                                                     <button
@@ -640,7 +640,7 @@ export default function AdminPedidosPage() {
                                                         onClick={() => updateStatus(selectedOrder.id, val)}
                                                         className={`px-3 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${selectedOrder.status === val
                                                             ? 'bg-primary text-white shadow-lg shadow-primary/20'
-                                                            : 'bg-white/5 text-white/40 hover:bg-white/10'
+                                                            : 'bg-slate-50 text-slate-600 hover:bg-slate-50'
                                                             }`}
                                                     >
                                                         {statusUpdating === selectedOrder.id && selectedOrder.status === val ? (
@@ -655,10 +655,10 @@ export default function AdminPedidosPage() {
 
                                         {/* OCA Section */}
                                         {(selectedOrder.shippingMethod === 'oca_domicilio' || selectedOrder.shippingMethod === 'oca_sucursal') && (
-                                            <div className="pt-8 mt-8 border-t border-white/5 space-y-4">
+                                            <div className="pt-8 mt-8 border-t border-slate-200 space-y-4">
                                                 <div className="flex items-center gap-2">
                                                     <Truck className="h-3.5 w-3.5 text-primary/60" />
-                                                    <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold">OCA ePak</p>
+                                                    <p className="text-[10px] uppercase tracking-widest text-slate-600 font-bold">OCA ePak</p>
                                                     <span className="text-[9px] uppercase font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary/60">
                                                         {selectedOrder.shippingMethod === 'oca_sucursal' ? 'Sucursal' : 'Domicilio'}
                                                     </span>
@@ -668,7 +668,7 @@ export default function AdminPedidosPage() {
                                                         <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 space-y-3">
                                                             <div className="flex items-center justify-between gap-3">
                                                                 <div>
-                                                                    <p className="text-[9px] text-white/30 uppercase tracking-widest mb-1">Nro. Seguimiento</p>
+                                                                    <p className="text-[9px] text-slate-500 uppercase tracking-widest mb-1">Nro. Seguimiento</p>
                                                                     <p className="text-primary font-mono font-bold text-base">{selectedOrder.trackingNumber}</p>
                                                                 </div>
                                                                 <button
@@ -683,7 +683,7 @@ export default function AdminPedidosPage() {
                                                                 href={`https://www.oca.com.ar/seguimiento/?nroEnvio=${selectedOrder.trackingNumber}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
-                                                                className="flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/50 hover:text-white text-[10px] font-bold uppercase tracking-widest transition-all border border-white/5"
+                                                                className="flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-slate-50 hover:bg-slate-50 text-slate-600 hover:text-slate-900 text-[10px] font-bold uppercase tracking-widest transition-all border border-slate-200"
                                                             >
                                                                 <ExternalLink className="h-3 w-3" />
                                                                 Abrir seguimiento OCA
@@ -712,18 +712,18 @@ export default function AdminPedidosPage() {
                                                             const largoCm = Math.ceil(maxDim("length"));
                                                             const anyMissingDims = selectedOrder.items.some((item: any) => item.width == null || item.height == null || item.length == null || item.weight == null);
                                                             return (
-                                                                <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-4 space-y-2">
-                                                                    <p className="text-[9px] uppercase tracking-widest text-white/30 font-bold">Se va a enviar a OCA</p>
+                                                                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+                                                                    <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Se va a enviar a OCA</p>
                                                                     <div className="flex items-center justify-between text-[12px]">
-                                                                        <span className="text-white/50">Peso declarado</span>
-                                                                        <span className="text-white font-mono font-bold">{pesoKg} kg</span>
+                                                                        <span className="text-slate-600">Peso declarado</span>
+                                                                        <span className="text-slate-900 font-mono font-bold">{pesoKg} kg</span>
                                                                     </div>
                                                                     <div className="flex items-center justify-between text-[12px]">
-                                                                        <span className="text-white/50">Bulto (alto x ancho x largo)</span>
-                                                                        <span className="text-white font-mono font-bold">{altoCm} x {anchoCm} x {largoCm} cm</span>
+                                                                        <span className="text-slate-600">Bulto (alto x ancho x largo)</span>
+                                                                        <span className="text-slate-900 font-mono font-bold">{altoCm} x {anchoCm} x {largoCm} cm</span>
                                                                     </div>
                                                                     {anyMissingDims && (
-                                                                        <p className="text-[10px] text-amber-400/80 pt-1">
+                                                                        <p className="text-[10px] text-amber-700/80 pt-1">
                                                                             Algún producto de este pedido no tiene peso o medidas cargadas — se usó un valor por defecto ({DEFAULT_DIM_CM}cm / 1kg).
                                                                         </p>
                                                                     )}
@@ -733,7 +733,7 @@ export default function AdminPedidosPage() {
                                                         <button
                                                             onClick={() => handleIngresoOR(selectedOrder.id)}
                                                             disabled={ocaLoading}
-                                                            className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-white/5 hover:bg-primary/10 border border-white/10 hover:border-primary/20 text-white/60 hover:text-primary rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all"
+                                                            className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-slate-50 hover:bg-primary/10 border border-slate-200 hover:border-primary/20 text-slate-600 hover:text-primary rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all"
                                                         >
                                                             {ocaLoading ? (
                                                                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -751,13 +751,13 @@ export default function AdminPedidosPage() {
 
                                         {/* Acordar por WhatsApp Section */}
                                         {selectedOrder.shippingMethod === 'acordar' && (
-                                            <div className="pt-8 mt-8 border-t border-white/5 space-y-4">
+                                            <div className="pt-8 mt-8 border-t border-slate-200 space-y-4">
                                                 <div className="flex items-center gap-2">
                                                     <MessageCircle className="h-3.5 w-3.5 text-primary/60" />
-                                                    <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Envío a coordinar</p>
+                                                    <p className="text-[10px] uppercase tracking-widest text-slate-600 font-bold">Envío a coordinar</p>
                                                 </div>
                                                 <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4">
-                                                    <p className="text-white/50 text-[11px] leading-relaxed">
+                                                    <p className="text-slate-600 text-[11px] leading-relaxed">
                                                         Este pedido eligió "envío a acordar". Contactá al cliente por WhatsApp para definir el medio y el costo de envío.
                                                     </p>
                                                 </div>
@@ -773,7 +773,7 @@ export default function AdminPedidosPage() {
                                             </div>
                                         )}
 
-                                        <div className="pt-8 mt-8 border-t border-white/5">
+                                        <div className="pt-8 mt-8 border-t border-slate-200">
                                             <button
                                                 onClick={() => handleDeleteOrder(selectedOrder.id)}
                                                 disabled={isDeleting}
@@ -788,18 +788,18 @@ export default function AdminPedidosPage() {
                                                     </>
                                                 )}
                                             </button>
-                                            <p className="text-[9px] text-white/20 text-center mt-3 uppercase tracking-widest font-medium">
+                                            <p className="text-[9px] text-slate-500 text-center mt-3 uppercase tracking-widest font-medium">
                                                 esta acción eliminará permanentemente el registro
                                             </p>
                                         </div>
                                     </motion.div>
                                 ) : (
-                                    <div className="h-[600px] border border-dashed border-white/10 rounded-[40px] flex flex-col items-center justify-center p-8 text-center bg-white/[0.01]">
-                                        <div className="p-4 bg-white/5 rounded-full mb-4">
-                                            <ShoppingCart className="h-8 w-8 text-white/10" />
+                                    <div className="h-[600px] border border-dashed border-slate-200 rounded-[40px] flex flex-col items-center justify-center p-8 text-center bg-slate-50">
+                                        <div className="p-4 bg-slate-50 rounded-full mb-4">
+                                            <ShoppingCart className="h-8 w-8 text-slate-500" />
                                         </div>
-                                        <h4 className="text-white/40 font-montserrat font-light text-lg mb-2">Selecciona un pedido</h4>
-                                        <p className="text-[11px] text-white/20 uppercase tracking-[0.2em] leading-relaxed">
+                                        <h4 className="text-slate-600 font-montserrat font-light text-lg mb-2">Selecciona un pedido</h4>
+                                        <p className="text-[11px] text-slate-500 uppercase tracking-[0.2em] leading-relaxed">
                                             Haz clic en la lista para ver todos los detalles y gestionar su estado.
                                         </p>
                                     </div>
@@ -832,16 +832,16 @@ export default function AdminPedidosPage() {
                                 initial={{ scale: 0.9, opacity: 0, y: 20 }}
                                 animate={{ scale: 1, opacity: 1, y: 0 }}
                                 exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                                className="relative bg-[#111] border border-white/10 rounded-[32px] overflow-hidden max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl"
+                                className="relative bg-white border border-slate-200 rounded-[32px] overflow-hidden max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl"
                             >
-                                <div className="p-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+                                <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
                                     <div>
-                                        <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-1">Comprobante de Pago</p>
-                                        <h3 className="text-white font-medium">Pedido #{String(selectedOrder.orderNumber).padStart(4, "0")}</h3>
+                                        <p className="text-[10px] uppercase tracking-widest text-slate-600 font-bold mb-1">Comprobante de Pago</p>
+                                        <h3 className="text-slate-900 font-medium">Pedido #{String(selectedOrder.orderNumber).padStart(4, "0")}</h3>
                                     </div>
                                     <button
                                         onClick={() => setShowProofModal(false)}
-                                        className="h-10 w-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-all border border-white/5"
+                                        className="h-10 w-10 rounded-full bg-slate-50 hover:bg-slate-50 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-all border border-slate-200"
                                     >
                                         <X className="h-5 w-5" />
                                     </button>
@@ -853,11 +853,11 @@ export default function AdminPedidosPage() {
                                         className="max-w-full h-auto rounded-2xl shadow-2xl"
                                     />
                                 </div>
-                                <div className="p-6 border-t border-white/5 flex justify-end bg-white/[0.02]">
+                                <div className="p-6 border-t border-slate-200 flex justify-end bg-slate-50">
                                     <a
                                         href={selectedOrder.paymentProof}
                                         target="_blank"
-                                        className="flex items-center gap-2 text-[11px] font-bold text-white bg-white/5 hover:bg-white/10 px-6 py-3 rounded-xl transition-all border border-white/5 uppercase tracking-widest"
+                                        className="flex items-center gap-2 text-[11px] font-bold text-slate-900 bg-slate-50 hover:bg-slate-50 px-6 py-3 rounded-xl transition-all border border-slate-200 uppercase tracking-widest"
                                     >
                                         <ExternalLink className="h-3.5 w-3.5" />
                                         Abrir original

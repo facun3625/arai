@@ -1,5 +1,7 @@
 "use client";
 
+import { ProductTextEditor } from "@/components/admin/ProductTextEditor";
+
 
 import {
     Plus,
@@ -307,24 +309,24 @@ export default function EditarProductoPage() {
         }
     };
 
-    if (isLoading) return <div className="p-8 text-white/20 uppercase tracking-widest text-center">Cargando...</div>;
+    if (isLoading) return <div className="p-8 text-slate-500 uppercase tracking-widest text-center">Cargando...</div>;
 
     return (
         <>
             <form onSubmit={handleSubmit} className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 {/* Header Contextual */}
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                     <div className="flex items-center gap-4">
-                        <Link href="/admin/productos" className="p-2 hover:bg-white/5 rounded-full transition-colors text-white/40 hover:text-white">
+                        <Link href="/admin/productos" className="p-2 hover:bg-slate-50 rounded-full transition-colors text-slate-600 hover:text-slate-900">
                             <ChevronLeft className="h-5 w-5" />
                         </Link>
                         <div className="flex flex-col gap-1">
-                            <h1 className="text-2xl font-light text-white font-montserrat tracking-tight">editar producto</h1>
-                            <p className="text-white/40 text-[11px] uppercase tracking-widest">modifica los detalles de tu artículo</p>
+                            <h1 className="text-2xl font-light text-slate-900 font-montserrat tracking-tight">editar producto</h1>
+                            <p className="text-slate-600 text-[11px] uppercase tracking-widest">modifica los detalles de tu artículo</p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <Link href="/admin/productos" className="px-6 py-2.5 rounded-full text-[11px] text-white/40 hover:text-white transition-colors">
+                    <div className="flex flex-wrap items-center justify-end gap-3">
+                        <Link href="/admin/productos" className="px-6 py-2.5 rounded-full text-[11px] text-slate-600 hover:text-slate-900 transition-colors">
                             Cancelar
                         </Link>
                         <button
@@ -340,70 +342,67 @@ export default function EditarProductoPage() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Columna Principal (2/3) */}
-                    <div className="lg:col-span-2 space-y-6">
+                    <div className="lg:col-span-2 min-w-0 space-y-6">
                         {/* Información Básica */}
-                        <section className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 space-y-6">
-                            <div className="flex items-center gap-3 border-b border-white/5 pb-4 mb-6">
+                        <section className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-6 xl:p-8 space-y-6">
+                            <div className="flex items-center gap-3 border-b border-slate-200 pb-4 mb-6">
                                 <Info className="h-4 w-4 text-primary" />
-                                <h2 className="text-[14px] text-white font-medium uppercase tracking-wider">Información General</h2>
+                                <h2 className="text-[14px] text-slate-900 font-medium uppercase tracking-wider">Información General</h2>
                             </div>
 
                             <div className="space-y-4">
                                 <div className="space-y-1.5">
-                                    <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Título del Producto</label>
+                                    <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Título del Producto</label>
                                     <input
                                         type="text"
                                         value={formData.name}
                                         onChange={handleNameChange}
-                                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-[15px] text-white focus:outline-none focus:border-primary transition-all font-light"
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-[15px] text-slate-900 focus:outline-none focus:border-primary transition-all font-light"
                                         placeholder="Ej: Café de Especialidad - Blend House"
                                         required
                                     />
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Slug (URL)</label>
+                                    <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Slug (URL)</label>
                                     <input
                                         type="text"
                                         value={formData.slug}
                                         onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[12px] text-white/60 font-mono focus:outline-none focus:border-primary transition-all"
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[12px] text-slate-600 font-mono focus:outline-none focus:border-primary transition-all"
                                     />
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Características / Descripción</label>
-                                    <textarea
-                                        rows={6}
+                                    <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Características / Descripción</label>
+                                    <ProductTextEditor
                                         value={formData.description}
-                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-[14px] text-white focus:outline-none focus:border-primary transition-all resize-none leading-relaxed"
-                                        placeholder="Describe las propiedades, origen y notas de cata..."
+                                        onChange={(description) => setFormData(prev => ({ ...prev, description }))}
                                     />
                                 </div>
                             </div>
                         </section>
 
                         {/* Media Section */}
-                        <section className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 space-y-6">
-                            <div className="flex items-center gap-3 border-b border-white/5 pb-4 mb-6">
+                        <section className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-6 xl:p-8 space-y-6">
+                            <div className="flex items-center gap-3 border-b border-slate-200 pb-4 mb-6">
                                 <ImageIcon className="h-4 w-4 text-primary" />
-                                <h2 className="text-[14px] text-white font-medium uppercase tracking-wider">Multimedia</h2>
+                                <h2 className="text-[14px] text-slate-900 font-medium uppercase tracking-wider">Multimedia</h2>
                             </div>
 
                             <div className="space-y-6">
                                 {/* Galería de Imágenes */}
                                 <div className="space-y-3">
-                                    <label className="text-[10px] uppercase tracking-widest text-white/40">Imágenes del Producto</label>
+                                    <label className="text-[10px] uppercase tracking-widest text-slate-600">Imágenes del Producto</label>
                                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                                         {formData.images.map((img, idx) => (
-                                            <div key={idx} className={`aspect-square bg-white/5 rounded-2xl border ${formData.featuredImage === img ? 'border-primary' : 'border-white/10'} relative group overflow-hidden`}>
+                                            <div key={idx} className={`aspect-square bg-slate-50 rounded-2xl border ${formData.featuredImage === img ? 'border-primary' : 'border-slate-200'} relative group overflow-hidden`}>
                                                 <Image src={img} alt={`Preview ${idx}`} fill className="object-cover" />
                                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
                                                     <button
                                                         type="button"
                                                         onClick={() => setFormData({ ...formData, featuredImage: img })}
-                                                        className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${formData.featuredImage === img ? 'bg-primary text-white' : 'bg-white/10 text-white hover:bg-white/20'}`}
+                                                        className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${formData.featuredImage === img ? 'bg-primary text-white' : 'bg-slate-50 text-slate-900 hover:bg-slate-50'}`}
                                                     >
                                                         {formData.featuredImage === img ? 'Destacada' : 'Hacer Principal'}
                                                     </button>
@@ -426,14 +425,14 @@ export default function EditarProductoPage() {
                                             type="button"
                                             disabled={isUploading}
                                             onClick={() => fileInputRef.current?.click()}
-                                            className="aspect-square rounded-2xl border-2 border-dashed border-white/10 hover:border-primary/40 hover:bg-primary/5 transition-all flex flex-col items-center justify-center gap-2 group disabled:opacity-50"
+                                            className="aspect-square rounded-2xl border-2 border-dashed border-slate-200 hover:border-primary/40 hover:bg-primary/5 transition-all flex flex-col items-center justify-center gap-2 group disabled:opacity-50"
                                         >
                                             {isUploading ? (
                                                 <Loader2 className="h-6 w-6 text-primary animate-spin" />
                                             ) : (
-                                                <PlusCircle className="h-6 w-6 text-white/10 group-hover:text-primary transition-colors" />
+                                                <PlusCircle className="h-6 w-6 text-slate-500 group-hover:text-primary transition-colors" />
                                             )}
-                                            <span className="text-[9px] uppercase tracking-widest text-white/20 group-hover:text-primary transition-colors">
+                                            <span className="text-[9px] uppercase tracking-widest text-slate-500 group-hover:text-primary transition-colors">
                                                 {isUploading ? "Subiendo..." : "Subir Imagen"}
                                             </span>
                                         </button>
@@ -449,14 +448,14 @@ export default function EditarProductoPage() {
 
                                 {/* Video Link */}
                                 <div className="space-y-1.5">
-                                    <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Video Relacionado (Link Youtube/Vimeo)</label>
+                                    <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Video Relacionado (Link Youtube/Vimeo)</label>
                                     <div className="relative">
-                                        <Video className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
+                                        <Video className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                                         <input
                                             type="url"
                                             value={formData.videoUrl}
                                             onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-5 py-4 text-[13px] text-white focus:outline-none focus:border-primary transition-all"
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-12 pr-5 py-4 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-all"
                                             placeholder="https://youtube.com/watch?v=..."
                                         />
                                     </div>
@@ -466,44 +465,44 @@ export default function EditarProductoPage() {
 
                         {/* Inventory & Dimensions (only if SIMPLE) */}
                         {formData.type === "SIMPLE" && (
-                            <section className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 space-y-6">
-                                <div className="flex items-center gap-3 border-b border-white/5 pb-4 mb-6">
+                            <section className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-6 xl:p-8 space-y-6">
+                                <div className="flex items-center gap-3 border-b border-slate-200 pb-4 mb-6">
                                     <Box className="h-4 w-4 text-primary" />
-                                    <h2 className="text-[14px] text-white font-medium uppercase tracking-wider">Inventario y Envío</h2>
+                                    <h2 className="text-[14px] text-slate-900 font-medium uppercase tracking-wider">Inventario y Envío</h2>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <div className="space-y-4">
                                         <div className="space-y-1.5 focus-within:z-10">
-                                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Stock Actual</label>
+                                            <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Stock Actual</label>
                                             <input
                                                 type="number"
                                                 value={formData.stock}
                                                 onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary outline-none transition-all"
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:border-primary outline-none transition-all"
                                                 placeholder="0"
                                             />
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-1.5 focus-within:z-10">
-                                                <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Precio Actual ($)</label>
+                                                <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Precio Actual ($)</label>
                                                 <input
                                                     type="number"
                                                     value={formData.price}
                                                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary outline-none transition-all placeholder:text-white/10"
+                                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:border-primary outline-none transition-all placeholder:text-slate-500"
                                                     placeholder="0.00"
                                                 />
                                             </div>
                                             <div className="space-y-1.5 focus-within:z-10">
-                                                <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Precio Anterior ($)</label>
+                                                <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Precio Anterior ($)</label>
                                                 <div className="relative">
                                                     <input
                                                         type="number"
                                                         value={formData.compareAtPrice}
                                                         onChange={(e) => setFormData({ ...formData, compareAtPrice: e.target.value })}
-                                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary outline-none transition-all placeholder:text-white/10"
+                                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:border-primary outline-none transition-all placeholder:text-slate-500"
                                                         placeholder="0.00"
                                                     />
                                                     {calculateDiscount(formData.price, formData.compareAtPrice) > 0 && (
@@ -518,39 +517,39 @@ export default function EditarProductoPage() {
 
                                     <div className="space-y-4">
                                         <div className="space-y-1.5">
-                                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Peso (kg)</label>
+                                            <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Peso (kg)</label>
                                             <input
                                                 type="number"
                                                 step="0.01"
                                                 value={formData.weight}
                                                 onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary outline-none"
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:border-primary outline-none"
                                                 placeholder="0.00"
                                             />
                                         </div>
                                         <div className="space-y-1.5">
-                                            <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Dimensiones (Ancho x Alto x Largo cm)</label>
+                                            <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Dimensiones (Ancho x Alto x Largo cm)</label>
                                             <div className="grid grid-cols-3 gap-2">
                                                 <input
                                                     type="number"
                                                     value={formData.width}
                                                     onChange={(e) => setFormData({ ...formData, width: e.target.value })}
                                                     placeholder="An"
-                                                    className="bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white focus:border-primary outline-none text-center"
+                                                    className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-slate-900 focus:border-primary outline-none text-center"
                                                 />
                                                 <input
                                                     type="number"
                                                     value={formData.height}
                                                     onChange={(e) => setFormData({ ...formData, height: e.target.value })}
                                                     placeholder="Al"
-                                                    className="bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white focus:border-primary outline-none text-center"
+                                                    className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-slate-900 focus:border-primary outline-none text-center"
                                                 />
                                                 <input
                                                     type="number"
                                                     value={formData.length}
                                                     onChange={(e) => setFormData({ ...formData, length: e.target.value })}
                                                     placeholder="La"
-                                                    className="bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white focus:border-primary outline-none text-center"
+                                                    className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-slate-900 focus:border-primary outline-none text-center"
                                                 />
                                             </div>
                                         </div>
@@ -561,20 +560,20 @@ export default function EditarProductoPage() {
 
                         {/* Variables Logic */}
                         {formData.type === "VARIABLE" && (
-                            <section className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 space-y-6">
-                                <div className="flex items-center gap-3 border-b border-white/5 pb-4 mb-6">
+                            <section className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-6 xl:p-8 space-y-6">
+                                <div className="flex items-center gap-3 border-b border-slate-200 pb-4 mb-6">
                                     <Layers className="h-4 w-4 text-primary" />
-                                    <h2 className="text-[14px] text-white font-medium uppercase tracking-wider">Variantes del Producto</h2>
+                                    <h2 className="text-[14px] text-slate-900 font-medium uppercase tracking-wider">Variantes del Producto</h2>
                                 </div>
 
                                 <div className="space-y-6">
                                     {/* Selección de Atributos */}
-                                    <div className="bg-white/5 p-6 rounded-2xl border border-white/5 space-y-6">
+                                    <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-6">
                                         <div className="space-y-4">
-                                            <p className="text-[11px] text-white/60">Selecciona los atributos y términos:</p>
+                                            <p className="text-[11px] text-slate-600">Selecciona los atributos y términos:</p>
                                             <div className="flex flex-wrap gap-3">
                                                 {allAttributes.filter(a => !a.isAddon).length === 0 ? (
-                                                    <p className="text-[10px] text-white/20 italic">No hay atributos definidos como variaciones.</p>
+                                                    <p className="text-[10px] text-slate-500 italic">No hay atributos definidos como variaciones.</p>
                                                 ) : allAttributes.filter(a => !a.isAddon).map(attr => (
                                                     <label key={attr.id} className="flex items-center gap-2 cursor-pointer group">
                                                         <input
@@ -590,7 +589,7 @@ export default function EditarProductoPage() {
                                                         />
                                                         <div className={`px-4 py-2 rounded-xl border text-[11px] transition-all shadow-sm ${selectedAttributes.includes(attr.id)
                                                             ? 'border-primary bg-primary/20 text-primary font-bold'
-                                                            : 'border-white/10 text-white/30 hover:border-white/20'
+                                                            : 'border-slate-200 text-slate-500 hover:border-slate-200'
                                                             }`}>
                                                             {attr.name}
                                                         </div>
@@ -606,7 +605,7 @@ export default function EditarProductoPage() {
                                                 if (!attr) return null;
                                                 const terms = attr.terms.split(/[,\.;\n]+/).map((t: string) => t.trim()).filter(Boolean);
                                                 return (
-                                                    <div key={attrId} className="bg-white/[0.02] p-4 rounded-2xl border border-white/5 space-y-3">
+                                                    <div key={attrId} className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
                                                         <p className="text-[10px] uppercase tracking-widest text-primary font-bold">{attr.name}</p>
                                                         <div className="flex flex-wrap gap-2">
                                                             {terms.map((term: string) => (
@@ -625,7 +624,7 @@ export default function EditarProductoPage() {
                                                                     />
                                                                     <div className={`px-3 py-1.5 rounded-lg border text-[10px] transition-all ${selectedTerms[attrId]?.includes(term)
                                                                         ? 'border-primary bg-primary/20 text-primary'
-                                                                        : 'border-white/5 text-white/30 hover:border-white/20'
+                                                                        : 'border-slate-200 text-slate-500 hover:border-slate-200'
                                                                         }`}>
                                                                         {term}
                                                                     </div>
@@ -649,8 +648,8 @@ export default function EditarProductoPage() {
                                     {/* Listado de Variantes */}
                                     <div className="space-y-4">
                                         {variants.map((variant, vIdx) => (
-                                            <div key={vIdx} className="bg-white/[0.03] border border-white/5 rounded-3xl p-6 space-y-6 animate-in fade-in duration-500">
-                                                <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                                            <div key={vIdx} className="bg-white border border-slate-200 rounded-3xl p-6 space-y-6 animate-in fade-in duration-500">
+                                                <div className="flex items-center justify-between border-b border-slate-200 pb-4">
                                                     <div className="flex items-center gap-2">
                                                         <Layers className="h-4 w-4 text-primary/40 mr-2" />
                                                         {Object.entries(variant.attributes).map(([k, v]: [any, any]) => (
@@ -662,7 +661,7 @@ export default function EditarProductoPage() {
                                                     <button
                                                         type="button"
                                                         onClick={() => setVariants(variants.filter((_, i) => i !== vIdx))}
-                                                        className="p-2 hover:bg-red-500/10 text-white/20 hover:text-red-400 rounded-full transition-all"
+                                                        className="p-2 hover:bg-red-500/10 text-slate-500 hover:text-red-700 rounded-full transition-all"
                                                     >
                                                         <Trash2 className="h-4 w-4" />
                                                     </button>
@@ -672,22 +671,22 @@ export default function EditarProductoPage() {
                                                     <div className="space-y-4">
                                                         <div className="grid grid-cols-3 gap-4">
                                                             <div className="space-y-1">
-                                                                <label className="text-[9px] uppercase tracking-widest text-white/20 ml-1">Precio</label>
+                                                                <label className="text-[9px] uppercase tracking-widest text-slate-500 ml-1">Precio</label>
                                                                 <input
                                                                     type="number"
                                                                     value={variant.price}
                                                                     onChange={(e) => updateVariantField(vIdx, 'price', e.target.value)}
-                                                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[14px] text-white focus:border-primary outline-none transition-all"
+                                                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] text-slate-900 focus:border-primary outline-none transition-all"
                                                                 />
                                                             </div>
                                                             <div className="space-y-1">
-                                                                <label className="text-[9px] uppercase tracking-widest text-white/20 ml-1">P. Anterior</label>
+                                                                <label className="text-[9px] uppercase tracking-widest text-slate-500 ml-1">P. Anterior</label>
                                                                 <div className="relative">
                                                                     <input
                                                                         type="number"
                                                                         value={variant.compareAtPrice}
                                                                         onChange={(e) => updateVariantField(vIdx, 'compareAtPrice', e.target.value)}
-                                                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[14px] text-white focus:border-primary outline-none transition-all"
+                                                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] text-slate-900 focus:border-primary outline-none transition-all"
                                                                     />
                                                                     {calculateDiscount(variant.price, variant.compareAtPrice) > 0 && (
                                                                         <span className="absolute right-2 top-1/2 -translate-y-1/2 px-1.5 py-0.5 bg-primary/20 text-primary text-[8px] font-bold rounded">
@@ -697,34 +696,34 @@ export default function EditarProductoPage() {
                                                                 </div>
                                                             </div>
                                                             <div className="space-y-1">
-                                                                <label className="text-[9px] uppercase tracking-widest text-white/20 ml-1">Stock</label>
+                                                                <label className="text-[9px] uppercase tracking-widest text-slate-500 ml-1">Stock</label>
                                                                 <input
                                                                     type="number"
                                                                     value={variant.stock}
                                                                     onChange={(e) => updateVariantField(vIdx, 'stock', e.target.value)}
-                                                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[14px] text-white focus:border-primary outline-none transition-all"
+                                                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] text-slate-900 focus:border-primary outline-none transition-all"
                                                                 />
                                                             </div>
                                                         </div>
 
                                                         {/* Images for variant */}
                                                         <div className="space-y-2">
-                                                            <label className="text-[9px] uppercase tracking-widest text-white/20 ml-1">Imágenes de la variación</label>
+                                                            <label className="text-[9px] uppercase tracking-widest text-slate-500 ml-1">Imágenes de la variación</label>
                                                             <div className="flex flex-wrap gap-2">
                                                                 {variant.images.map((img: string, iIdx: number) => (
-                                                                    <div key={iIdx} className="relative w-16 h-16 rounded-xl overflow-hidden border border-white/10 group">
+                                                                    <div key={iIdx} className="relative w-16 h-16 rounded-xl overflow-hidden border border-slate-200 group">
                                                                         <Image src={img} alt="Variant" fill className="object-cover" />
                                                                         <button
                                                                             type="button"
                                                                             onClick={() => handleRemoveVariantImage(vIdx, iIdx)}
                                                                             className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity"
                                                                         >
-                                                                            <X className="h-4 w-4 text-white" />
+                                                                            <X className="h-4 w-4 text-slate-900" />
                                                                         </button>
                                                                     </div>
                                                                 ))}
-                                                                <label className="w-16 h-16 rounded-xl border-2 border-dashed border-white/5 hover:border-primary/40 hover:bg-primary/5 flex items-center justify-center cursor-pointer transition-all group">
-                                                                    <PlusCircle className="h-5 w-5 text-white/10 group-hover:text-primary transition-colors" />
+                                                                <label className="w-16 h-16 rounded-xl border-2 border-dashed border-slate-200 hover:border-primary/40 hover:bg-primary/5 flex items-center justify-center cursor-pointer transition-all group">
+                                                                    <PlusCircle className="h-5 w-5 text-slate-500 group-hover:text-primary transition-colors" />
                                                                     <input type="file" className="hidden" accept="image/*" onChange={(e) => handleVariantFileUpload(e, vIdx)} />
                                                                 </label>
                                                             </div>
@@ -733,21 +732,21 @@ export default function EditarProductoPage() {
 
                                                     <div className="space-y-4">
                                                         <div className="space-y-1">
-                                                            <label className="text-[9px] uppercase tracking-widest text-white/20 ml-1">Peso (kg)</label>
+                                                            <label className="text-[9px] uppercase tracking-widest text-slate-500 ml-1">Peso (kg)</label>
                                                             <input
                                                                 type="number"
                                                                 step="0.01"
                                                                 value={variant.weight}
                                                                 onChange={(e) => updateVariantField(vIdx, 'weight', e.target.value)}
-                                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[14px] text-white focus:border-primary outline-none transition-all"
+                                                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] text-slate-900 focus:border-primary outline-none transition-all"
                                                             />
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <label className="text-[9px] uppercase tracking-widest text-white/20 ml-1">Dimensiones (An x Al x La cm)</label>
+                                                            <label className="text-[9px] uppercase tracking-widest text-slate-500 ml-1">Dimensiones (An x Al x La cm)</label>
                                                             <div className="flex gap-2">
-                                                                <input type="number" value={variant.width} onChange={(e) => updateVariantField(vIdx, 'width', e.target.value)} placeholder="W" className="w-1/3 bg-white/5 border border-white/10 rounded-xl py-3 text-[12px] text-center text-white focus:border-primary outline-none transition-all" />
-                                                                <input type="number" value={variant.height} onChange={(e) => updateVariantField(vIdx, 'height', e.target.value)} placeholder="H" className="w-1/3 bg-white/5 border border-white/10 rounded-xl py-3 text-[12px] text-center text-white focus:border-primary outline-none transition-all" />
-                                                                <input type="number" value={variant.length} onChange={(e) => updateVariantField(vIdx, 'length', e.target.value)} placeholder="L" className="w-1/3 bg-white/5 border border-white/10 rounded-xl py-3 text-[12px] text-center text-white focus:border-primary outline-none transition-all" />
+                                                                <input type="number" value={variant.width} onChange={(e) => updateVariantField(vIdx, 'width', e.target.value)} placeholder="W" className="w-1/3 bg-slate-50 border border-slate-200 rounded-xl py-3 text-[12px] text-center text-slate-900 focus:border-primary outline-none transition-all" />
+                                                                <input type="number" value={variant.height} onChange={(e) => updateVariantField(vIdx, 'height', e.target.value)} placeholder="H" className="w-1/3 bg-slate-50 border border-slate-200 rounded-xl py-3 text-[12px] text-center text-slate-900 focus:border-primary outline-none transition-all" />
+                                                                <input type="number" value={variant.length} onChange={(e) => updateVariantField(vIdx, 'length', e.target.value)} placeholder="L" className="w-1/3 bg-slate-50 border border-slate-200 rounded-xl py-3 text-[12px] text-center text-slate-900 focus:border-primary outline-none transition-all" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -760,13 +759,13 @@ export default function EditarProductoPage() {
                         )}
 
                         {/* Complementos / Add-ons */}
-                        <section className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 space-y-6">
-                            <div className="flex items-center gap-3 border-b border-white/5 pb-4 mb-6">
+                        <section className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-6 xl:p-8 space-y-6">
+                            <div className="flex items-center gap-3 border-b border-slate-200 pb-4 mb-6">
                                 <PlusCircle className="h-4 w-4 text-primary" />
-                                <h2 className="text-[14px] text-white font-medium uppercase tracking-wider">Complementos (Multi-selección)</h2>
+                                <h2 className="text-[14px] text-slate-900 font-medium uppercase tracking-wider">Complementos (Multi-selección)</h2>
                             </div>
 
-                            <p className="text-[11px] text-white/40 leading-relaxed -mt-4 mb-6">
+                            <p className="text-[11px] text-slate-600 leading-relaxed -mt-4 mb-6">
                                 Selecciona qué atributos quieres que aparezcan como complementos elegibles por el cliente (ej: Blends, Hierbas).
                                 A diferencia de las variaciones, el cliente podrá seleccionar múltiples opciones.
                             </p>
@@ -774,7 +773,7 @@ export default function EditarProductoPage() {
                             <div className="space-y-6">
                                 <div className="flex flex-wrap gap-3">
                                     {allAttributes.filter(a => a.isAddon).length === 0 ? (
-                                        <p className="text-[10px] text-white/20 italic">No hay atributos definidos como complementos. Marca alguno como 'Complemento' en la sección de atributos.</p>
+                                        <p className="text-[10px] text-slate-500 italic">No hay atributos definidos como complementos. Marca alguno como 'Complemento' en la sección de atributos.</p>
                                     ) : allAttributes.filter(a => a.isAddon).map(attr => {
                                         const isSelected = formData.addons.some(a => a.attributeId === attr.id);
                                         return (
@@ -790,7 +789,7 @@ export default function EditarProductoPage() {
                                                 }}
                                                 className={`px-4 py-2 rounded-xl border text-[11px] transition-all ${isSelected
                                                     ? 'border-primary bg-primary/20 text-primary font-bold'
-                                                    : 'border-white/10 text-white/30 hover:border-white/20'
+                                                    : 'border-slate-200 text-slate-500 hover:border-slate-200'
                                                     }`}
                                             >
                                                 {attr.name}
@@ -806,13 +805,13 @@ export default function EditarProductoPage() {
                                         const availableTerms = fullAttr.terms.split(/[,\.;\n]+/).map((t: string) => t.trim()).filter(Boolean);
 
                                         return (
-                                            <div key={addon.attributeId} className="bg-white/[0.02] p-5 rounded-2xl border border-white/5 space-y-4">
+                                            <div key={addon.attributeId} className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
                                                 <div className="flex items-center justify-between">
                                                     <p className="text-[10px] uppercase tracking-widest text-primary font-bold">{addon.name}</p>
                                                     <button
                                                         type="button"
                                                         onClick={() => setFormData({ ...formData, addons: formData.addons.filter(a => a.attributeId !== addon.attributeId) })}
-                                                        className="text-white/20 hover:text-red-400 p-1"
+                                                        className="text-slate-500 hover:text-red-700 p-1"
                                                     >
                                                         <X className="h-3 w-3" />
                                                     </button>
@@ -836,7 +835,7 @@ export default function EditarProductoPage() {
                                                             />
                                                             <div className={`px-3 py-1.5 rounded-lg border text-[10px] transition-all ${addon.terms.includes(term)
                                                                 ? 'border-primary bg-primary/20 text-primary'
-                                                                : 'border-white/5 text-white/30 hover:border-white/20'
+                                                                : 'border-slate-200 text-slate-500 hover:border-slate-200'
                                                                 }`}>
                                                                 {term}
                                                             </div>
@@ -854,15 +853,15 @@ export default function EditarProductoPage() {
                     {/* Columna Lateral (1/3) */}
                     <div className="space-y-6">
                         {/* Tipo de Producto */}
-                        <section className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 space-y-4">
-                            <label className="text-[10px] uppercase tracking-widest text-white/40 block">Configuración de Producto</label>
+                        <section className="bg-white border border-slate-200 rounded-3xl p-6 space-y-4">
+                            <label className="text-[10px] uppercase tracking-widest text-slate-600 block">Configuración de Producto</label>
                             <div className="grid grid-cols-2 gap-2">
                                 <button
                                     type="button"
                                     onClick={() => setFormData({ ...formData, type: "SIMPLE" })}
                                     className={`py-3 rounded-2xl text-[11px] font-medium transition-all ${formData.type === "SIMPLE"
                                         ? 'bg-primary text-white shadow-lg shadow-primary/20'
-                                        : 'bg-white/5 text-white/40 hover:bg-white/10'
+                                        : 'bg-slate-50 text-slate-600 hover:bg-slate-50'
                                         }`}
                                 >
                                     Simple
@@ -872,7 +871,7 @@ export default function EditarProductoPage() {
                                     onClick={() => setFormData({ ...formData, type: "VARIABLE" })}
                                     className={`py-3 rounded-2xl text-[11px] font-medium transition-all ${formData.type === "VARIABLE"
                                         ? 'bg-primary text-white shadow-lg shadow-primary/20'
-                                        : 'bg-white/5 text-white/40 hover:bg-white/10'
+                                        : 'bg-slate-50 text-slate-600 hover:bg-slate-50'
                                         }`}
                                 >
                                     Variable
@@ -881,8 +880,8 @@ export default function EditarProductoPage() {
                         </section>
 
                         {/* Categorías */}
-                        <section className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 space-y-4">
-                            <label className="text-[10px] uppercase tracking-widest text-white/40 block">Categorías</label>
+                        <section className="bg-white border border-slate-200 rounded-3xl p-6 space-y-4">
+                            <label className="text-[10px] uppercase tracking-widest text-slate-600 block">Categorías</label>
                             <div className="space-y-2 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
                                 {categories.map((cat) => (
                                     <label key={cat.id} className="flex items-center gap-3 group cursor-pointer">
@@ -890,9 +889,9 @@ export default function EditarProductoPage() {
                                             type="checkbox"
                                             checked={formData.categories.includes(cat.id)}
                                             onChange={() => handleCategoryToggle(cat.id)}
-                                            className="w-4 h-4 rounded border-white/10 bg-white/5 text-primary focus:ring-primary/20"
+                                            className="w-4 h-4 rounded border-slate-200 bg-slate-50 text-primary focus:ring-primary/20"
                                         />
-                                        <span className={`text-[12px] transition-colors ${formData.categories.includes(cat.id) ? 'text-white' : 'text-white/40 group-hover:text-white/60'}`}>
+                                        <span className={`text-[12px] transition-colors ${formData.categories.includes(cat.id) ? 'text-slate-900' : 'text-slate-600 group-hover:text-slate-600'}`}>
                                             {cat.name}
                                         </span>
                                     </label>
@@ -903,7 +902,7 @@ export default function EditarProductoPage() {
                         {/* Ayuda/Tips */}
                         <div className="p-6 bg-primary/5 rounded-3xl border border-primary/10">
                             <h3 className="text-[11px] font-bold text-primary uppercase tracking-widest mb-2">Tip: Variaciones</h3>
-                            <p className="text-[11px] text-white/40 leading-relaxed">
+                            <p className="text-[11px] text-slate-600 leading-relaxed">
                                 Si el producto tiene diferentes talles o colores, cámbialo a "Variable".
                                 Podrás generar automáticamente todas las combinaciones y asignarles stock independiente.
                             </p>

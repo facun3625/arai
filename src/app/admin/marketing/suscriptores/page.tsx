@@ -76,8 +76,8 @@ export default function SubscribersPage() {
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex flex-col gap-1">
-                        <h1 className="text-2xl font-light text-white font-montserrat tracking-tight">suscriptores</h1>
-                        <p className="text-white/40 text-[11px] uppercase tracking-widest">gestión de audiencia y newsletter</p>
+                        <h1 className="text-2xl font-light text-slate-900 font-montserrat tracking-tight">suscriptores</h1>
+                        <p className="text-slate-600 text-[11px] uppercase tracking-widest">gestión de audiencia y newsletter</p>
                     </div>
 
                     <button
@@ -92,74 +92,74 @@ export default function SubscribersPage() {
 
                 {/* Filters & Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-white/[0.03] border border-white/5 rounded-3xl p-6">
-                        <p className="text-white/40 text-[10px] uppercase tracking-widest mb-1">Total de Suscriptores</p>
-                        <p className="text-3xl font-light text-white font-montserrat">{subscribers.length}</p>
+                    <div className="bg-white border border-slate-200 rounded-3xl p-6">
+                        <p className="text-slate-600 text-[10px] uppercase tracking-widest mb-1">Total de Suscriptores</p>
+                        <p className="text-3xl font-light text-slate-900 font-montserrat">{subscribers.length}</p>
                     </div>
 
-                    <div className="md:col-span-2 bg-white/[0.03] border border-white/5 rounded-3xl p-4 flex items-center px-6">
-                        <Search className="h-5 w-5 text-white/20 mr-4" />
+                    <div className="md:col-span-2 bg-white border border-slate-200 rounded-3xl p-4 flex items-center px-6">
+                        <Search className="h-5 w-5 text-slate-500 mr-4" />
                         <input
                             type="text"
                             placeholder="Buscar por email..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="bg-transparent border-none text-white text-sm w-full focus:outline-none placeholder:text-white/20"
+                            className="bg-transparent border-none text-slate-900 text-sm w-full focus:outline-none placeholder:text-slate-500"
                         />
                     </div>
                 </div>
 
                 {/* Table */}
-                <div className="bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
+                <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-2xl">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b border-white/5 bg-white/[0.04]">
-                                    <th className="px-8 py-5 text-[10px] uppercase tracking-widest text-white/40 font-medium italic">Email de Contacto</th>
-                                    <th className="px-8 py-5 text-[10px] uppercase tracking-widest text-white/40 font-medium italic text-center">Estado</th>
-                                    <th className="px-8 py-5 text-[10px] uppercase tracking-widest text-white/40 font-medium italic text-right">Fecha de Alta</th>
+                                <tr className="border-b border-slate-200 bg-slate-50">
+                                    <th className="px-8 py-5 text-[10px] uppercase tracking-widest text-slate-600 font-medium italic">Email de Contacto</th>
+                                    <th className="px-8 py-5 text-[10px] uppercase tracking-widest text-slate-600 font-medium italic text-center">Estado</th>
+                                    <th className="px-8 py-5 text-[10px] uppercase tracking-widest text-slate-600 font-medium italic text-right">Fecha de Alta</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-white/5">
+                            <tbody className="divide-y divide-slate-200">
                                 {isLoading ? (
                                     <tr>
                                         <td colSpan={3} className="px-8 py-20 text-center">
                                             <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
-                                            <p className="text-[11px] text-white/20 uppercase tracking-widest">Cargando base de datos...</p>
+                                            <p className="text-[11px] text-slate-500 uppercase tracking-widest">Cargando base de datos...</p>
                                         </td>
                                     </tr>
                                 ) : filteredSubscribers.length === 0 ? (
                                     <tr>
                                         <td colSpan={3} className="px-8 py-20 text-center">
-                                            <Mail className="h-10 w-10 text-white/10 mx-auto mb-4" />
-                                            <p className="text-[11px] text-white/20 uppercase tracking-widest">No se encontraron suscriptores</p>
+                                            <Mail className="h-10 w-10 text-slate-500 mx-auto mb-4" />
+                                            <p className="text-[11px] text-slate-500 uppercase tracking-widest">No se encontraron suscriptores</p>
                                         </td>
                                     </tr>
                                 ) : filteredSubscribers.map((s) => (
-                                    <tr key={s.id} className="hover:bg-white/[0.02] transition-colors group">
+                                    <tr key={s.id} className="hover:bg-slate-50 transition-colors group">
                                         <td className="px-8 py-5 flex items-center gap-4">
-                                            <div className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-primary/30 transition-colors">
-                                                <Mail className="h-4 w-4 text-white/40 group-hover:text-primary transition-colors" />
+                                            <div className="h-10 w-10 rounded-full bg-slate-50 flex items-center justify-center border border-slate-200 group-hover:border-primary/30 transition-colors">
+                                                <Mail className="h-4 w-4 text-slate-600 group-hover:text-primary transition-colors" />
                                             </div>
-                                            <span className="text-[14px] text-white/80 group-hover:text-white transition-colors">{s.email}</span>
+                                            <span className="text-[14px] text-slate-900 group-hover:text-slate-900 transition-colors">{s.email}</span>
                                         </td>
                                         <td className="px-8 py-5 text-center">
                                             {s.isActive ? (
-                                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/10 text-green-400 text-[10px] font-bold uppercase tracking-widest border border-green-500/20">
+                                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/10 text-green-700 text-[10px] font-bold uppercase tracking-widest border border-green-500/20">
                                                     <CheckCircle2 className="h-3 w-3" /> activo
                                                 </span>
                                             ) : (
-                                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 text-red-400 text-[10px] font-bold uppercase tracking-widest border border-red-500/20">
+                                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 text-red-700 text-[10px] font-bold uppercase tracking-widest border border-red-500/20">
                                                     <XCircle className="h-3 w-3" /> inactivo
                                                 </span>
                                             )}
                                         </td>
                                         <td className="px-8 py-5 text-right">
                                             <div className="flex flex-col items-end">
-                                                <span className="text-[13px] text-white/60 font-mono">
+                                                <span className="text-[13px] text-slate-600 font-mono">
                                                     {new Date(s.createdAt).toLocaleDateString('es-AR')}
                                                 </span>
-                                                <span className="text-[9px] text-white/20 uppercase tracking-tighter">
+                                                <span className="text-[9px] text-slate-500 uppercase tracking-tighter">
                                                     {new Date(s.createdAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })} hs
                                                 </span>
                                             </div>

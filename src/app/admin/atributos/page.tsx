@@ -136,39 +136,39 @@ export default function AtributosPage() {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-1">
-                        <h1 className="text-2xl font-light text-white font-montserrat tracking-tight">atributos</h1>
-                        <p className="text-white/40 text-[11px] uppercase tracking-widest">gestiona las variaciones de tus productos</p>
+                        <h1 className="text-2xl font-light text-slate-900 font-montserrat tracking-tight">atributos</h1>
+                        <p className="text-slate-600 text-[11px] uppercase tracking-widest">gestiona las variaciones de tus productos</p>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Formulario Lateral */}
                     <div className="lg:col-span-1 space-y-6">
-                        <form onSubmit={handleSubmit} className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 space-y-4">
-                            <h2 className="text-[14px] text-white font-medium mb-4">
+                        <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-3xl p-6 space-y-4">
+                            <h2 className="text-[14px] text-slate-900 font-medium mb-4">
                                 {editingId ? "Editar atributo" : "Añadir nuevo atributo"}
                             </h2>
 
                             <div className="space-y-1.5">
-                                <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Nombre</label>
+                                <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Nombre</label>
                                 <input
                                     type="text"
                                     value={formData.name}
                                     onChange={handleNameChange}
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors"
                                     placeholder="Ej: Talle, Color, Molienda"
                                     required
                                 />
-                                <p className="text-[9px] text-white/20 ml-1 italic">Nombre del atributo (ej: Tamaño).</p>
+                                <p className="text-[9px] text-slate-500 ml-1 italic">Nombre del atributo (ej: Tamaño).</p>
                             </div>
 
                             <div className="space-y-1.5">
-                                <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Slug</label>
+                                <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Slug</label>
                                 <input
                                     type="text"
                                     value={formData.slug}
                                     onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors"
                                     placeholder="ej-tamano"
                                     required
                                 />
@@ -176,66 +176,66 @@ export default function AtributosPage() {
 
                             <div className="space-y-1.5">
                                 <div className="flex items-center justify-between ml-1">
-                                    <label className="text-[10px] uppercase tracking-widest text-white/40">Términos</label>
+                                    <label className="text-[10px] uppercase tracking-widest text-slate-600">Términos</label>
                                 </div>
                                 <textarea
                                     rows={4}
                                     value={formData.terms}
                                     onChange={(e) => setFormData({ ...formData, terms: e.target.value })}
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors resize-none"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors resize-none"
                                     placeholder="Ej: S, M, L o Roja, Azul (separados por coma)"
                                 />
-                                <p className="text-[9px] text-white/20 ml-1 italic">Ingresa los valores separados por comas.</p>
+                                <p className="text-[9px] text-slate-500 ml-1 italic">Ingresa los valores separados por comas.</p>
                             </div>
 
-                            <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3 cursor-pointer group" onClick={() => setFormData({ ...formData, isAddon: !formData.isAddon })}>
-                                <div className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${formData.isAddon ? 'bg-primary border-primary' : 'bg-white/5 border-white/20'}`}>
-                                    {formData.isAddon && <Plus className="h-3 w-3 text-white" />}
+                            <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 cursor-pointer group" onClick={() => setFormData({ ...formData, isAddon: !formData.isAddon })}>
+                                <div className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${formData.isAddon ? 'bg-primary border-primary' : 'bg-slate-50 border-slate-200'}`}>
+                                    {formData.isAddon && <Plus className="h-3 w-3 text-slate-900" />}
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-[11px] text-white group-hover:text-primary transition-colors">¿Es un Complemento?</span>
-                                    <span className="text-[9px] text-white/40 italic">Para blends, hierbas y agregados multi-selección.</span>
+                                    <span className="text-[11px] text-slate-900 group-hover:text-primary transition-colors">¿Es un Complemento?</span>
+                                    <span className="text-[9px] text-slate-600 italic">Para blends, hierbas y agregados multi-selección.</span>
                                 </div>
                             </div>
 
                             {formData.isAddon && (
                                 <>
-                                    <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3 cursor-pointer group" onClick={() => setFormData({ ...formData, required: !formData.required })}>
-                                        <div className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${formData.required ? 'bg-primary border-primary' : 'bg-white/5 border-white/20'}`}>
-                                            {formData.required && <Plus className="h-3 w-3 text-white" />}
+                                    <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 cursor-pointer group" onClick={() => setFormData({ ...formData, required: !formData.required })}>
+                                        <div className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${formData.required ? 'bg-primary border-primary' : 'bg-slate-50 border-slate-200'}`}>
+                                            {formData.required && <Plus className="h-3 w-3 text-slate-900" />}
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="text-[11px] text-white group-hover:text-primary transition-colors">¿Es obligatorio elegir una opción?</span>
-                                            <span className="text-[9px] text-white/40 italic">El cliente no podrá agregar el producto al carrito sin elegir al menos una.</span>
+                                            <span className="text-[11px] text-slate-900 group-hover:text-primary transition-colors">¿Es obligatorio elegir una opción?</span>
+                                            <span className="text-[9px] text-slate-600 italic">El cliente no podrá agregar el producto al carrito sin elegir al menos una.</span>
                                         </div>
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Máximo de selecciones</label>
+                                        <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Máximo de selecciones</label>
                                         <input
                                             type="number"
                                             min={1}
                                             value={formData.maxSelections}
                                             onChange={(e) => setFormData({ ...formData, maxSelections: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors"
                                             placeholder="Sin límite"
                                         />
-                                        <p className="text-[9px] text-white/20 ml-1 italic">Dejá vacío para sin límite.</p>
+                                        <p className="text-[9px] text-slate-500 ml-1 italic">Dejá vacío para sin límite.</p>
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] uppercase tracking-widest text-white/40 ml-1">Bloquea al complemento</label>
+                                        <label className="text-[10px] uppercase tracking-widest text-slate-600 ml-1">Bloquea al complemento</label>
                                         <select
                                             value={formData.blocksAttributeId}
                                             onChange={(e) => setFormData({ ...formData, blocksAttributeId: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-primary transition-colors"
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-900 focus:outline-none focus:border-primary transition-colors"
                                         >
                                             <option value="">— Ninguno —</option>
                                             {atributos.filter(a => a.isAddon && a.id !== editingId).map(a => (
                                                 <option key={a.id} value={a.id} className="text-black">{a.name}</option>
                                             ))}
                                         </select>
-                                        <p className="text-[9px] text-white/20 ml-1 italic">Si el cliente elige algo aquí, ese complemento se deshabilita.</p>
+                                        <p className="text-[9px] text-slate-500 ml-1 italic">Si el cliente elige algo aquí, ese complemento se deshabilita.</p>
                                     </div>
                                 </>
                             )}
@@ -254,7 +254,7 @@ export default function AtributosPage() {
                                     <button
                                         type="button"
                                         onClick={handleCancelEdit}
-                                        className="w-full bg-white/5 hover:bg-white/10 text-white/60 py-3 rounded-xl text-[12px] font-medium transition-all"
+                                        className="w-full bg-slate-50 hover:bg-slate-50 text-slate-600 py-3 rounded-xl text-[12px] font-medium transition-all"
                                     >
                                         Cancelar edición
                                     </button>
@@ -265,45 +265,45 @@ export default function AtributosPage() {
 
                     {/* Tabla de Atributos */}
                     <div className="lg:col-span-2">
-                        <div className="bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden">
+                        <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden">
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
                                     <thead>
-                                        <tr className="border-b border-white/5 bg-white/[0.02]">
-                                            <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Nombre</th>
-                                            <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Slug</th>
-                                            <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-white/40 font-medium">Términos</th>
+                                        <tr className="border-b border-slate-200 bg-slate-50">
+                                            <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Nombre</th>
+                                            <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Slug</th>
+                                            <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-slate-600 font-medium">Términos</th>
                                             <th className="px-6 py-4 text-right"></th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-white/5">
+                                    <tbody className="divide-y divide-slate-200">
                                         {isLoading ? (
                                             <tr>
-                                                <td colSpan={4} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
+                                                <td colSpan={4} className="px-6 py-12 text-center text-slate-500 text-[11px] uppercase tracking-widest">
                                                     Cargando atributos...
                                                 </td>
                                             </tr>
                                         ) : atributos.length === 0 ? (
                                             <tr>
-                                                <td colSpan={4} className="px-6 py-12 text-center text-white/20 text-[11px] uppercase tracking-widest">
+                                                <td colSpan={4} className="px-6 py-12 text-center text-slate-500 text-[11px] uppercase tracking-widest">
                                                     No hay atributos creados.
                                                 </td>
                                             </tr>
                                         ) : atributos.map((attr) => (
-                                            <tr key={attr.id} className="hover:bg-white/[0.02] transition-colors group">
+                                            <tr key={attr.id} className="hover:bg-slate-50 transition-colors group">
                                                 <td className="px-6 py-6">
                                                     <div className="flex flex-col gap-1">
                                                         <div className="flex items-center gap-2">
-                                                            <span className="text-[13px] font-medium text-primary hover:text-white cursor-pointer transition-colors">
+                                                            <span className="text-[13px] font-medium text-primary hover:text-slate-900 cursor-pointer transition-colors">
                                                                 {attr.name}
                                                             </span>
                                                             {attr.isAddon && (
-                                                                <span className="text-[8px] bg-[#23553d]/40 text-white/80 border border-[#23553d]/50 px-2 py-0.5 rounded-full uppercase font-bold tracking-tighter">
+                                                                <span className="text-[8px] bg-[#23553d]/40 text-slate-900 border border-[#23553d]/50 px-2 py-0.5 rounded-full uppercase font-bold tracking-tighter">
                                                                     Complemento
                                                                 </span>
                                                             )}
                                                             {attr.isAddon && attr.required && (
-                                                                <span className="text-[8px] bg-orange-500/20 text-orange-300 border border-orange-500/40 px-2 py-0.5 rounded-full uppercase font-bold tracking-tighter">
+                                                                <span className="text-[8px] bg-orange-500/20 text-orange-700 border border-orange-500/40 px-2 py-0.5 rounded-full uppercase font-bold tracking-tighter">
                                                                     Obligatorio
                                                                 </span>
                                                             )}
@@ -312,33 +312,33 @@ export default function AtributosPage() {
                                                             <button
                                                                 type="button"
                                                                 onClick={() => handleEdit(attr)}
-                                                                className="text-[10px] text-white/40 hover:text-white flex items-center gap-1 hover:underline"
+                                                                className="text-[10px] text-slate-600 hover:text-slate-900 flex items-center gap-1 hover:underline"
                                                             >
                                                                 <Edit2 className="h-3 w-3" /> Editar
                                                             </button>
                                                             <button
                                                                 onClick={() => handleDelete(attr.id)}
-                                                                className="text-[10px] text-red-400/60 hover:text-red-400 flex items-center gap-1"
+                                                                className="text-[10px] text-red-700/60 hover:text-red-700 flex items-center gap-1"
                                                             >
                                                                 <Trash2 className="h-3 w-3" /> Borrar
                                                             </button>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-6 text-[12px] text-white/60 font-mono tracking-tight">{attr.slug}</td>
+                                                <td className="px-6 py-6 text-[12px] text-slate-600 font-mono tracking-tight">{attr.slug}</td>
                                                 <td className="px-6 py-6">
                                                     <div className="flex flex-wrap gap-1.5">
                                                         {attr.terms ? attr.terms.split(',').map((term: string, idx: number) => (
-                                                            <span key={idx} className="text-[10px] text-white/40 bg-white/5 px-2 py-0.5 rounded-md border border-white/5">
+                                                            <span key={idx} className="text-[10px] text-slate-600 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200">
                                                                 {term.trim()}
                                                             </span>
                                                         )) : (
-                                                            <span className="text-[10px] text-white/20 italic">Sin términos</span>
+                                                            <span className="text-[10px] text-slate-500 italic">Sin términos</span>
                                                         )}
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-6 text-right">
-                                                    <button className="p-2 hover:bg-white/5 rounded-full transition-colors text-white/20 hover:text-white">
+                                                    <button className="p-2 hover:bg-slate-50 rounded-full transition-colors text-slate-500 hover:text-slate-900">
                                                         <MoreVertical className="h-4 w-4" />
                                                     </button>
                                                 </td>
@@ -355,8 +355,8 @@ export default function AtributosPage() {
                                 <Settings2 className="h-5 w-5 text-primary" />
                             </div>
                             <div className="flex flex-col gap-1">
-                                <p className="text-[12px] text-white/90">Uso de Atributos</p>
-                                <p className="text-[11px] text-white/40 leading-relaxed max-w-2xl">
+                                <p className="text-[12px] text-slate-900">Uso de Atributos</p>
+                                <p className="text-[11px] text-slate-600 leading-relaxed max-w-2xl">
                                     Los atributos te permiten definir variaciones de productos.
                                     Ingresa los términos separados por comas. Estos se usarán para generar las variantes de tus productos.
                                 </p>
