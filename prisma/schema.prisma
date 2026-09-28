@@ -223,6 +223,7 @@ model StoreSettings {
   legalBusinessName     String?
   legalCuit             String?
   legalAddress          String?
+  showReturnsNotice     Boolean  @default(true)
 }
 
 model Coupon {

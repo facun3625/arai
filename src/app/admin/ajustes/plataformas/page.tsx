@@ -35,7 +35,8 @@ export default function PlataformasPage() {
         footerLocation: "",
         legalBusinessName: "",
         legalCuit: "",
-        legalAddress: ""
+        legalAddress: "",
+        showReturnsNotice: true
     });
 
     const showToast = (message: string, type: "success" | "error" = "success") => {
@@ -63,7 +64,8 @@ export default function PlataformasPage() {
                         footerLocation: data.footerLocation || "",
                         legalBusinessName: data.legalBusinessName || "",
                         legalCuit: data.legalCuit || "",
-                        legalAddress: data.legalAddress || ""
+                        legalAddress: data.legalAddress || "",
+                        showReturnsNotice: data.showReturnsNotice !== false
                     });
                 }
             } catch (error) {
@@ -265,6 +267,21 @@ export default function PlataformasPage() {
                                         onChange={(e) => setSettings({ ...settings, legalAddress: e.target.value })}
                                         className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 text-[15px] focus:outline-none focus:border-slate-200 focus:bg-white transition-all placeholder:text-slate-500"
                                     />
+                                </div>
+                                <div className="md:col-span-2 flex items-center justify-between bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4">
+                                    <div>
+                                        <p className="text-slate-900 text-sm font-medium">Aviso de arrepentimiento en la ficha de producto</p>
+                                        <p className="text-[11px] text-slate-500 mt-0.5">
+                                            Muestra &quot;10 días para arrepentirte de tu compra&quot; junto al botón de comprar.
+                                        </p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => setSettings({ ...settings, showReturnsNotice: !settings.showReturnsNotice })}
+                                        className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${settings.showReturnsNotice ? "bg-primary" : "bg-slate-300"}`}
+                                    >
+                                        <span className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${settings.showReturnsNotice ? "translate-x-5" : "translate-x-0"}`} />
+                                    </button>
                                 </div>
                             </div>
                         </div>
