@@ -214,7 +214,7 @@ export default function CheckoutPage() {
                     setModoEnabled(!!d.modoEnabled);
                     setPaypalEnabled(!!d.paypalEnabled);
                     setModoMode(d.modoMode === "production" ? "prod" : "preprod");
-                    setFreeShippingThreshold(Number(d.freeShippingThreshold) || 0);
+                    setFreeShippingThreshold(d.freeShippingEnabled !== false ? (Number(d.freeShippingThreshold) || 0) : 0);
                     setOcaEnabled(d.ocaEnabled !== false);
                     setAcordarEnabled(d.acordarEnabled !== false);
                     setWhatsappNumber(d.whatsappNumber || "");

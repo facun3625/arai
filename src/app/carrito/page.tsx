@@ -32,7 +32,7 @@ export default function CarritoPage() {
                 const res = await fetch("/api/settings");
                 if (res.ok) {
                     const data = await res.json();
-                    if (data && data.freeShippingThreshold > 0) {
+                    if (data && data.freeShippingEnabled !== false && data.freeShippingThreshold > 0) {
                         setFreeShippingThreshold(data.freeShippingThreshold);
                     }
                 }

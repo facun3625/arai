@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
 
     const shippingInfo = [
       settings?.ocaEnabled ? "OCA (envío a domicilio y sucursal)" : null,
-      settings?.freeShippingThreshold
+      settings?.freeShippingEnabled !== false && settings?.freeShippingThreshold
         ? `Envío gratis a partir de $${settings.freeShippingThreshold}`
         : null,
     ]

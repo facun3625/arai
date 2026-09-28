@@ -14,6 +14,7 @@ export default function MarketingPage() {
     // Configuración Global
     const [settings, setSettings] = useState({
         freeShippingThreshold: 0,
+        freeShippingEnabled: true,
         bankTransferDiscount: 15,
         pointsEnabled: false,
         pointsRatio: 0.01,
@@ -129,6 +130,7 @@ export default function MarketingPage() {
             if (data && !data.error) {
                 setSettings({
                     freeShippingThreshold: data.freeShippingThreshold || 0,
+                    freeShippingEnabled: data.freeShippingEnabled !== false,
                     bankTransferDiscount: data.bankTransferDiscount || 15,
                     pointsEnabled: data.pointsEnabled || false,
                     pointsRatio: data.pointsRatio || 0.01,
@@ -448,16 +450,26 @@ export default function MarketingPage() {
                         <form onSubmit={handleSaveSettings} className="space-y-8">
 
                             <div className="space-y-4">
-                                <div>
-                                    <h2 className="text-slate-900 text-lg font-medium tracking-tight mb-1 flex items-center gap-2">
-                                        <Truck className="h-5 w-5 text-primary" /> Umbral de Envío Gratis
-                                    </h2>
-                                    <p className="text-[12px] text-slate-600">Si el subtotal del cliente supera este monto, el envío se vuelve gratuito. Ingresa 0 para desactivarlo.</p>
+                                <div className="flex items-center justify-between gap-4">
+                                    <div>
+                                        <h2 className="text-slate-900 text-lg font-medium tracking-tight mb-1 flex items-center gap-2">
+                                            <Truck className="h-5 w-5 text-primary" /> Umbral de Envío Gratis
+                                        </h2>
+                                        <p className="text-[12px] text-slate-600">Si el subtotal del cliente supera este monto, el envío se vuelve gratuito.</p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => setSettings({ ...settings, freeShippingEnabled: !settings.freeShippingEnabled })}
+                                        className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${settings.freeShippingEnabled ? "bg-primary" : "bg-slate-300"}`}
+                                    >
+                                        <span className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${settings.freeShippingEnabled ? "translate-x-5" : "translate-x-0"}`} />
+                                    </button>
                                 </div>
-                                <div className="relative">
+                                <div className={`relative transition-opacity ${!settings.freeShippingEnabled ? "opacity-40 pointer-events-none" : ""}`}>
                                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600">$</span>
                                     <input
                                         type="number"
+                                        disabled={!settings.freeShippingEnabled}
                                         value={settings.freeShippingThreshold}
                                         onChange={(e) => setSettings({ ...settings, freeShippingThreshold: Number(e.target.value) })}
                                         className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-4 py-4 text-[14px] text-slate-900 focus:outline-none focus:border-primary transition-colors font-mono"

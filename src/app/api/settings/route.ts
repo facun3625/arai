@@ -68,6 +68,7 @@ export async function POST(request: Request) {
 
         const updateData: any = {
             ...(body.freeShippingThreshold !== undefined && { freeShippingThreshold: parseNum(body.freeShippingThreshold) }),
+            ...(body.freeShippingEnabled !== undefined && { freeShippingEnabled: !!body.freeShippingEnabled }),
             ...(body.bankTransferDiscount !== undefined && { bankTransferDiscount: parseNum(body.bankTransferDiscount) }),
             ...(body.bankTransferCbu !== undefined && { bankTransferCbu: parseStr(body.bankTransferCbu) }),
             ...(body.bankTransferAlias !== undefined && { bankTransferAlias: parseStr(body.bankTransferAlias) }),

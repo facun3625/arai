@@ -115,7 +115,7 @@ export default function ProductDetailClient() {
                 if (data) {
                     setStoreInfo({
                         bankTransferDiscount: Number(data.bankTransferDiscount) || 0,
-                        freeShippingThreshold: Number(data.freeShippingThreshold) || 0,
+                        freeShippingThreshold: data.freeShippingEnabled !== false ? (Number(data.freeShippingThreshold) || 0) : 0,
                         showReturnsNotice: data.showReturnsNotice !== false,
                     });
                 }

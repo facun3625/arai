@@ -135,6 +135,7 @@ model Review {
 model StoreSettings {
   id                    String   @id @default("global")
   freeShippingThreshold Float    @default(0)
+  freeShippingEnabled   Boolean  @default(true)
   bankTransferDiscount  Float    @default(15)
   bankTransferCbu       String?
   bankTransferAlias     String?
