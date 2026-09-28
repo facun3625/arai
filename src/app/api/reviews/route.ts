@@ -1,3 +1,4 @@
+import { getReviewEligibility } from "@/lib/reviewEligibility";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
@@ -27,6 +28,15 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: "productId requerido" }, { status: 400 });
         }
 
+        if (searchParams.get("eligibility") === "1") {
+            const session = await getServerSession(authOptions);
+            const user = session?.user?.email
+                ? await prisma.user.findUnique({ where: { email: session.user.email }, select: { id: true } })
+                : null;
+            const eligibility = user ? await getReviewEligibility(user.id, productId) : { canReview: false, reason: "LOGIN_REQUIRED" };
+            return NextResponse.json(eligibility, { headers: { "Cache-Control": "private, no-store" } });
+        }
+
         const reviews = await prisma.review.findMany({
             where: { productId, isApproved: true },
             orderBy: { createdAt: "desc" },
@@ -47,11 +57,11 @@ export async function POST(req: Request) {
         const body = await req.json();
         const { productId, rating, comment } = body;
 
-        if (!productId || !rating || !comment?.trim()) {
+        if (typeof productId !== "string" || !productId || typeof comment !== "string" || !comment.trim()) {
             return NextResponse.json({ error: "Faltan datos requeridos" }, { status: 400 });
         }
         const ratingNum = Number(rating);
-        if (isNaN(ratingNum) || ratingNum < 1 || ratingNum > 5) {
+        if (!Number.isInteger(ratingNum) || ratingNum < 1 || ratingNum > 5) {
             return NextResponse.json({ error: "La calificación debe ser entre 1 y 5" }, { status: 400 });
         }
 
@@ -64,34 +74,34 @@ export async function POST(req: Request) {
         const user = await prisma.user.findUnique({ where: { email: userEmail } });
         if (!user) return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
 
-        const existing = await prisma.review.findFirst({ where: { productId, userId: user.id } });
-        if (existing) {
-            return NextResponse.json({ error: "Ya dejaste una reseña para este producto" }, { status: 409 });
-        }
+        return await prisma.$transaction(async (tx) => {
+            const eligibility = await getReviewEligibility(user.id, productId, tx);
+            if (!eligibility.canReview) {
+                return NextResponse.json({
+                    error: eligibility.reason === "ALREADY_REVIEWED"
+                        ? "Ya dejaste una reseña para este producto"
+                        : "Solo podés reseñar productos que compraste con esta cuenta y cuyo pago fue confirmado",
+                }, { status: eligibility.reason === "ALREADY_REVIEWED" ? 409 : 403 });
+            }
 
-        // A review is "verified" when this user has a PAID order that actually contains the product.
-        const verifiedPurchase = await prisma.order.findFirst({
-            where: {
-                userId: user.id,
-                status: "PAID",
-                items: { some: { productId } },
-            },
-        });
+            const review = await tx.review.create({
+                data: {
+                    productId,
+                    userId: user.id,
+                    authorName: `${user.name || ""} ${user.lastName || ""}`.trim() || "Cliente Araí",
+                    rating: ratingNum,
+                    comment: comment.trim(),
+                    isVerified: true,
+                    isApproved: false,
+                },
+            });
 
-        const review = await prisma.review.create({
-            data: {
-                productId,
-                userId: user.id,
-                authorName: `${user.name || ""} ${user.lastName || ""}`.trim() || "Cliente Araí",
-                rating: ratingNum,
-                comment: comment.trim(),
-                isVerified: Boolean(verifiedPurchase),
-                isApproved: false,
-            },
-        });
-
-        return NextResponse.json({ review, message: "¡Gracias! Tu reseña va a publicarse luego de ser revisada." });
+            return NextResponse.json({ review, message: "¡Gracias! Tu reseña va a publicarse luego de ser revisada." });
+        }, { isolationLevel: "Serializable" });
     } catch (error: any) {
+        if (error?.code === "P2034") {
+            return NextResponse.json({ error: "La compra o reseña se actualizó. Recargá la página antes de intentarlo nuevamente." }, { status: 409 });
+        }
         console.error("POST REVIEW ERROR:", error);
         return NextResponse.json({ error: "Error al crear la reseña" }, { status: 500 });
     }

@@ -1,5 +1,6 @@
 "use client";
 
+import { AuthModal } from "@/components/auth/AuthModal";
 import { ProductDescription } from "@/components/product/ProductDescription";
 
 import { useEffect, useState } from "react";
@@ -50,6 +51,23 @@ export default function ProductDetailClient() {
     const [reviewsCount, setReviewsCount] = useState(0);
     const [reviewForm, setReviewForm] = useState({ rating: 5, comment: "" });
     const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+    const [reviewEligibility, setReviewEligibility] = useState<{ canReview: boolean; reason: string; userId: string; productId: string } | null>(null);
+    const [reviewLoginOpen, setReviewLoginOpen] = useState(false);
+    const [reviewSubmitted, setReviewSubmitted] = useState<string | null>(null);
+    const eligibilityMatches = reviewEligibility?.userId === user?.id && reviewEligibility?.productId === product?.id;
+    const canReview = isAuthenticated && eligibilityMatches && reviewEligibility?.canReview && reviewSubmitted !== `${user?.id}:${product?.id}`;
+
+    useEffect(() => {
+        if (!isAuthenticated || !user?.id || !product?.id) return;
+        const controller = new AbortController();
+        fetch(`/api/reviews?productId=${encodeURIComponent(product.id)}&eligibility=1`, { cache: "no-store", signal: controller.signal })
+            .then(response => { if (!response.ok) throw new Error(); return response.json(); })
+            .then(data => setReviewEligibility({ ...data, userId: user.id, productId: product.id }))
+            .catch(() => {
+                if (!controller.signal.aborted) setReviewEligibility({ canReview: false, reason: "ERROR", userId: user.id, productId: product.id });
+            });
+        return () => controller.abort();
+    }, [isAuthenticated, user?.id, product?.id, reviewLoginOpen]);
     const [reviewMessage, setReviewMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
     const fetchReviews = async (productId: string) => {
@@ -66,7 +84,7 @@ export default function ProductDetailClient() {
 
     const handleSubmitReview = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!product) return;
+        if (!product || !canReview || isSubmittingReview) return;
         setIsSubmittingReview(true);
         setReviewMessage(null);
         try {
@@ -79,6 +97,7 @@ export default function ProductDetailClient() {
             if (res.ok) {
                 setReviewMessage({ text: data.message || "¡Gracias por tu reseña!", type: "success" });
                 setReviewForm({ rating: 5, comment: "" });
+                setReviewSubmitted(`${user?.id}:${product.id}`);
             } else {
                 setReviewMessage({ text: data.error || "No pudimos guardar tu reseña.", type: "error" });
             }
@@ -649,6 +668,7 @@ export default function ProductDetailClient() {
                         )}
 
                         {/* Reviews */}
+                        <AuthModal isOpen={reviewLoginOpen} onClose={() => setReviewLoginOpen(false)} />
                         <div id="reseñas" className="pt-8 border-t border-gray-50 space-y-8 scroll-mt-24">
                             <div className="flex items-center justify-between">
                                 <h2 className="text-lg font-medium text-gray-900">Reseñas de clientes</h2>
@@ -691,14 +711,15 @@ export default function ProductDetailClient() {
                                 <p className="text-gray-400 text-[13px]">Este producto todavía no tiene reseñas.</p>
                             )}
 
-                            {isAuthenticated ? (
+                            {canReview ? (
                                 <form onSubmit={handleSubmitReview} className="bg-gray-50/60 border border-gray-100 rounded-2xl p-6 space-y-4">
-                                    <p className="text-[13px] font-medium text-gray-900">Dejá tu reseña</p>
+                                    <p className="text-[13px] font-medium text-gray-900">Dejá tu reseña de esta compra</p>
                                     <div className="flex items-center gap-1">
                                         {Array.from({ length: 5 }).map((_, i) => (
                                             <button
                                                 key={i}
                                                 type="button"
+                                                aria-label={`${i + 1} estrellas`}
                                                 onClick={() => setReviewForm(prev => ({ ...prev, rating: i + 1 }))}
                                                 className="p-0.5"
                                             >
@@ -729,7 +750,19 @@ export default function ProductDetailClient() {
                                 </form>
                             ) : (
                                 <p className="text-[13px] text-gray-400">
-                                    <Link href="/mi-cuenta" className="text-primary underline">Iniciá sesión</Link> para dejar tu reseña.
+                                    {!isAuthenticated || (eligibilityMatches && reviewEligibility?.reason === "LOGIN_REQUIRED") ? (
+                                        <><button type="button" onClick={() => setReviewLoginOpen(true)} className="text-primary underline">Iniciá sesión</button> con la cuenta de tu compra para dejar una reseña.</>
+                                    ) : reviewSubmitted === `${user?.id}:${product?.id}` ? (
+                                        "¡Gracias! Tu reseña fue enviada y está pendiente de revisión."
+                                    ) : !eligibilityMatches ? (
+                                        "Verificando tu compra…"
+                                    ) : reviewEligibility?.reason === "ALREADY_REVIEWED" ? (
+                                        "Ya dejaste una reseña para este producto."
+                                    ) : reviewEligibility?.reason === "ERROR" ? (
+                                        "No pudimos verificar tu compra. Volvé a cargar la página para intentarlo nuevamente."
+                                    ) : (
+                                        "Podés dejar una reseña después de comprar este producto con tu cuenta y de que se confirme el pago."
+                                    )}
                                 </p>
                             )}
                         </div>

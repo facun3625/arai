@@ -29,8 +29,6 @@ function TiendaContent() {
     const [sortBy, setSortBy] = useState<"destacados" | "price_asc" | "price_desc">("destacados");
     const [priceMin, setPriceMin] = useState("");
     const [priceMax, setPriceMax] = useState("");
-    const [selectedWeights, setSelectedWeights] = useState<number[]>([]);
-    const [selectedAttrs, setSelectedAttrs] = useState<Record<string, string[]>>({});
     const [showMobileFilters, setShowMobileFilters] = useState(false);
     const addItem = useCartStore((state) => state.addItem);
     const cartItems = useCartStore((state) => state.items);
@@ -65,7 +63,7 @@ function TiendaContent() {
 
     useEffect(() => {
         const cat = searchParams.get("categoria");
-        if (cat) setSelectedCategory(cat);
+        setSelectedCategory(cat || "todas");
     }, [searchParams]);
 
     useEffect(() => {
@@ -82,42 +80,11 @@ function TiendaContent() {
         return [slug, ...(cat.children || []).map((c: any) => c.slug)];
     };
 
-    // Price/weight/attributes are read from whatever's already on each product - no extra
-    // fetch needed, /api/products already includes variants with their attributes JSON.
+    // Variable products are listed by their lowest available variant price.
     const getProductPrice = (p: any): number => {
         const hasVariations = p.type === "VARIABLE" && p.variants?.length > 0;
         return hasVariations ? Math.min(...p.variants.map((v: any) => v.price)) : p.price;
     };
-
-    const getProductWeights = (p: any): number[] => {
-        const hasVariations = p.type === "VARIABLE" && p.variants?.length > 0;
-        if (hasVariations) {
-            return Array.from(new Set(p.variants.map((v: any) => v.weight).filter((w: any): w is number => w != null)));
-        }
-        return p.weight != null ? [p.weight] : [];
-    };
-
-    const getProductAttrs = (p: any): Record<string, string[]> => {
-        const hasVariations = p.type === "VARIABLE" && p.variants?.length > 0;
-        const result: Record<string, string[]> = {};
-        if (hasVariations) {
-            p.variants.forEach((v: any) => {
-                let attrs: Record<string, string> = {};
-                try {
-                    attrs = typeof v.attributes === "string" ? JSON.parse(v.attributes) : (v.attributes || {});
-                } catch {
-                    attrs = {};
-                }
-                Object.entries(attrs).forEach(([k, val]) => {
-                    if (!result[k]) result[k] = [];
-                    if (!result[k].includes(val as string)) result[k].push(val as string);
-                });
-            });
-        }
-        return result;
-    };
-
-    const formatWeight = (kg: number) => kg < 1 ? `${Math.round(kg * 1000)}g` : `${kg} kg`;
 
     const categorySearchFiltered = (selectedCategory === "todas"
         ? products
@@ -127,58 +94,20 @@ function TiendaContent() {
         })
     ).filter(p => !searchTerm.trim() || p.name.toLowerCase().includes(searchTerm.trim().toLowerCase()));
 
-    // Facet options reflect what's available for the selected category/search, so users never
-    // see a "formato" or "molienda" option that would filter the list down to zero results.
-    const availableWeights = Array.from(new Set(categorySearchFiltered.flatMap(getProductWeights))).sort((a, b) => a - b);
-    const availableAttrs: Record<string, string[]> = {};
-    categorySearchFiltered.forEach(p => {
-        const attrs = getProductAttrs(p);
-        Object.entries(attrs).forEach(([name, values]) => {
-            if (!availableAttrs[name]) availableAttrs[name] = [];
-            values.forEach(v => { if (!availableAttrs[name].includes(v)) availableAttrs[name].push(v); });
-        });
-    });
-
     const priceMinNum = priceMin.trim() ? Number(priceMin) : null;
     const priceMaxNum = priceMax.trim() ? Number(priceMax) : null;
 
-    const hasActiveFilters = Boolean(priceMinNum || priceMaxNum || selectedWeights.length > 0 || Object.values(selectedAttrs).some(v => v.length > 0));
+    const hasActiveFilters = Boolean(priceMin.trim() || priceMax.trim());
 
     const clearFilters = () => {
         setPriceMin("");
         setPriceMax("");
-        setSelectedWeights([]);
-        setSelectedAttrs({});
-    };
-
-    const toggleWeight = (w: number) => {
-        setSelectedWeights(prev => prev.includes(w) ? prev.filter(x => x !== w) : [...prev, w]);
-    };
-
-    const toggleAttrValue = (name: string, value: string) => {
-        setSelectedAttrs(prev => {
-            const current = prev[name] || [];
-            const next = current.includes(value) ? current.filter(v => v !== value) : [...current, value];
-            return { ...prev, [name]: next };
-        });
     };
 
     let filteredProducts = categorySearchFiltered.filter(p => {
         const price = getProductPrice(p);
         if (priceMinNum != null && price < priceMinNum) return false;
         if (priceMaxNum != null && price > priceMaxNum) return false;
-
-        if (selectedWeights.length > 0) {
-            const weights = getProductWeights(p);
-            if (!weights.some(w => selectedWeights.includes(w))) return false;
-        }
-
-        const attrs = getProductAttrs(p);
-        for (const [attrName, values] of Object.entries(selectedAttrs)) {
-            if (values.length === 0) continue;
-            const productValues = attrs[attrName] || [];
-            if (!values.some(v => productValues.includes(v))) return false;
-        }
 
         return true;
     });
@@ -219,79 +148,29 @@ function TiendaContent() {
     const countClass = (slug: string) =>
         `text-[10px] font-medium ${selectedCategory === slug ? "text-white/70 md:text-primary/50" : "text-gray-500"}`;
 
-    const FiltersPanel = () => (
-        <div className="space-y-8">
-            <div>
-                <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Precio</h3>
-                <div className="flex items-center gap-2">
-                    <input
-                        type="number"
-                        min={0}
-                        value={priceMin}
-                        onChange={(e) => setPriceMin(e.target.value)}
-                        placeholder="Desde"
-                        className="w-full bg-gray-50 border border-gray-100 rounded-lg px-3 py-2 text-[12px] text-gray-700 focus:outline-none focus:border-primary/30"
-                    />
-                    <span className="text-gray-300 text-[11px]">-</span>
-                    <input
-                        type="number"
-                        min={0}
-                        value={priceMax}
-                        onChange={(e) => setPriceMax(e.target.value)}
-                        placeholder="Hasta"
-                        className="w-full bg-gray-50 border border-gray-100 rounded-lg px-3 py-2 text-[12px] text-gray-700 focus:outline-none focus:border-primary/30"
-                    />
-                </div>
+    // Keep this as an element: redefining a component here remounts the inputs
+    // on every keystroke and makes the price fields lose focus.
+    const priceFilters = (
+        <div className="space-y-4">
+            <p className="text-xs leading-relaxed text-gray-500">Indicá cuánto querés gastar. Los precios están en pesos argentinos.</p>
+            <div className="grid grid-cols-2 gap-3">
+                <label className="space-y-1.5 text-xs text-gray-600">
+                    <span>Precio mínimo</span>
+                    <input type="number" min={0} inputMode="numeric" value={priceMin}
+                        onChange={e => setPriceMin(e.target.value)} placeholder="$ 0"
+                        className="w-full min-w-0 rounded-lg border-gray-200 bg-white px-3 py-2 text-sm focus:border-primary focus:ring-primary" />
+                </label>
+                <label className="space-y-1.5 text-xs text-gray-600">
+                    <span>Precio máximo</span>
+                    <input type="number" min={0} inputMode="numeric" value={priceMax}
+                        onChange={e => setPriceMax(e.target.value)} placeholder="Sin límite"
+                        className="w-full min-w-0 rounded-lg border-gray-200 bg-white px-3 py-2 text-sm focus:border-primary focus:ring-primary" />
+                </label>
             </div>
-
-            {availableWeights.length > 1 && (
-                <div>
-                    <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Formato</h3>
-                    <div className="flex flex-wrap gap-2">
-                        {availableWeights.map((w) => (
-                            <button
-                                key={w}
-                                onClick={() => toggleWeight(w)}
-                                className={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${selectedWeights.includes(w)
-                                    ? "bg-primary border-primary text-white"
-                                    : "bg-white border-gray-200 text-gray-500 hover:border-primary/30"
-                                    }`}
-                            >
-                                {formatWeight(w)}
-                            </button>
-                        ))}
-                    </div>
-                </div>
+            {priceMinNum !== null && priceMaxNum !== null && priceMinNum > priceMaxNum && (
+                <p role="alert" className="text-xs text-red-700">El precio máximo debe ser mayor o igual al mínimo.</p>
             )}
-
-            {Object.entries(availableAttrs).map(([name, values]) => values.length > 1 && (
-                <div key={name}>
-                    <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 capitalize">{name}</h3>
-                    <div className="flex flex-wrap gap-2">
-                        {values.map((val) => (
-                            <button
-                                key={val}
-                                onClick={() => toggleAttrValue(name, val)}
-                                className={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all capitalize ${(selectedAttrs[name] || []).includes(val)
-                                    ? "bg-primary border-primary text-white"
-                                    : "bg-white border-gray-200 text-gray-500 hover:border-primary/30"
-                                    }`}
-                            >
-                                {val}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            ))}
-
-            {hasActiveFilters && (
-                <button
-                    onClick={clearFilters}
-                    className="text-[11px] font-semibold text-primary underline"
-                >
-                    Limpiar filtros
-                </button>
-            )}
+            {hasActiveFilters && <button type="button" onClick={clearFilters} className="text-xs font-medium text-primary underline">Quitar filtro de precio</button>}
         </div>
     );
 
@@ -344,15 +223,16 @@ function TiendaContent() {
                     {/* Mobile: filters toggle + collapsible panel */}
                     <div className="md:hidden mt-4">
                         <button
+                            aria-expanded={showMobileFilters}
                             onClick={() => setShowMobileFilters(prev => !prev)}
                             className="flex items-center gap-2 text-[11px] font-bold text-gray-500 uppercase tracking-widest"
                         >
                             <SlidersHorizontal className="h-3.5 w-3.5 text-primary/60" />
-                            Filtros {hasActiveFilters && <span className="w-1.5 h-1.5 rounded-full bg-primary" />}
+                            Filtrar por precio {hasActiveFilters && <span className="w-1.5 h-1.5 rounded-full bg-primary" />}
                         </button>
                         {showMobileFilters && (
                             <div className="mt-4 p-4 bg-gray-50/60 rounded-2xl">
-                                <FiltersPanel />
+                                {priceFilters}
                             </div>
                         )}
                     </div>
@@ -398,13 +278,14 @@ function TiendaContent() {
                         })}
                     </ul>
 
-                    <div className="hidden md:block mt-8 pt-8 border-t border-gray-100">
-                        <FiltersPanel />
-                    </div>
+                    <details className="hidden md:block mt-6 border-t border-gray-100 pt-5">
+                        <summary className="cursor-pointer text-sm font-medium text-gray-700">Filtrar por precio{hasActiveFilters ? " · Activo" : ""}</summary>
+                        <div className="mt-4">{priceFilters}</div>
+                    </details>
                 </aside>
 
                 {/* Grid de Productos */}
-                <main className="flex-1">
+                <main className="flex-1 min-w-0">
                     <div className="relative mb-6">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
                         <input
@@ -433,6 +314,22 @@ function TiendaContent() {
                             </select>
                         </div>
                     </div>
+
+                    {hasActiveFilters && (
+                        <div className="mb-5 flex flex-wrap items-center gap-3 text-xs">
+                            <span className="rounded-lg bg-primary/5 px-3 py-2 text-primary">
+                                Precio: {priceMinNum !== null ? `$ ${priceMinNum.toLocaleString("es-AR")}` : "$ 0"} — {priceMaxNum !== null ? `$ ${priceMaxNum.toLocaleString("es-AR")}` : "sin límite"}
+                            </span>
+                            <button type="button" onClick={clearFilters} className="text-gray-600 underline">Quitar</button>
+                        </div>
+                    )}
+                    {filteredProducts.length === 0 && (
+                        <div className="rounded-2xl border border-gray-200 bg-gray-50 px-6 py-12 text-center">
+                            <h2 className="text-base font-medium text-gray-900">No encontramos productos</h2>
+                            <p className="mt-2 text-sm text-gray-500">Probá con otra búsqueda, categoría o rango de precio.</p>
+                            <button type="button" onClick={() => { clearFilters(); setSearchTerm(""); setSelectedCategory("todas"); }} className="mt-5 rounded-full bg-primary px-5 py-2.5 text-sm text-white">Ver todos los productos</button>
+                        </div>
+                    )}
 
                     <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-3 md:gap-x-6 gap-y-6 md:gap-y-8">
                         {filteredProducts.map((product) => {

@@ -19,7 +19,7 @@ export function SessionSync() {
                     name: session.user.name || "",
                     email: session.user.email || "",
                     role: (session.user as any).role || "USER",
-                    provider: 'google'
+                    provider: (session as typeof session & { provider?: string }).provider === 'credentials' ? 'credentials' : 'google'
                 });
             }
         } else if (isAuthenticated && user?.provider === 'google') {

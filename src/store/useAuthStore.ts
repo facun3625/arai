@@ -1,3 +1,4 @@
+import { signOut } from "next-auth/react";
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -25,7 +26,10 @@ export const useAuthStore = create<AuthState>()(
             user: null,
             isAuthenticated: false,
             login: (user) => set({ user, isAuthenticated: true }),
-            logout: () => set({ user: null, isAuthenticated: false }),
+            logout: async () => {
+                await signOut({ redirect: false });
+                set({ user: null, isAuthenticated: false });
+            },
         }),
         {
             name: 'auth-storage',

@@ -1,5 +1,6 @@
 "use client";
 
+import { signIn } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { Mail, Lock, X, User, ArrowRight, Loader2, ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -79,7 +80,16 @@ export const AuthModal = ({ isOpen, onClose, initialView = "login" }: AuthModalP
                 return;
             }
 
-            console.log("Login exitoso:", result.user);
+            const sessionResult = await signIn("credentials", {
+                email: payload.email,
+                password: payload.password,
+                redirect: false,
+            });
+            if (!sessionResult?.ok || sessionResult.error) {
+                setError("No pudimos iniciar la sesión. Intentá ingresar nuevamente.");
+                setIsLoading(false);
+                return;
+            }
             login({ ...result.user, provider: 'credentials' });
             onClose();
             setIsLoading(false);
