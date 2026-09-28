@@ -501,9 +501,8 @@ export default function ProductDetailClient() {
                                 <div className="flex items-start gap-3">
                                     <ShieldCheck className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                                     <p className="text-[12.5px] text-gray-600 leading-relaxed">
-                                        10 días para arrepentirte de tu compra.{" "}
                                         <Link href="/legales/devoluciones" className="text-primary underline">
-                                            Ver cambios y devoluciones
+                                            Políticas de cambios y devoluciones
                                         </Link>.
                                     </p>
                                 </div>
