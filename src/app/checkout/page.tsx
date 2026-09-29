@@ -504,9 +504,12 @@ export default function CheckoutPage() {
         totalDiscount += subtotal * (bankTransferInfo.discount / 100);
     }
 
-    // Shipping cost only counts if not null — a FREE_SHIPPING coupon zeroes it out
+    // Free shipping is automatic once the configured subtotal is reached. Keep the
+    // selected carrier/method so the order still has the information needed for fulfilment.
     const hasFreeShippingCoupon = appliedCoupon?.discountType === 'FREE_SHIPPING';
-    const effectiveShippingCost = hasFreeShippingCoupon ? 0 : (selectedShipping !== null ? selectedShipping : 0);
+    const hasFreeShippingThreshold = freeShippingThreshold > 0 && subtotal >= freeShippingThreshold;
+    const hasFreeShipping = hasFreeShippingCoupon || hasFreeShippingThreshold;
+    const effectiveShippingCost = hasFreeShipping ? 0 : (selectedShipping !== null ? selectedShipping : 0);
     const total = Math.max(0, subtotal + effectiveShippingCost - totalDiscount);
 
     // Discriminated shipping breakdown (envío + IVA) for OCA methods — sucursal is priced
@@ -1154,7 +1157,14 @@ export default function CheckoutPage() {
                                                                                 <p className="text-xs text-gray-500 mt-1">Llega en aprox. {ocaQuote.deliveryDays} días hábiles</p>
                                                                             </div>
                                                                         </div>
-                                                                        <span className="font-medium text-gray-900">$ {ocaQuote.price.toLocaleString('es-AR')}</span>
+                                                                        {hasFreeShipping ? (
+                                                                            <span className="font-medium text-primary flex items-center gap-2">
+                                                                                <span className="line-through text-gray-300 font-normal">$ {ocaQuote.price.toLocaleString('es-AR')}</span>
+                                                                                Gratis
+                                                                            </span>
+                                                                        ) : (
+                                                                            <span className="font-medium text-gray-900">$ {ocaQuote.price.toLocaleString('es-AR')}</span>
+                                                                        )}
                                                                     </div>
                                                                 </label>
                                                             )}
@@ -1179,7 +1189,14 @@ export default function CheckoutPage() {
                                                                                 <p className="text-xs text-gray-500 mt-1">Más económico y rápido</p>
                                                                             </div>
                                                                         </div>
-                                                                        <span className="font-medium text-gray-900">$ {(ocaQuote?.price ? ocaQuote.price * 0.7 : 3500).toLocaleString('es-AR')}</span>
+                                                                        {hasFreeShipping ? (
+                                                                            <span className="font-medium text-primary flex items-center gap-2">
+                                                                                <span className="line-through text-gray-300 font-normal">$ {(ocaQuote?.price ? ocaQuote.price * 0.7 : 3500).toLocaleString('es-AR')}</span>
+                                                                                Gratis
+                                                                            </span>
+                                                                        ) : (
+                                                                            <span className="font-medium text-gray-900">$ {(ocaQuote?.price ? ocaQuote.price * 0.7 : 3500).toLocaleString('es-AR')}</span>
+                                                                        )}
                                                                     </label>
 
                                                                     {selectedShippingMethod === 'oca_sucursal' && (
@@ -1233,30 +1250,19 @@ export default function CheckoutPage() {
                                                         </label>
                                                     )}
 
-                                                    {freeShippingThreshold > 0 && subtotal >= freeShippingThreshold && activeRestriction?.type !== 'BLOCK_SHIPPING' && (
-                                                        <label className={`block border ${selectedShippingMethod === 'gratis' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-gray-200 bg-white hover:border-gray-300'} rounded-2xl p-5 cursor-pointer transition-all relative overflow-hidden`}>
+                                                    {hasFreeShippingThreshold && activeRestriction?.type !== 'BLOCK_SHIPPING' && (
+                                                        <div className="block border border-primary/30 bg-primary/5 rounded-2xl p-5 relative overflow-hidden">
                                                             <div className="absolute top-0 left-0 w-1 h-full bg-primary"></div>
                                                             <div className="flex items-center justify-between pl-3">
                                                                 <div className="flex items-center gap-4">
-                                                                    <input
-                                                                        type="radio"
-                                                                        name="shipping"
-                                                                        checked={selectedShippingMethod === 'gratis'}
-                                                                        onChange={() => {
-                                                                            setSelectedShippingMethod('gratis');
-                                                                            setSelectedShipping(0);
-                                                                            setSelectedBranchId(null);
-                                                                        }}
-                                                                        className="w-5 h-5 text-primary border-gray-300 focus:ring-primary"
-                                                                    />
                                                                     <div>
-                                                                        <p className="font-medium text-primary text-sm flex items-center gap-2">Envío Gratuito Promocional</p>
-                                                                        <p className="text-xs text-gray-500 mt-1">Bonificado por superar los ${freeShippingThreshold.toLocaleString("es-AR")}</p>
+                                                                        <p className="font-medium text-primary text-sm">Envío gratuito desbloqueado</p>
+                                                                        <p className="text-xs text-gray-500 mt-1">Se aplica automáticamente por superar los ${freeShippingThreshold.toLocaleString("es-AR")}</p>
                                                                     </div>
                                                                 </div>
                                                                 <span className="font-bold text-primary uppercase text-xs tracking-widest">Gratis</span>
                                                             </div>
-                                                        </label>
+                                                        </div>
                                                     )}
                                                     {ocaEnabled && (!ocaQuote && !ocaBranches.length && !isCalculatingShipping) && activeRestriction?.type !== 'BLOCK_SHIPPING' && (
                                                         <div className="p-6 bg-amber-50 rounded-2xl border border-amber-100 text-center">
@@ -1633,7 +1639,7 @@ export default function CheckoutPage() {
                                     <span className="text-gray-500">Costo de envío</span>
                                     <span className="text-xs text-primary animate-pulse font-medium">calculando...</span>
                                 </div>
-                            ) : shippingBreakdown && !hasFreeShippingCoupon ? (
+                            ) : shippingBreakdown && !hasFreeShipping ? (
                                 <div className="space-y-1.5">
                                     <div className="flex justify-between items-center text-sm">
                                         <span className="text-gray-500">Envío</span>
@@ -1652,7 +1658,7 @@ export default function CheckoutPage() {
                                 <div className="flex justify-between items-center text-sm">
                                     <span className="text-gray-500">Costo de envío</span>
                                     {(ocaQuote || selectedShipping !== null) ? (
-                                        hasFreeShippingCoupon ? (
+                                        hasFreeShipping ? (
                                             <span className="font-medium text-primary flex items-center gap-1.5">
                                                 <span className="line-through text-gray-300 font-normal">$ {(shippingBreakdown?.total ?? selectedShipping ?? ocaQuote?.price ?? 0).toLocaleString('es-AR')}</span>
                                                 Gratis

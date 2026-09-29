@@ -132,7 +132,14 @@ export async function POST(request: Request) {
             const categoryDiscountTotal = categoryPromo.discount + categoryPercent.discount;
             const finalDiscount = Math.max(Number(discount) || 0, categoryDiscountTotal);
             const finalSubtotal = Number(subtotal);
-            const finalShippingCost = Number(shippingCost);
+            const settings = await tx.storeSettings.findUnique({
+                where: { id: 'global' },
+                select: { freeShippingEnabled: true, freeShippingThreshold: true }
+            });
+            const qualifiesForFreeShipping = settings?.freeShippingEnabled !== false
+                && Number(settings?.freeShippingThreshold) > 0
+                && finalSubtotal >= Number(settings?.freeShippingThreshold);
+            const finalShippingCost = qualifiesForFreeShipping ? 0 : Number(shippingCost);
             const finalTotal = Math.max(0, finalSubtotal + finalShippingCost - finalDiscount);
 
             const newOrder = await tx.order.create({
